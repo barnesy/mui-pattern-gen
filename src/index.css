@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+  Tailwind + MUI Integration
+  -------------------------
+  These styles complement MUI's theming system without overriding it.
+  We only add enhancements that MUI doesn't provide out of the box.
+*/
+
+@layer components {
+  /* Enhanced transitions and animations for MUI components */
+  .MuiButton-root {
+    @apply transition-all duration-200;
+  }
+  
+  .MuiChip-clickable:hover {
+    @apply -translate-y-0.5;
+  }
+  
+  /* Focus ring enhancements (complementary to MUI) */
+  .MuiOutlinedInput-root.Mui-focused {
+    @apply ring-2 ring-blue-500/20;
+  }
+}
+
+/* Custom utility classes for use alongside MUI */
+@layer utilities {
+  /* Layout utilities */
+  .mui-container {
+    @apply container mx-auto px-4;
+  }
+  
+  /* Gradient utilities for custom use */
+  .gradient-primary {
+    @apply bg-gradient-to-r from-blue-500 to-blue-600;
+  }
+  
+  .gradient-secondary {
+    @apply bg-gradient-to-r from-pink-500 to-pink-600;
+  }
+  
+  /* Animation utilities */
+  .animate-fade-in {
+    @apply animate-[fadeIn_0.3s_ease-in-out];
+  }
+  
+  @keyframes fadeIn {
+    from { @apply opacity-0; }
+    to { @apply opacity-100; }
+  }
+  
+  /* Responsive spacing utilities */
+  .section-spacing {
+    @apply py-8 md:py-12 lg:py-16;
+  }
+}
