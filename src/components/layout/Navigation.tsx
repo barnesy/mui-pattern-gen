@@ -11,6 +11,7 @@ import {
   Home as HomeIcon,
   Dashboard as DashboardIcon,
   Palette as PaletteIcon,
+  Edit as EditIcon,
 } from '@mui/icons-material';
 
 interface NavigationItem {
@@ -25,8 +26,9 @@ interface NavigationProps {
 
 const navigationItems: NavigationItem[] = [
   { text: 'Home', path: '/', icon: <HomeIcon /> },
-  { text: 'Component Showcase', path: '/components', icon: <DashboardIcon /> },
-  { text: 'Theme Viewer', path: '/theme', icon: <PaletteIcon /> },
+  { text: 'Editor', path: '/theme-editor', icon: <EditIcon /> },
+  { text: 'Theme', path: '/theme', icon: <PaletteIcon /> },
+  { text: 'Components', path: '/components', icon: <DashboardIcon /> },
 ];
 
 export const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {

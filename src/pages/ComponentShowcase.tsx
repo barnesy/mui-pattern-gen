@@ -45,7 +45,7 @@ export const ComponentShowcase: React.FC = () => {
   return (
     <Box>
       <Typography variant="h3" gutterBottom>
-        Component Showcase
+        Foundation Components
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
         Various variants, states, and configurations organized by category

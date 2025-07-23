@@ -33,6 +33,16 @@ body {
   }
 }
 
+/* Density mode transitions */
+[data-density] * {
+  transition: padding 0.2s ease-in-out, 
+              margin 0.2s ease-in-out, 
+              gap 0.2s ease-in-out,
+              font-size 0.2s ease-in-out,
+              width 0.2s ease-in-out,
+              height 0.2s ease-in-out;
+}
+
 /* Custom utility classes for use alongside MUI */
 @layer utilities {
   /* Layout utilities */

@@ -24,6 +24,7 @@ import {
   ToggleButtonGroup,
 } from '@mui/material';
 import { Send as SendIcon } from '@mui/icons-material';
+import { useDensitySpacing } from '../../contexts/DensityModeContext';
 
 export const InputShowcase: React.FC = () => {
   const [radioValue, setRadioValue] = React.useState('option1');
@@ -31,6 +32,8 @@ export const InputShowcase: React.FC = () => {
   const [sliderValue, setSliderValue] = React.useState(30);
   const [toggleValue, setToggleValue] = React.useState('left');
   const [ratingValue, setRatingValue] = React.useState(3);
+
+  const { gapNormal, paddingNormal, gapDense } = useDensitySpacing();
 
   const autocompleteOptions = ['Option 1', 'Option 2', 'Option 3'];
 
@@ -40,13 +43,13 @@ export const InputShowcase: React.FC = () => {
         Input Components
       </Typography>
 
-      <Grid container spacing={{ xs: 2, sm: 3 }}>
+      <Grid container spacing={gapNormal}>
         <Grid item xs={12} md={6} lg={4}>
-          <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+          <Paper sx={{ p: paddingNormal }}>
             <Typography variant="h6" gutterBottom>
               Text Fields
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: gapDense }}>
               <TextField label="Standard" variant="standard" />
               <TextField label="Outlined" variant="outlined" />
               <TextField label="Filled" variant="filled" />
@@ -59,11 +62,11 @@ export const InputShowcase: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={6} lg={4}>
-          <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+          <Paper sx={{ p: paddingNormal }}>
             <Typography variant="h6" gutterBottom>
               Buttons
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: gapDense }}>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                 <Button variant="text">Text</Button>
                 <Button variant="contained">Contained</Button>
@@ -94,11 +97,11 @@ export const InputShowcase: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={6} lg={4}>
-          <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+          <Paper sx={{ p: paddingNormal }}>
             <Typography variant="h6" gutterBottom>
               Selection Controls
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: gapDense }}>
               <Box>
                 <FormControlLabel control={<Checkbox defaultChecked />} label="Checkbox" />
                 <FormControlLabel control={<Checkbox />} label="Unchecked" />
@@ -123,11 +126,11 @@ export const InputShowcase: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={6} lg={4}>
-          <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+          <Paper sx={{ p: paddingNormal }}>
             <Typography variant="h6" gutterBottom>
               Select & Autocomplete
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: gapDense }}>
               <FormControl fullWidth>
                 <InputLabel>Select</InputLabel>
                 <Select
@@ -150,11 +153,11 @@ export const InputShowcase: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={6} lg={4}>
-          <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+          <Paper sx={{ p: paddingNormal }}>
             <Typography variant="h6" gutterBottom>
               Slider & Rating
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: gapNormal }}>
               <Box>
                 <Typography gutterBottom>Slider</Typography>
                 <Slider
@@ -176,7 +179,7 @@ export const InputShowcase: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={6} lg={4}>
-          <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+          <Paper sx={{ p: paddingNormal }}>
             <Typography variant="h6" gutterBottom>
               Toggle Buttons
             </Typography>

@@ -133,19 +133,6 @@ export const BorderRadiusDebug: React.FC = () => {
           })}
         </TableBody>
       </Table>
-
-      <Box sx={{ mt: 4, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
-        <Typography variant="body2" gutterBottom>
-          <strong>Debug Info:</strong>
-        </Typography>
-        <Typography variant="caption" component="pre" sx={{ fontFamily: 'monospace' }}>
-          {JSON.stringify({
-            'theme.shape.borderRadius': theme.shape.borderRadius,
-            'typeof borderRadius': typeof theme.shape.borderRadius,
-            'theme.shape': theme.shape,
-          }, null, 2)}
-        </Typography>
-      </Box>
     </Box>
   );
 };
