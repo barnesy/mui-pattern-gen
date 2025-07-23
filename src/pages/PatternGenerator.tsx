@@ -382,6 +382,9 @@ export const PatternGenerator: React.FC = () => {
           fullScreen
           open={isFullscreen}
           onClose={() => setIsFullscreen(false)}
+          sx={{
+            zIndex: 10000, // Higher than Debug panel (9999) and AI overlay (9999)
+          }}
           TransitionProps={{
             onEntered: () => {
               // Ensure iframe resizes after dialog animation

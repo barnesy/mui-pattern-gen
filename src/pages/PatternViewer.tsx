@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -21,6 +21,8 @@ import {
   useTheme,
   alpha,
   Divider,
+  useMediaQuery,
+  Modal,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -35,6 +37,7 @@ import {
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { IframePreview } from '../components/patterns/IframePreview';
+import { PatternPropsPanel, PropControl } from '../components/patterns/PatternPropsPanel';
 
 interface Pattern {
   name: string;
@@ -68,6 +71,8 @@ const devicePresets: DevicePreset[] = [
 
 export const PatternViewer: React.FC = () => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
   const [patterns, setPatterns] = useState<Pattern[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -80,6 +85,21 @@ export const PatternViewer: React.FC = () => {
   const [previewWidth, setPreviewWidth] = useState<number>(1200);
   const [selectedVariant, setSelectedVariant] = useState<string>('default');
   const [variantOptions, setVariantOptions] = useState<Array<{ label: string; value: string }>>([]);
+  const [patternConfig, setPatternConfig] = useState<PropControl[]>([]);
+  const [componentProps, setComponentProps] = useState<Record<string, any>>({});
+  const [configLoading, setConfigLoading] = useState(false);
+
+  // Handle Escape key to close preview
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && selectedPattern) {
+        setSelectedPattern(null);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedPattern]);
 
   // Load patterns from file system
   useEffect(() => {
@@ -172,38 +192,48 @@ export const PatternViewer: React.FC = () => {
     setSelectedPattern(pattern);
     setSelectedVariant('default');
     setVariantOptions([]);
+    setConfigLoading(true);
+    setPatternConfig([]);
+    setComponentProps({});
     
-    // Try to load pattern config to get variants
+    // Try to load pattern config
     try {
       const configPath = pattern.status === 'pending'
-        ? `/src/patterns/pending/${pattern.name}.config.ts`
-        : `/src/patterns/${pattern.category}/${pattern.name}.config.ts`;
+        ? `../patterns/pending/${pattern.name}.config`
+        : `../patterns/${pattern.category}/${pattern.name}.config`;
       
-      const response = await fetch(configPath);
-      if (response.ok) {
-        const configText = await response.text();
+      try {
+        const configModule = await import(configPath);
+        const controlsKey = `${pattern.name.charAt(0).toLowerCase() + pattern.name.slice(1)}Controls`;
+        const controls = configModule[controlsKey] || [];
+        setPatternConfig(controls);
         
-        // Extract variant options from config (simple regex approach)
-        const variantMatch = configText.match(/type:\s*['"]variant['"]/i);
-        if (variantMatch) {
-          // Look for options array after variant type
-          const optionsMatch = configText.match(/options:\s*\[((?:[^\[\]]|\[[^\]]*\])*?)\]/s);
-          if (optionsMatch) {
-            // Parse the options array
-            const optionsStr = optionsMatch[1];
-            const optionMatches = optionsStr.matchAll(/\{\s*label:\s*['"]([^'"]+)['"],\s*value:\s*['"]([^'"]+)['"]/g);
-            const options = Array.from(optionMatches).map(match => ({
-              label: match[1],
-              value: match[2]
-            }));
-            if (options.length > 0) {
-              setVariantOptions(options);
-            }
+        // Initialize props with defaults
+        const defaults: Record<string, any> = {};
+        controls.forEach((control: PropControl) => {
+          if (control.defaultValue !== undefined) {
+            defaults[control.name] = control.defaultValue;
+          }
+        });
+        setComponentProps(defaults);
+        
+        // Extract variant options
+        const variantControl = controls.find((c: PropControl) => c.type === 'variant');
+        if (variantControl && variantControl.options) {
+          setVariantOptions(variantControl.options);
+          if (variantControl.defaultValue) {
+            setSelectedVariant(variantControl.defaultValue);
           }
         }
+      } catch (importError) {
+        // Config doesn't exist, but that's okay
+        console.log('No config file found for pattern:', pattern.name);
+        setPatternConfig([]);
       }
     } catch (error) {
-      console.log('No config file found for pattern:', pattern.name);
+      console.error('Error loading pattern config:', error);
+    } finally {
+      setConfigLoading(false);
     }
   };
 
@@ -216,6 +246,29 @@ export const PatternViewer: React.FC = () => {
       }
     }
   };
+
+  const handlePropChange = useCallback((name: string, value: any) => {
+    setComponentProps(prev => ({ ...prev, [name]: value }));
+    // Update variant if it's the variant control
+    if (name === 'variant') {
+      setSelectedVariant(value);
+    }
+  }, []);
+
+  const handleResetProps = useCallback(() => {
+    const defaults: Record<string, any> = {};
+    patternConfig.forEach((control) => {
+      if (control.defaultValue !== undefined) {
+        defaults[control.name] = control.defaultValue;
+      }
+    });
+    setComponentProps(defaults);
+    // Reset variant
+    const variantControl = patternConfig.find(c => c.type === 'variant');
+    if (variantControl && variantControl.defaultValue) {
+      setSelectedVariant(variantControl.defaultValue);
+    }
+  }, [patternConfig]);
 
   const PatternCard = ({ pattern }: { pattern: Pattern }) => (
     <Card 
@@ -415,42 +468,68 @@ export const PatternViewer: React.FC = () => {
         </Grid>
       )}
 
-      {/* Pattern Preview Dialog */}
-      {selectedPattern && (
-        <Paper
+      {/* Pattern Preview Modal */}
+      <Modal
+        open={!!selectedPattern}
+        onClose={() => setSelectedPattern(null)}
+        sx={{
+          zIndex: 10000, // Ensure it's on top of everything
+        }}
+      >
+        {selectedPattern ? (
+          <Paper
           sx={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '90%',
-            maxWidth: 1400,
-            maxHeight: '90vh',
-            overflow: 'auto',
-            p: 3,
-            zIndex: theme.zIndex.modal,
-            boxShadow: theme.shadows[24],
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
+            p: 0,
+            borderRadius: 0, // Remove rounded corners for fullscreen
+            display: 'flex',
+            flexDirection: 'column',
+            outline: 'none', // Remove focus outline from modal
           }}
         >
-          <Stack spacing={2}>
+          {/* Header */}
+          <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <Typography variant="h5">{selectedPattern.name} Preview</Typography>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <Typography variant="h5">{selectedPattern.name}</Typography>
+                <Chip
+                  label={selectedPattern.category}
+                  size="small"
+                  color={categories.find(c => c.id === selectedPattern.category)?.color as any || 'default'}
+                />
+                <Chip
+                  icon={selectedPattern.status === 'pending' ? <PendingIcon /> : <CheckIcon />}
+                  label={selectedPattern.status}
+                  size="small"
+                  color={selectedPattern.status === 'pending' ? 'warning' : 'success'}
+                  variant="outlined"
+                />
+              </Stack>
               <Stack direction="row" spacing={2} alignItems="center">
-                {variantOptions.length > 0 && (
-                  <ToggleButtonGroup
-                    value={selectedVariant}
-                    exclusive
-                    onChange={(_, value) => value && setSelectedVariant(value)}
-                    size="small"
-                  >
-                    {variantOptions.map((variant) => (
-                      <ToggleButton key={variant.value} value={variant.value}>
-                        {variant.label}
-                      </ToggleButton>
-                    ))}
-                  </ToggleButtonGroup>
+                {!isMobile && variantOptions.length > 0 && (
+                  <>
+                    <ToggleButtonGroup
+                      value={selectedVariant}
+                      exclusive
+                      onChange={(_, value) => value && setSelectedVariant(value)}
+                      size="small"
+                    >
+                      {variantOptions.map((variant) => (
+                        <ToggleButton key={variant.value} value={variant.value}>
+                          {variant.label}
+                        </ToggleButton>
+                      ))}
+                    </ToggleButtonGroup>
+                    <Divider orientation="vertical" flexItem />
+                  </>
                 )}
-                {variantOptions.length > 0 && <Divider orientation="vertical" flexItem />}
                 <ToggleButtonGroup
                   value={previewDevice}
                   exclusive
@@ -466,20 +545,67 @@ export const PatternViewer: React.FC = () => {
                 <Button 
                   onClick={() => setSelectedPattern(null)}
                   startIcon={<CloseIcon />}
+                  variant="outlined"
                 >
                   Close
                 </Button>
               </Stack>
             </Stack>
-            <Divider />
+          </Box>
+
+          {/* Content */}
+          <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex' }}>
+            {/* Props Panel - Show only if config exists */}
+            {patternConfig.length > 0 && (
+              <Box
+                sx={{
+                  width: isMobile ? '100%' : isTablet ? '40%' : '30%',
+                  borderRight: isMobile ? 0 : 1,
+                  borderColor: 'divider',
+                  overflow: 'auto',
+                  display: isMobile ? 'none' : 'block', // Hide on mobile, show bottom sheet instead
+                }}
+              >
+                <PatternPropsPanel
+                  controls={patternConfig}
+                  values={componentProps}
+                  onChange={handlePropChange}
+                  onReset={handleResetProps}
+                />
+              </Box>
+            )}
+
+            {/* Preview Area */}
             <Box 
               sx={{ 
+                flex: 1,
+                overflow: 'auto',
+                bgcolor: 'background.default',
+                p: 3,
                 display: 'flex',
-                justifyContent: 'center',
-                py: 2,
-                minHeight: 400,
+                flexDirection: 'column',
+                alignItems: 'center',
               }}
             >
+              {/* Mobile variant selector */}
+              {isMobile && variantOptions.length > 0 && (
+                <Box sx={{ width: '100%', mb: 2 }}>
+                  <ToggleButtonGroup
+                    value={selectedVariant}
+                    exclusive
+                    onChange={(_, value) => value && setSelectedVariant(value)}
+                    size="small"
+                    fullWidth
+                  >
+                    {variantOptions.map((variant) => (
+                      <ToggleButton key={variant.value} value={variant.value}>
+                        {variant.label}
+                      </ToggleButton>
+                    ))}
+                  </ToggleButtonGroup>
+                </Box>
+              )}
+
               <Box
                 sx={{ 
                   width: '100%',
@@ -488,11 +614,12 @@ export const PatternViewer: React.FC = () => {
                   border: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
                   borderRadius: 1,
                   overflow: 'hidden',
+                  bgcolor: 'background.paper',
                 }}
               >
                 <IframePreview
                   componentName={selectedPattern.name}
-                  componentProps={{ variant: selectedVariant }}
+                  componentProps={componentProps}
                   theme={theme.palette.mode}
                   width="100%"
                   componentPath={selectedPattern.status === 'pending' 
@@ -502,9 +629,37 @@ export const PatternViewer: React.FC = () => {
                 />
               </Box>
             </Box>
-          </Stack>
+          </Box>
+
+          {/* Mobile Props Bottom Sheet */}
+          {isMobile && patternConfig.length > 0 && (
+            <Paper
+              sx={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                maxHeight: '50vh',
+                overflow: 'auto',
+                borderTop: 1,
+                borderColor: 'divider',
+                borderRadius: '16px 16px 0 0',
+              }}
+              elevation={8}
+            >
+              <PatternPropsPanel
+                controls={patternConfig}
+                values={componentProps}
+                onChange={handlePropChange}
+                onReset={handleResetProps}
+              />
+            </Paper>
+          )}
         </Paper>
-      )}
+        ) : (
+          <Box /> // Empty box as Modal requires a single child
+        )}
+      </Modal>
     </Box>
   );
 };
