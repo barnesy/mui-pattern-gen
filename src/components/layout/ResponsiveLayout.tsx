@@ -17,6 +17,7 @@ import {
   Brightness7 as LightModeIcon,
 } from '@mui/icons-material';
 import { Navigation } from './Navigation';
+import { AIDesignModeToggle } from '../AIDesignMode/AIDesignModeToggle';
 
 interface ResponsiveLayoutProps {
   toggleColorMode: () => void;
@@ -59,6 +60,7 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ toggleColorM
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             MUI Pattern Generator
           </Typography>
+          <AIDesignModeToggle variant="icon" />
           <IconButton
             color="inherit"
             onClick={toggleColorMode}
@@ -112,6 +114,7 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ toggleColorM
           width: { xs: '100%', md: `calc(100% - ${DRAWER_WIDTH}px)` },
           minHeight: '100vh',
           bgcolor: 'background.default',
+          color: 'text.primary',
         }}
       >
         <Toolbar />

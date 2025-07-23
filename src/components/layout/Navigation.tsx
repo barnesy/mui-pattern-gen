@@ -6,8 +6,6 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Toolbar,
-  Divider,
 } from '@mui/material';
 import {
   Home as HomeIcon,
@@ -35,24 +33,20 @@ export const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
   const location = useLocation();
 
   return (
-    <>
-      <Toolbar />
-      <Divider />
-      <List>
-        {navigationItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton
-              component={Link}
-              to={item.path}
-              selected={location.pathname === item.path}
-              onClick={onItemClick}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </>
+    <List>
+      {navigationItems.map((item) => (
+        <ListItem key={item.text} disablePadding>
+          <ListItemButton
+            component={Link}
+            to={item.path}
+            selected={location.pathname === item.path}
+            onClick={onItemClick}
+          >
+            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.text} />
+          </ListItemButton>
+        </ListItem>
+      ))}
+    </List>
   );
 };

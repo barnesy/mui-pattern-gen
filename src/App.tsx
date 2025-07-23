@@ -1,11 +1,13 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, PaletteMode } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
+import { PaletteMode } from '@mui/material';
+import { AIDesignThemeProvider } from './providers/AIDesignThemeProvider';
 import { ResponsiveLayout } from './components/layout/ResponsiveLayout';
 import { Home } from './pages/Home';
 import { ComponentShowcase } from './pages/ComponentShowcase';
 import { ThemeViewer } from './pages/ThemeViewer';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { theme as baseTheme } from './theme/theme';
 import { darkPalette } from './theme';
 
@@ -44,21 +46,22 @@ function App() {
   }, [mode]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={<ResponsiveLayout toggleColorMode={toggleColorMode} isDarkMode={mode === 'dark'} />}
-          >
-            <Route index element={<Home />} />
-            <Route path="components" element={<ComponentShowcase />} />
-            <Route path="theme" element={<ThemeViewer />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <AIDesignThemeProvider theme={theme}>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={<ResponsiveLayout toggleColorMode={toggleColorMode} isDarkMode={mode === 'dark'} />}
+            >
+              <Route index element={<Home />} />
+              <Route path="components" element={<ComponentShowcase />} />
+              <Route path="theme" element={<ThemeViewer />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AIDesignThemeProvider>
+    </ErrorBoundary>
   );
 }
 

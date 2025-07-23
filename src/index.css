@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Reset body styles to ensure MUI theme takes precedence */
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: transparent;
+}
+
 /* 
   Tailwind + MUI Integration
   -------------------------
@@ -16,7 +24,7 @@
   }
   
   .MuiChip-clickable:hover {
-    @apply -translate-y-0.5;
+    transform: translateY(-2px);
   }
   
   /* Focus ring enhancements (complementary to MUI) */
@@ -47,8 +55,8 @@
   }
   
   @keyframes fadeIn {
-    from { @apply opacity-0; }
-    to { @apply opacity-100; }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
   
   /* Responsive spacing utilities */

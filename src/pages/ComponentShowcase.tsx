@@ -11,7 +11,6 @@ import { FeedbackShowcase } from '../components/showcase/FeedbackShowcase';
 import { NavigationShowcase } from '../components/showcase/NavigationShowcase';
 import { SurfaceShowcase } from '../components/showcase/SurfaceShowcase';
 import { TailwindMUIBestPractices } from '../components/showcase/TailwindMUIBestPractices';
-import { BorderRadiusTest } from '../components/showcase/BorderRadiusTest';
 import { BorderRadiusDebug } from '../components/showcase/BorderRadiusDebug';
 
 interface TabPanelProps {
@@ -49,8 +48,7 @@ export const ComponentShowcase: React.FC = () => {
         Component Showcase
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        Explore all Material-UI components organized by category. Each section demonstrates
-        various component variants, states, and configurations.
+        Various variants, states, and configurations organized by category
       </Typography>
       
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
