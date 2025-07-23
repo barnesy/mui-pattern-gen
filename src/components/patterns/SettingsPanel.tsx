@@ -72,6 +72,18 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               value={value ?? control.defaultValue ?? ''}
               label={control.label}
               onChange={(e) => onChange(control.name, e.target.value)}
+              MenuProps={{
+                // Ensure dropdown appears above modal
+                style: { zIndex: 10001 },
+                anchorOrigin: {
+                  vertical: 'bottom',
+                  horizontal: 'left',
+                },
+                transformOrigin: {
+                  vertical: 'top',
+                  horizontal: 'left',
+                },
+              }}
             >
               {control.options?.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
