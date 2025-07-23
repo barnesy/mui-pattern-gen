@@ -25,9 +25,7 @@ import {
   Tablet,
   Computer,
   Fullscreen,
-  FullscreenExit,
-  LightMode,
-  DarkMode
+  FullscreenExit
 } from '@mui/icons-material';
 import { PatternPropsPanel, PropControl } from '../components/patterns/PatternPropsPanel';
 import { IframePreview } from '../components/patterns/IframePreview';
@@ -59,7 +57,6 @@ export const PatternGenerator: React.FC = () => {
   const [previewDevice, setPreviewDevice] = useState<string>('Desktop');
   const [previewWidth, setPreviewWidth] = useState<number>(1200);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [previewTheme, setPreviewTheme] = useState<'light' | 'dark'>(theme.palette.mode as 'light' | 'dark');
   
   // Track initialization state
   const [isInitialized, setIsInitialized] = useState(false);
@@ -246,7 +243,7 @@ export const PatternGenerator: React.FC = () => {
       <IframePreview
         componentName={context.current}
         componentProps={componentProps}
-        theme={previewTheme}
+        theme={theme.palette.mode}
         width="100%"
         isFullscreen={isFullscreen}
       />
@@ -331,16 +328,6 @@ export const PatternGenerator: React.FC = () => {
                       ))}
                     </ToggleButtonGroup>
 
-                    {/* Theme Toggle */}
-                    <Tooltip title={`Switch to ${previewTheme === 'light' ? 'dark' : 'light'} mode`}>
-                      <IconButton
-                        size="small"
-                        onClick={() => setPreviewTheme(prev => prev === 'light' ? 'dark' : 'light')}
-                      >
-                        {previewTheme === 'light' ? <DarkMode /> : <LightMode />}
-                      </IconButton>
-                    </Tooltip>
-
                     {/* Fullscreen Toggle */}
                     <Tooltip title="Fullscreen">
                       <IconButton
@@ -357,10 +344,20 @@ export const PatternGenerator: React.FC = () => {
               <Box
                 sx={{
                   flex: 1,
-                  bgcolor: previewTheme === 'dark' ? 'grey.900' : 'grey.50',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  p: 2,
+                  overflow: 'auto'
                 }}
               >
-                <PreviewContent />
+                <Box sx={{ 
+                  width: '100%', 
+                  maxWidth: previewWidth,
+                  transition: 'max-width 0.3s ease-in-out'
+                }}>
+                  <PreviewContent />
+                </Box>
               </Box>
             </Box>
           </Grid>
@@ -422,16 +419,6 @@ export const PatternGenerator: React.FC = () => {
                   ))}
                 </ToggleButtonGroup>
 
-                {/* Theme Toggle */}
-                <Tooltip title={`Switch to ${previewTheme === 'light' ? 'dark' : 'light'} mode`}>
-                  <IconButton
-                    color="inherit"
-                    onClick={() => setPreviewTheme(prev => prev === 'light' ? 'dark' : 'light')}
-                  >
-                    {previewTheme === 'light' ? <DarkMode /> : <LightMode />}
-                  </IconButton>
-                </Tooltip>
-
                 {/* Exit Fullscreen */}
                 <Tooltip title="Exit fullscreen (Esc)">
                   <IconButton
@@ -448,14 +435,18 @@ export const PatternGenerator: React.FC = () => {
           </AppBar>
           <DialogContent 
             sx={{ 
-              p: 0, 
-              bgcolor: previewTheme === 'dark' ? 'grey.900' : 'grey.50',
+              p: 2, 
               display: 'flex',
-              alignItems: 'center',
+              alignItems: 'flex-start',
               justifyContent: 'center',
+              overflow: 'auto'
             }}
           >
-            <Box sx={{ width: '100%', height: '100%' }}>
+            <Box sx={{ 
+              width: '100%', 
+              maxWidth: previewWidth,
+              transition: 'max-width 0.3s ease-in-out'
+            }}>
               <PreviewContent />
             </Box>
           </DialogContent>

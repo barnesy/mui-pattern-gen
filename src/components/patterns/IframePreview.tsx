@@ -91,7 +91,7 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
           border: 'none',
           opacity: isLoading ? 0 : 1,
           transition: 'opacity 0.2s, height 0.2s',
-          backgroundColor: theme === 'dark' ? '#121212' : '#ffffff',
+          backgroundColor: 'transparent',
           display: 'block', // Remove inline spacing
           verticalAlign: 'bottom', // Prevent baseline alignment issues
         }}

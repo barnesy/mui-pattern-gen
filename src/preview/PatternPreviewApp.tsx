@@ -21,13 +21,15 @@ type PreviewMessage = UpdatePropsMessage | UpdateThemeMessage;
 function PatternPreviewApp() {
   const [component, setComponent] = useState<React.ComponentType<any> | null>(null);
   const [props, setProps] = useState<Record<string, any>>({});
-  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
   const [error, setError] = useState<string | null>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
 
-  // Get component name from URL
+  // Get component name and initial theme from URL
   const params = new URLSearchParams(window.location.search);
   const componentName = params.get('component');
+  const initialTheme = params.get('theme') as 'light' | 'dark' || 'light';
+  
+  const [themeMode, setThemeMode] = useState<'light' | 'dark'>(initialTheme);
 
   // Create theme
   const theme = React.useMemo(
@@ -42,6 +44,12 @@ function PatternPreviewApp() {
       }),
     [themeMode]
   );
+
+  // Remove any background colors to let parent control styling
+  useEffect(() => {
+    document.documentElement.style.backgroundColor = 'transparent';
+    document.body.style.backgroundColor = 'transparent';
+  }, []);
 
   // Load component
   useEffect(() => {
@@ -147,10 +155,11 @@ function PatternPreviewApp() {
       <Box
         ref={contentRef}
         sx={{
-          bgcolor: 'background.default',
+          bgcolor: 'transparent',
           p: 4,
           // Remove any potential margin collapse
           display: 'flow-root',
+          minHeight: '100vh',
         }}
       >
         <Component {...props} />
