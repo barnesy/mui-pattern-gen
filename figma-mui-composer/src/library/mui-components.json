@@ -1,0 +1,170 @@
+{
+  "components": {
+    "Button": {
+      "description": "Basic button component with multiple variants",
+      "figmaNamePattern": "Button/*",
+      "props": {
+        "variant": ["contained", "outlined", "text"],
+        "size": ["small", "medium", "large"],
+        "color": ["primary", "secondary", "error", "warning", "info", "success"],
+        "disabled": "boolean",
+        "fullWidth": "boolean",
+        "startIcon": "node",
+        "endIcon": "node"
+      }
+    },
+    "Card": {
+      "description": "Container for content with optional actions",
+      "figmaNamePattern": "Card",
+      "props": {
+        "variant": ["elevation", "outlined"],
+        "raised": "boolean"
+      }
+    },
+    "CardContent": {
+      "description": "Content area for Card component",
+      "figmaNamePattern": "Card/Content"
+    },
+    "CardActions": {
+      "description": "Action area for Card component",
+      "figmaNamePattern": "Card/Actions"
+    },
+    "TextField": {
+      "description": "Text input field with multiple variants",
+      "figmaNamePattern": "TextField/*",
+      "props": {
+        "variant": ["standard", "filled", "outlined"],
+        "size": ["small", "medium"],
+        "fullWidth": "boolean",
+        "multiline": "boolean",
+        "error": "boolean",
+        "disabled": "boolean",
+        "label": "string",
+        "helperText": "string"
+      }
+    },
+    "Typography": {
+      "description": "Text component with predefined styles",
+      "figmaNamePattern": "Typography/*",
+      "props": {
+        "variant": ["h1", "h2", "h3", "h4", "h5", "h6", "subtitle1", "subtitle2", "body1", "body2", "button", "caption", "overline"],
+        "color": ["primary", "secondary", "textPrimary", "textSecondary", "error"],
+        "align": ["left", "center", "right", "justify"],
+        "gutterBottom": "boolean",
+        "noWrap": "boolean"
+      }
+    },
+    "Avatar": {
+      "description": "User avatar component",
+      "figmaNamePattern": "Avatar/*",
+      "props": {
+        "variant": ["circular", "rounded", "square"],
+        "size": ["small", "medium", "large"],
+        "src": "string",
+        "alt": "string"
+      }
+    },
+    "Chip": {
+      "description": "Compact element for tags or selections",
+      "figmaNamePattern": "Chip/*",
+      "props": {
+        "variant": ["filled", "outlined"],
+        "size": ["small", "medium"],
+        "color": ["default", "primary", "secondary", "error", "warning", "info", "success"],
+        "clickable": "boolean",
+        "deletable": "boolean"
+      }
+    },
+    "IconButton": {
+      "description": "Button with icon only",
+      "figmaNamePattern": "IconButton/*",
+      "props": {
+        "size": ["small", "medium", "large"],
+        "color": ["default", "primary", "secondary", "error", "warning", "info", "success"],
+        "disabled": "boolean"
+      }
+    },
+    "Paper": {
+      "description": "Surface component with elevation",
+      "figmaNamePattern": "Paper/*",
+      "props": {
+        "variant": ["elevation", "outlined"],
+        "elevation": [0, 1, 2, 3, 4, 6, 8, 12, 16, 24],
+        "square": "boolean"
+      }
+    },
+    "Divider": {
+      "description": "Thin line to separate content",
+      "figmaNamePattern": "Divider/*",
+      "props": {
+        "variant": ["fullWidth", "inset", "middle"],
+        "orientation": ["horizontal", "vertical"],
+        "light": "boolean"
+      }
+    },
+    "List": {
+      "description": "Container for list items",
+      "figmaNamePattern": "List",
+      "props": {
+        "dense": "boolean",
+        "disablePadding": "boolean"
+      }
+    },
+    "ListItem": {
+      "description": "Single item in a list",
+      "figmaNamePattern": "List/Item/*",
+      "props": {
+        "alignItems": ["flex-start", "center"],
+        "dense": "boolean",
+        "disableGutters": "boolean",
+        "divider": "boolean",
+        "selected": "boolean"
+      }
+    },
+    "ListItemText": {
+      "description": "Text content for list item",
+      "figmaNamePattern": "List/ItemText",
+      "props": {
+        "primary": "string",
+        "secondary": "string"
+      }
+    },
+    "ListItemAvatar": {
+      "description": "Avatar wrapper for list item",
+      "figmaNamePattern": "List/ItemAvatar"
+    },
+    "AppBar": {
+      "description": "Top app bar for navigation",
+      "figmaNamePattern": "AppBar/*",
+      "props": {
+        "position": ["fixed", "absolute", "sticky", "static", "relative"],
+        "color": ["default", "primary", "secondary", "transparent"],
+        "elevation": [0, 1, 2, 3, 4]
+      }
+    },
+    "Toolbar": {
+      "description": "Container for app bar content",
+      "figmaNamePattern": "Toolbar/*",
+      "props": {
+        "variant": ["regular", "dense"],
+        "disableGutters": "boolean"
+      }
+    }
+  },
+  "icons": {
+    "description": "Material Icons",
+    "figmaNamePattern": "Icons/*",
+    "variants": ["filled", "outlined", "rounded", "sharp", "two-tone"]
+  },
+  "spacing": {
+    "unit": 8,
+    "values": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 20, 24, 32, 40, 48, 56, 64]
+  },
+  "breakpoints": {
+    "xs": 0,
+    "sm": 600,
+    "md": 960,
+    "lg": 1280,
+    "xl": 1920
+  }
+}
