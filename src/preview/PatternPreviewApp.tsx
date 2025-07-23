@@ -16,32 +16,78 @@ interface UpdateThemeMessage {
   theme: 'light' | 'dark';
 }
 
-type PreviewMessage = UpdatePropsMessage | UpdateThemeMessage;
+interface UpdateDensityMessage {
+  type: 'UPDATE_DENSITY';
+  density: 'comfortable' | 'compact' | 'spacious';
+}
+
+type PreviewMessage = UpdatePropsMessage | UpdateThemeMessage | UpdateDensityMessage;
 
 function PatternPreviewApp() {
   const [component, setComponent] = useState<React.ComponentType<any> | null>(null);
   const [props, setProps] = useState<Record<string, any>>({});
-  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
   const [error, setError] = useState<string | null>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
 
-  // Get component name from URL
+  // Get component name, path, and initial theme from URL
   const params = new URLSearchParams(window.location.search);
   const componentName = params.get('component');
+  const componentPath = params.get('path');
+  const initialTheme = params.get('theme') as 'light' | 'dark' || 'light';
+  
+  const [themeMode, setThemeMode] = useState<'light' | 'dark'>(initialTheme);
+  const [density, setDensity] = useState<'comfortable' | 'compact' | 'spacious'>('comfortable');
 
-  // Create theme
+  // Create theme with density
   const theme = React.useMemo(
     () =>
       createTheme({
         palette: themeMode === 'light' ? lightPalette : darkPalette,
         typography,
-        spacing: 8,
+        spacing: density === 'compact' ? 6 : density === 'spacious' ? 10 : 8,
         shape: {
           borderRadius: 4,
         },
+        components: {
+          MuiButton: {
+            styleOverrides: {
+              root: {
+                padding: density === 'compact' ? '4px 12px' : 
+                        density === 'spacious' ? '8px 20px' : 
+                        '6px 16px',
+              },
+            },
+          },
+          MuiTextField: {
+            defaultProps: {
+              size: density === 'compact' ? 'small' : 'medium',
+            },
+          },
+          MuiSelect: {
+            defaultProps: {
+              size: density === 'compact' ? 'small' : 'medium',
+            },
+          },
+          MuiChip: {
+            defaultProps: {
+              size: density === 'compact' ? 'small' : 'medium',
+            },
+          },
+          MuiIconButton: {
+            defaultProps: {
+              size: density === 'compact' ? 'small' : 'medium',
+            },
+          },
+        },
       }),
-    [themeMode]
+    [themeMode, density]
   );
+
+  // Remove any background colors to let parent control styling
+  useEffect(() => {
+    document.documentElement.style.backgroundColor = 'transparent';
+    document.body.style.backgroundColor = 'transparent';
+  }, []);
 
   // Load component
   useEffect(() => {
@@ -49,7 +95,22 @@ function PatternPreviewApp() {
 
     const loadComponent = async () => {
       try {
-        const module = await import(`../patterns/pending/${componentName}.tsx`);
+        let module;
+        
+        if (componentPath) {
+          // Try the provided path
+          try {
+            module = await import(/* @vite-ignore */ componentPath);
+          } catch (err) {
+            // If custom path fails, try default pending path
+            console.warn(`Failed to load from ${componentPath}, trying pending directory`);
+            module = await import(`../patterns/pending/${componentName}.tsx`);
+          }
+        } else {
+          // Default to pending directory
+          module = await import(`../patterns/pending/${componentName}.tsx`);
+        }
+        
         const Component = module[componentName] || module.default;
         setComponent(() => Component);
         setError(null);
@@ -58,12 +119,14 @@ function PatternPreviewApp() {
         window.parent.postMessage({ type: 'PREVIEW_READY' }, '*');
       } catch (err) {
         console.error('Failed to load component:', err);
-        setError(`Failed to load component: ${componentName}`);
+        setError(`Component "${componentName}" not found`);
+        // Still notify parent that we're ready (even with error)
+        window.parent.postMessage({ type: 'PREVIEW_READY' }, '*');
       }
     };
 
     loadComponent();
-  }, [componentName]);
+  }, [componentName, componentPath]);
 
   // Listen for messages from parent
   useEffect(() => {
@@ -72,6 +135,8 @@ function PatternPreviewApp() {
         setProps(event.data.props);
       } else if (event.data.type === 'UPDATE_THEME') {
         setThemeMode(event.data.theme);
+      } else if (event.data.type === 'UPDATE_DENSITY') {
+        setDensity(event.data.density);
       }
     };
 
@@ -121,7 +186,7 @@ function PatternPreviewApp() {
       clearTimeout(timer);
       clearTimeout(initialTimer);
     };
-  }, [props, themeMode, component]);
+  }, [props, themeMode, component, density]);
 
   if (error) {
     return (
@@ -147,10 +212,11 @@ function PatternPreviewApp() {
       <Box
         ref={contentRef}
         sx={{
-          bgcolor: 'background.default',
+          bgcolor: 'transparent',
           p: 4,
           // Remove any potential margin collapse
           display: 'flow-root',
+          minHeight: '100vh',
         }}
       >
         <Component {...props} />

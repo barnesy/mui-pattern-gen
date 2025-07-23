@@ -32,7 +32,7 @@ export const ThemeViewer: React.FC = () => {
           height: 40,
           backgroundColor: color,
           borderRadius: 1,
-          border: '1px solid rgba(0,0,0,0.1)',
+          border: (theme) => `1px solid ${theme.palette.divider}`,
         }}
       />
       <Box sx={{ flexGrow: 1 }}>

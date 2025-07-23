@@ -175,7 +175,7 @@ export const FeedbackShowcase: React.FC = () => {
               Open Backdrop
             </Button>
             <Backdrop
-              sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+              sx={{ color: (theme) => theme.palette.common.white, zIndex: (theme) => theme.zIndex.drawer + 1 }}
               open={openBackdrop}
               onClick={() => setOpenBackdrop(false)}
             >

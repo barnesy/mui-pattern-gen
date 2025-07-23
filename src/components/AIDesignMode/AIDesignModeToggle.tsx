@@ -24,8 +24,8 @@ export const AIDesignModeToggle: React.FC<AIDesignModeToggleProps> = ({ variant 
         invisible={!isEnabled}
         sx={{
           '& .MuiBadge-badge': {
-            backgroundColor: '#00ff00',
-            boxShadow: '0 0 0 2px white',
+            backgroundColor: (theme) => theme.palette.success.main,
+            boxShadow: (theme) => `0 0 0 2px ${theme.palette.background.paper}`,
             '&::after': {
               position: 'absolute',
               top: 0,
@@ -59,7 +59,7 @@ export const AIDesignModeToggle: React.FC<AIDesignModeToggleProps> = ({ variant 
               transition: 'all 0.3s ease',
               transform: isEnabled ? 'scale(1.1)' : 'scale(1)',
               boxShadow: isEnabled 
-                ? '0 0 20px rgba(0, 255, 255, 0.5)' 
+                ? (theme) => `0 0 20px ${theme.palette.secondary.main}80` 
                 : undefined,
             }}
           >

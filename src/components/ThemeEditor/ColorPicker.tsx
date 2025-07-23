@@ -44,7 +44,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange
                   width: 24,
                   height: 24,
                   backgroundColor: value,
-                  border: '1px solid rgba(0, 0, 0, 0.23)',
+                  border: (theme) => `1px solid ${theme.palette.action.disabled}`,
                   borderRadius: 0.5,
                   cursor: 'pointer',
                 }}
@@ -99,7 +99,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange
                     width: 30,
                     height: 30,
                     backgroundColor: color,
-                    border: '1px solid rgba(0, 0, 0, 0.23)',
+                    border: (theme) => `1px solid ${theme.palette.action.disabled}`,
                     borderRadius: 0.5,
                     cursor: 'pointer',
                     '&:hover': {

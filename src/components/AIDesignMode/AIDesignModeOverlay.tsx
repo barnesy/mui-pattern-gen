@@ -99,7 +99,9 @@ export const AIDesignModeOverlay: React.FC = () => {
               p: 2,
               maxWidth: 400,
               minWidth: 280,
-              background: 'rgba(0, 0, 0, 0.9)',
+              background: (theme) => theme.palette.mode === 'dark' 
+                ? 'rgba(0, 0, 0, 0.9)' 
+                : 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(10px)',
               border: '1px solid',
               borderColor: 'primary.main',

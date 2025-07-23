@@ -20,15 +20,15 @@ export const TailwindMUIBestPractices: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Tailwind + MUI Best Practices
+        MUI Styling Best Practices
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        Using Tailwind CSS to complement MUI's theming system without conflicts.
+        Best practices for styling with Material-UI's theme system.
       </Typography>
 
       <Alert severity="success" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          Tailwind is configured to work alongside MUI without overriding theme values like border radius, colors, or shadows.
+          MUI provides a complete styling solution with the sx prop, styled components, and theme customization.
         </Typography>
       </Alert>
 
@@ -48,12 +48,12 @@ export const TailwindMUIBestPractices: React.FC = () => {
             <Stack spacing={2}>
               <Box>
                 <Typography variant="subtitle2" fontWeight="bold">
-                  Use Tailwind for Layout
+                  Use sx prop for one-off styles
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Flexbox, Grid, spacing utilities
+                  Quick styling without creating new components
                 </Typography>
-                <Box className="flex gap-4 mt-2">
+                <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
                   <Button variant="contained" size="small">Button 1</Button>
                   <Button variant="outlined" size="small">Button 2</Button>
                 </Box>
@@ -63,28 +63,32 @@ export const TailwindMUIBestPractices: React.FC = () => {
 
               <Box>
                 <Typography variant="subtitle2" fontWeight="bold">
-                  Use Tailwind for Responsive Design
+                  Use Theme Breakpoints
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Responsive modifiers like sm:, md:, lg:
+                  Responsive design with theme.breakpoints
                 </Typography>
-                <Box className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-                  <Card><CardContent>Card 1</CardContent></Card>
-                  <Card><CardContent>Card 2</CardContent></Card>
-                </Box>
+                <Grid container spacing={1} sx={{ mt: 1 }}>
+                  <Grid item xs={12} sm={6}>
+                    <Card><CardContent>Card 1</CardContent></Card>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Card><CardContent>Card 2</CardContent></Card>
+                  </Grid>
+                </Grid>
               </Box>
 
               <Divider />
 
               <Box>
                 <Typography variant="subtitle2" fontWeight="bold">
-                  Use MUI Theme for Component Styling
+                  Use Theme Values
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Let MUI handle colors, shadows, border radius
+                  Consistent spacing, colors, and typography
                 </Typography>
                 <Button variant="contained" sx={{ mt: 1 }}>
-                  MUI Themed Button
+                  Themed Button
                 </Button>
               </Box>
             </Stack>
@@ -99,13 +103,13 @@ export const TailwindMUIBestPractices: React.FC = () => {
             <Stack spacing={2}>
               <Box>
                 <Typography variant="subtitle2" fontWeight="bold">
-                  Don't Override MUI Styles
+                  Don't Use Inline Styles
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Avoid changing colors, shadows, or radii with Tailwind
+                  Avoid style prop, use sx instead
                 </Typography>
                 <Typography variant="caption" component="div" sx={{ mt: 1, fontFamily: 'monospace' }}>
-                  ❌ className="rounded-lg shadow-xl bg-blue-500"
+                  ❌ style=&#123;&#123; color: 'blue' &#125;&#125;
                 </Typography>
               </Box>
 
@@ -113,13 +117,15 @@ export const TailwindMUIBestPractices: React.FC = () => {
 
               <Box>
                 <Typography variant="subtitle2" fontWeight="bold">
-                  Don't Mix Styling Approaches
+                  Don't Hard-code Values
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Use either sx prop or theme for component styling
+                  Use theme values for consistency
                 </Typography>
                 <Typography variant="caption" component="div" sx={{ mt: 1, fontFamily: 'monospace' }}>
-                  ❌ sx=&#123;&#123; color: 'primary.main' &#125;&#125; className="text-blue-500"
+                  ❌ sx=&#123;&#123; margin: '16px' &#125;&#125;
+                  <br />
+                  ✅ sx=&#123;&#123; m: 2 &#125;&#125;
                 </Typography>
               </Box>
 
@@ -127,13 +133,13 @@ export const TailwindMUIBestPractices: React.FC = () => {
 
               <Box>
                 <Typography variant="subtitle2" fontWeight="bold">
-                  Don't Use Conflicting Resets
+                  Don't Mix Styling Systems
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Keep Tailwind's preflight disabled
+                  Stick to MUI's styling approach
                 </Typography>
                 <Typography variant="caption" component="div" sx={{ mt: 1, fontFamily: 'monospace' }}>
-                  ✅ corePlugins: &#123; preflight: false &#125;
+                  ✅ Use sx, styled(), or theme
                 </Typography>
               </Box>
             </Stack>
@@ -150,35 +156,42 @@ export const TailwindMUIBestPractices: React.FC = () => {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: { xs: 2, sm: 3 } }}>
             <Typography variant="h6" gutterBottom>
-              Layout with Tailwind
+              Layout with MUI
             </Typography>
-            <Box className="space-y-4">
-              <Box className="flex justify-between items-center">
+            <Stack spacing={2}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="body1">Flexbox Layout</Typography>
                 <Button variant="outlined" size="small">Action</Button>
               </Box>
-              <Box className="grid grid-cols-3 gap-2">
+              <Grid container spacing={1}>
                 {[1, 2, 3].map(i => (
-                  <Card key={i}>
-                    <CardContent>
-                      <Typography variant="body2">Item {i}</Typography>
-                    </CardContent>
-                  </Card>
+                  <Grid item xs={4} key={i}>
+                    <Card>
+                      <CardContent>
+                        <Typography variant="body2">Item {i}</Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
                 ))}
-              </Box>
-            </Box>
+              </Grid>
+            </Stack>
           </Paper>
         </Grid>
 
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: { xs: 2, sm: 3 } }}>
             <Typography variant="h6" gutterBottom>
-              Animations with Tailwind
+              Transitions with MUI
             </Typography>
             <Stack spacing={2}>
               <Button 
                 variant="contained" 
-                className="transition-transform hover:scale-105"
+                sx={{ 
+                  transition: 'transform 0.2s',
+                  '&:hover': {
+                    transform: 'scale(1.05)'
+                  }
+                }}
               >
                 Hover Scale Effect
               </Button>
@@ -191,11 +204,11 @@ export const TailwindMUIBestPractices: React.FC = () => {
           </Paper>
         </Grid>
 
-        {/* Configuration Example */}
+        {/* Theme Example */}
         <Grid item xs={12}>
           <Paper sx={{ p: { xs: 2, sm: 3 }, bgcolor: 'grey.50' }}>
             <Typography variant="h6" gutterBottom>
-              Proper Configuration
+              MUI Theme Configuration
             </Typography>
             <Typography variant="body2" component="pre" sx={{ 
               fontFamily: 'monospace', 
@@ -207,19 +220,29 @@ export const TailwindMUIBestPractices: React.FC = () => {
               borderRadius: 1,
               overflow: 'auto'
             }}>
-{`// tailwind.config.js
-export default {
-  corePlugins: {
-    preflight: false, // Don't reset MUI styles
+{`// theme.js
+import { createTheme } from '@mui/material/styles';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2',
+    },
   },
-  important: false,   // Let MUI win specificity battles
-  
-  theme: {
-    extend: {
-      // Only add custom utilities, don't override
-    }
-  }
-}`}
+  spacing: 8, // 8px * factor
+  typography: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+        },
+      },
+    },
+  },
+});`}
             </Typography>
           </Paper>
         </Grid>

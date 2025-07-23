@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
-  TextField,
   Switch,
   Select,
   MenuItem,
@@ -34,6 +33,7 @@ export interface PropControl {
   step?: number;
   helperText?: string;
   group?: string;
+  isContent?: boolean; // Mark text/number fields as content vs settings
 }
 
 interface PatternPropsPanelProps {

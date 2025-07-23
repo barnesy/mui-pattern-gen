@@ -44,7 +44,7 @@ export const ComponentShowcase: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h3" gutterBottom>
+      <Typography variant="h4" gutterBottom>
         Foundation Components
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>

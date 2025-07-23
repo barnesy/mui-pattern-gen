@@ -8,6 +8,8 @@ interface IframePreviewProps {
   width: number | string;
   onLoad?: () => void;
   isFullscreen?: boolean;
+  componentPath?: string;
+  density?: 'comfortable' | 'compact' | 'spacious';
 }
 
 export const IframePreview: React.FC<IframePreviewProps> = ({
@@ -16,15 +18,24 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
   theme,
   width,
   onLoad,
-  isFullscreen = false
+  isFullscreen = false,
+  componentPath,
+  density = 'comfortable'
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [iframeReady, setIframeReady] = useState(false);
   const [iframeHeight, setIframeHeight] = useState<number>(400);
 
-  // Generate iframe URL with component name
-  const iframeUrl = `/pattern-preview.html?component=${componentName}&theme=${theme}`;
+  // Generate iframe URL with component name and path
+  const params = new URLSearchParams({
+    component: componentName,
+    theme: theme
+  });
+  if (componentPath) {
+    params.append('path', componentPath);
+  }
+  const iframeUrl = `/pattern-preview.html?${params.toString()}`;
 
   // Listen for iframe messages
   useEffect(() => {
@@ -62,6 +73,16 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
     }
   }, [theme, iframeReady]);
 
+  // Send density updates
+  useEffect(() => {
+    if (iframeReady && iframeRef.current) {
+      iframeRef.current.contentWindow?.postMessage({
+        type: 'UPDATE_DENSITY',
+        density
+      }, '*');
+    }
+  }, [density, iframeReady]);
+
   return (
     <Box sx={{ 
       position: 'relative', 
@@ -91,7 +112,7 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
           border: 'none',
           opacity: isLoading ? 0 : 1,
           transition: 'opacity 0.2s, height 0.2s',
-          backgroundColor: theme === 'dark' ? '#121212' : '#ffffff',
+          backgroundColor: 'transparent',
           display: 'block', // Remove inline spacing
           verticalAlign: 'bottom', // Prevent baseline alignment issues
         }}
