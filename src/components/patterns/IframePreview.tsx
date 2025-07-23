@@ -8,6 +8,7 @@ interface IframePreviewProps {
   width: number | string;
   onLoad?: () => void;
   isFullscreen?: boolean;
+  componentPath?: string;
 }
 
 export const IframePreview: React.FC<IframePreviewProps> = ({
@@ -16,15 +17,23 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
   theme,
   width,
   onLoad,
-  isFullscreen = false
+  isFullscreen = false,
+  componentPath
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [iframeReady, setIframeReady] = useState(false);
   const [iframeHeight, setIframeHeight] = useState<number>(400);
 
-  // Generate iframe URL with component name
-  const iframeUrl = `/pattern-preview.html?component=${componentName}&theme=${theme}`;
+  // Generate iframe URL with component name and path
+  const params = new URLSearchParams({
+    component: componentName,
+    theme: theme
+  });
+  if (componentPath) {
+    params.append('path', componentPath);
+  }
+  const iframeUrl = `/pattern-preview.html?${params.toString()}`;
 
   // Listen for iframe messages
   useEffect(() => {

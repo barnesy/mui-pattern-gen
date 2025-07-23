@@ -143,17 +143,23 @@ When updating a pattern:
 ## When asked to approve a pattern:
 
 1. Move the file from `src/patterns/pending/ComponentName.tsx` to `src/patterns/{category}/ComponentName.tsx`
-2. Update `src/patterns/{category}/index.ts` to export the component:
+2. Move the config file (if exists) from `src/patterns/pending/ComponentName.config.ts` to `src/patterns/{category}/ComponentName.config.ts`
+3. Update `src/patterns/{category}/index.ts` to export the component:
    ```typescript
    export { ComponentName } from './ComponentName';
    export type { ComponentNameProps } from './ComponentName';
    ```
-3. Clear or update the context file at `src/patterns/pending/.context.json`
+4. Update the Pattern Library (`src/pages/PatternViewer.tsx`):
+   - Add the component name to the appropriate category in the `acceptedPatterns` object
+   - This ensures the pattern appears in the Pattern Library immediately
+5. Clear or update the context file at `src/patterns/pending/.context.json`
 
 ## When asked to reject a pattern:
 
 1. Delete the file from `src/patterns/pending/`
-2. Clear the context file
+2. Delete the config file (if exists) from `src/patterns/pending/`
+3. Clear the context file
+4. If the pattern was previously accepted, remove it from the Pattern Library (`src/pages/PatternViewer.tsx`)
 
 ## Available categories:
 - **auth**: Login forms, registration, password reset, 2FA
@@ -259,3 +265,41 @@ The Pattern Generator now includes these interactive features:
 - **Dark mode support**: Initial background color prevents white flash
 - **Responsive testing**: Real-time viewport adjustments
 - **Memory efficient**: Components unmount properly when switching patterns
+
+## Pattern Library (`/patterns` route):
+
+The Pattern Library provides a centralized view of all patterns in the system:
+
+### Features:
+1. **Browsing**: View all pending and accepted patterns in one place
+2. **Search**: Filter patterns by name
+3. **Category Filtering**: Filter by pattern category (auth, cards, forms, etc.)
+4. **Status Filtering**: View all, pending only, or accepted only
+5. **View Modes**: Grid view or list view
+6. **Live Preview**: Click any pattern to see a live preview with responsive controls
+7. **Device Preview**: Test patterns on Mobile (375px), Tablet (768px), and Desktop (1200px)
+
+### Keeping the Library Updated:
+When patterns are approved/rejected, you MUST update the Pattern Library:
+1. Open `src/pages/PatternViewer.tsx`
+2. Find the `acceptedPatterns` object (around line 129)
+3. Add/remove pattern names from the appropriate category arrays
+4. This ensures the library always reflects the current state of patterns
+
+### Pattern Library Structure:
+```typescript
+const acceptedPatterns: Record<string, string[]> = {
+  auth: ['LoginForm', 'RegisterForm'],  // Add approved auth patterns here
+  cards: ['ProfileCard'],                // Add approved card patterns here
+  forms: [],                             // Add approved form patterns here
+  navigation: [],                        // Add approved navigation patterns here
+  lists: [],                             // Add approved list patterns here
+  dashboards: [],                        // Add approved dashboard patterns here
+};
+```
+
+### Important Notes:
+- The Pattern Library automatically discovers pending patterns from the context file
+- Accepted patterns must be manually added to maintain accuracy
+- The preview feature works for both pending and accepted patterns
+- Patterns without config files will still preview but won't have interactive controls

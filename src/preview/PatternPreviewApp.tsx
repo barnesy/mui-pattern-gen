@@ -24,9 +24,10 @@ function PatternPreviewApp() {
   const [error, setError] = useState<string | null>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
 
-  // Get component name and initial theme from URL
+  // Get component name, path, and initial theme from URL
   const params = new URLSearchParams(window.location.search);
   const componentName = params.get('component');
+  const componentPath = params.get('path');
   const initialTheme = params.get('theme') as 'light' | 'dark' || 'light';
   
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>(initialTheme);
@@ -57,7 +58,22 @@ function PatternPreviewApp() {
 
     const loadComponent = async () => {
       try {
-        const module = await import(`../patterns/pending/${componentName}.tsx`);
+        let module;
+        
+        if (componentPath) {
+          // Try the provided path
+          try {
+            module = await import(componentPath);
+          } catch (err) {
+            // If custom path fails, try default pending path
+            console.warn(`Failed to load from ${componentPath}, trying pending directory`);
+            module = await import(`../patterns/pending/${componentName}.tsx`);
+          }
+        } else {
+          // Default to pending directory
+          module = await import(`../patterns/pending/${componentName}.tsx`);
+        }
+        
         const Component = module[componentName] || module.default;
         setComponent(() => Component);
         setError(null);
@@ -66,12 +82,14 @@ function PatternPreviewApp() {
         window.parent.postMessage({ type: 'PREVIEW_READY' }, '*');
       } catch (err) {
         console.error('Failed to load component:', err);
-        setError(`Failed to load component: ${componentName}`);
+        setError(`Component "${componentName}" not found`);
+        // Still notify parent that we're ready (even with error)
+        window.parent.postMessage({ type: 'PREVIEW_READY' }, '*');
       }
     };
 
     loadComponent();
-  }, [componentName]);
+  }, [componentName, componentPath]);
 
   // Listen for messages from parent
   useEffect(() => {

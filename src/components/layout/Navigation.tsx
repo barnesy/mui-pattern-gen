@@ -13,6 +13,7 @@ import {
   Palette as PaletteIcon,
   Edit as EditIcon,
   ViewModule as ViewModuleIcon,
+  AddBox as AddBoxIcon,
 } from '@mui/icons-material';
 
 interface NavigationItem {
@@ -30,7 +31,8 @@ const navigationItems: NavigationItem[] = [
   { text: 'Editor', path: '/theme-editor', icon: <EditIcon /> },
   { text: 'Theme', path: '/theme', icon: <PaletteIcon /> },
   { text: 'Components', path: '/components', icon: <DashboardIcon /> },
-  { text: 'Patterns', path: '/patterns', icon: <ViewModuleIcon /> },
+  { text: 'Pattern Generator', path: '/pattern-generator', icon: <AddBoxIcon /> },
+  { text: 'Pattern Library', path: '/patterns', icon: <ViewModuleIcon /> },
 ];
 
 export const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
