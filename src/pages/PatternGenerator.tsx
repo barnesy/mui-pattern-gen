@@ -24,10 +24,9 @@ import {
   Smartphone,
   Tablet,
   Computer,
-  Fullscreen,
   FullscreenExit
 } from '@mui/icons-material';
-import { PatternPropsPanel, PropControl } from '../components/patterns/PatternPropsPanel';
+import { SettingControl } from '../components/patterns/SettingsPanel';
 import { IframePreview } from '../components/patterns/IframePreview';
 
 interface PatternContext {
@@ -47,21 +46,73 @@ const devicePresets: DevicePreset[] = [
   { name: 'Desktop', width: 1200, icon: <Computer /> },
 ];
 
+// Generate variations based on control configuration
+const generateVariations = (controls: SettingControl[]): Array<{name: string; props: Record<string, any>}> => {
+  const variations: Array<{name: string; props: Record<string, any>}> = [];
+  
+  // Get defaults
+  const defaults: Record<string, any> = {};
+  controls.forEach(control => {
+    if (control.defaultValue !== undefined) {
+      defaults[control.name] = control.defaultValue;
+    }
+  });
+  
+  // Always include default variation
+  variations.push({ name: 'Default', props: { ...defaults } });
+  
+  // Add variations for each variant type
+  const variantControl = controls.find(c => c.type === 'variant');
+  if (variantControl && variantControl.options) {
+    variantControl.options.forEach(option => {
+      if (option.value !== variantControl.defaultValue) {
+        variations.push({
+          name: option.label,
+          props: { ...defaults, variant: option.value }
+        });
+      }
+    });
+  }
+  
+  // Add variations for boolean controls
+  const booleanControls = controls.filter(c => c.type === 'boolean' && !c.isContent);
+  booleanControls.forEach(control => {
+    const oppositeValue = !control.defaultValue;
+    variations.push({
+      name: `${control.label}: ${oppositeValue ? 'On' : 'Off'}`,
+      props: { ...defaults, [control.name]: oppositeValue }
+    });
+  });
+  
+  // Add variations for select controls with notable options
+  const selectControls = controls.filter(c => c.type === 'select' && !c.isContent);
+  selectControls.forEach(control => {
+    if (control.options && control.options.length > 1) {
+      const altOption = control.options.find(o => o.value !== control.defaultValue);
+      if (altOption) {
+        variations.push({
+          name: `${control.label}: ${altOption.label}`,
+          props: { ...defaults, [control.name]: altOption.value }
+        });
+      }
+    }
+  });
+  
+  // Limit to reasonable number of variations
+  return variations.slice(0, 9);
+};
+
 export const PatternGenerator: React.FC = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [patternConfig, setPatternConfig] = useState<PropControl[]>([]);
   const [context, setContext] = useState<PatternContext>({ current: null, category: null });
   const [error, setError] = useState<string | null>(null);
-  const [componentProps, setComponentProps] = useState<Record<string, any>>({});
+  const [componentVariations, setComponentVariations] = useState<Array<{name: string; props: Record<string, any>}>>([]);
   const [previewDevice, setPreviewDevice] = useState<string>('Desktop');
   const [previewWidth, setPreviewWidth] = useState<number>(1200);
   const [isFullscreen, setIsFullscreen] = useState(false);
   
-  // Track initialization state
-  const [isInitialized, setIsInitialized] = useState(false);
   const loadedComponentRef = useRef<string | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<number | null>(null);
   
   // Handle Escape key to exit fullscreen
   useEffect(() => {
@@ -81,8 +132,7 @@ export const PatternGenerator: React.FC = () => {
     
     try {
       // Reset state when loading new component
-      setIsInitialized(false);
-      setComponentProps({});
+      setComponentVariations([]);
       setError(null);
       loadedComponentRef.current = componentName;
       
@@ -90,25 +140,16 @@ export const PatternGenerator: React.FC = () => {
       try {
         const configModule = await import(`../patterns/pending/${componentName}.config.ts`);
         const controls = configModule[`${componentName.charAt(0).toLowerCase() + componentName.slice(1)}Controls`] || [];
-        setPatternConfig(controls);
         
-        // Initialize props with defaults
-        const defaults: Record<string, any> = {};
-        controls.forEach((control: PropControl) => {
-          if (control.defaultValue !== undefined) {
-            defaults[control.name] = control.defaultValue;
-          }
-        });
-        setComponentProps(defaults);
-        setIsInitialized(true);
+        // Generate variations based on control types
+        const variations = generateVariations(controls);
+        setComponentVariations(variations);
       } catch (configError) {
-        // Config doesn't exist, but that's okay
-        setPatternConfig([]);
-        setIsInitialized(true);
+        // Config doesn't exist, show single default variation
+        setComponentVariations([{ name: 'Default', props: {} }]);
       }
     } catch (importError) {
       setError('Failed to load pattern configuration');
-      setIsInitialized(true);
     }
   }, []);
 
@@ -124,10 +165,8 @@ export const PatternGenerator: React.FC = () => {
         if (!response.ok) {
           if (loadedComponentRef.current) {
             setContext({ current: null, category: null });
-            setPatternConfig([]);
-            setComponentProps({});
-            setIsInitialized(false);
             loadedComponentRef.current = null;
+            setComponentVariations([]);
           }
           return;
         }
@@ -164,20 +203,6 @@ export const PatternGenerator: React.FC = () => {
       }
     };
   }, [loadPattern]);
-
-  const handlePropChange = useCallback((name: string, value: any) => {
-    setComponentProps(prev => ({ ...prev, [name]: value }));
-  }, []);
-
-  const handleResetProps = useCallback(() => {
-    const defaults: Record<string, any> = {};
-    patternConfig.forEach((control) => {
-      if (control.defaultValue !== undefined) {
-        defaults[control.name] = control.defaultValue;
-      }
-    });
-    setComponentProps(defaults);
-  }, [patternConfig]);
 
   const handleDeviceChange = useCallback((_event: React.MouseEvent<HTMLElement>, newDevice: string | null) => {
     if (newDevice) {
@@ -238,21 +263,23 @@ export const PatternGenerator: React.FC = () => {
     </Box>
   );
 
-  const PreviewContent = React.memo(() => {
-    return context.current ? (
-      <IframePreview
-        componentName={context.current}
-        componentProps={componentProps}
-        theme={theme.palette.mode}
-        width="100%"
-        isFullscreen={isFullscreen}
-      />
-    ) : (
-      <Box sx={{ p: 4, textAlign: 'center', minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Typography color="text.secondary">
-          Loading pattern...
-        </Typography>
-      </Box>
+  const VariationPreview = React.memo(({ variation }: { variation: { name: string; props: Record<string, any> } }) => {
+    if (!context.current) return null;
+
+    return (
+      <Paper variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ p: 1.5, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
+          <Typography variant="subtitle2" noWrap>{variation.name}</Typography>
+        </Box>
+        <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden', minHeight: 300 }}>
+          <IframePreview
+            componentName={context.current}
+            componentProps={variation.props}
+            theme={theme.palette.mode}
+            width="100%"
+          />
+        </Box>
+      </Paper>
     );
   });
 
@@ -303,79 +330,39 @@ export const PatternGenerator: React.FC = () => {
           </Alert>
         </Paper>
 
-        <Grid container spacing={3}>
-          {/* Preview Panel */}
-          <Grid item xs={12} lg={patternConfig.length > 0 ? 8 : 12}>
-            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
-                <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
-                  <Typography variant="h6">Live Preview</Typography>
-                  
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    {/* Device Selection */}
-                    <ToggleButtonGroup
-                      value={previewDevice}
-                      exclusive
-                      onChange={handleDeviceChange}
-                      size="small"
-                    >
-                      {devicePresets.map((device) => (
-                        <ToggleButton key={device.name} value={device.name}>
-                          <Tooltip title={device.name}>
-                            {device.icon}
-                          </Tooltip>
-                        </ToggleButton>
-                      ))}
-                    </ToggleButtonGroup>
-
-                    {/* Fullscreen Toggle */}
-                    <Tooltip title="Fullscreen">
-                      <IconButton
-                        size="small"
-                        onClick={() => setIsFullscreen(true)}
-                      >
-                        <Fullscreen />
-                      </IconButton>
-                    </Tooltip>
-                  </Stack>
-                </Stack>
-              </Box>
+        <Box>
+          <Box sx={{ p: 2, mb: 3, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
+            <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+              <Typography variant="h6">Pattern Variations</Typography>
               
-              <Box
-                sx={{
-                  flex: 1,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'flex-start',
-                  p: 2,
-                  overflow: 'auto'
-                }}
-              >
-                <Box sx={{ 
-                  width: '100%', 
-                  maxWidth: previewWidth,
-                  transition: 'max-width 0.3s ease-in-out'
-                }}>
-                  <PreviewContent />
-                </Box>
-              </Box>
-            </Box>
-          </Grid>
+              <Stack direction="row" spacing={1} alignItems="center">
+                {/* Device Selection */}
+                <ToggleButtonGroup
+                  value={previewDevice}
+                  exclusive
+                  onChange={handleDeviceChange}
+                  size="small"
+                >
+                  {devicePresets.map((device) => (
+                    <ToggleButton key={device.name} value={device.name}>
+                      <Tooltip title={device.name}>
+                        {device.icon}
+                      </Tooltip>
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </Stack>
+            </Stack>
+          </Box>
 
-          {/* Props Panel */}
-          {patternConfig.length > 0 && (
-            <Grid item xs={12} lg={4}>
-              <Box sx={{ position: isMobile ? 'relative' : 'sticky', top: isMobile ? 'auto' : 80 }}>
-                <PatternPropsPanel
-                  controls={patternConfig}
-                  values={componentProps}
-                  onChange={handlePropChange}
-                  onReset={handleResetProps}
-                />
-              </Box>
-            </Grid>
-          )}
-        </Grid>
+          <Grid container spacing={3}>
+            {componentVariations.map((variation, index) => (
+              <Grid item key={index} xs={12} md={6} lg={4}>
+                <VariationPreview variation={variation} />
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
 
         {/* Fullscreen Dialog */}
         <Dialog
@@ -450,7 +437,15 @@ export const PatternGenerator: React.FC = () => {
               maxWidth: previewWidth,
               transition: 'max-width 0.3s ease-in-out'
             }}>
-              <PreviewContent />
+              {context.current && (
+                <IframePreview
+                  componentName={context.current}
+                  componentProps={componentVariations[0]?.props || {}}
+                  theme={theme.palette.mode}
+                  width="100%"
+                  isFullscreen={true}
+                />
+              )}
             </Box>
           </DialogContent>
         </Dialog>

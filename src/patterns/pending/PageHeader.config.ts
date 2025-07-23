@@ -15,13 +15,14 @@ export const pageHeaderControls: PropControl[] = [
     group: 'General',
   },
 
-  // Text props
+  // Text props (marked as content)
   {
     name: 'title',
     type: 'text',
     label: 'Title',
     defaultValue: 'Page Title',
     group: 'General',
+    isContent: true,
   },
   {
     name: 'subtitle',
@@ -29,6 +30,7 @@ export const pageHeaderControls: PropControl[] = [
     label: 'Subtitle',
     defaultValue: 'This is a page description that provides context about the content below',
     group: 'General',
+    isContent: true,
   },
 
   // Status
@@ -38,6 +40,7 @@ export const pageHeaderControls: PropControl[] = [
     label: 'Status Label',
     defaultValue: 'Published',
     helperText: 'Leave empty to hide status chip',
+    isContent: true,
     group: 'Status',
   },
   {
@@ -73,6 +76,7 @@ export const pageHeaderControls: PropControl[] = [
     label: 'Primary Action Label',
     defaultValue: 'Edit Page',
     group: 'Actions',
+    isContent: true,
   },
 
   // Appearance

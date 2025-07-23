@@ -16,13 +16,14 @@ export const labelValuePairControls: PropControl[] = [
     group: 'General',
   },
 
-  // Text props
+  // Text props (marked as content)
   {
     name: 'label',
     type: 'text',
     label: 'Label',
     defaultValue: 'Revenue',
     group: 'General',
+    isContent: true,
   },
   {
     name: 'value',
@@ -30,6 +31,7 @@ export const labelValuePairControls: PropControl[] = [
     label: 'Value',
     defaultValue: '$125,430',
     group: 'General',
+    isContent: true,
   },
 
   // Size
@@ -162,6 +164,7 @@ export const labelValuePairControls: PropControl[] = [
     defaultValue: '+12.5%',
     helperText: 'Shows when trend is set',
     group: 'Trend',
+    isContent: true,
   },
 
   // Additional
@@ -172,6 +175,7 @@ export const labelValuePairControls: PropControl[] = [
     defaultValue: 'Total revenue for the current quarter',
     helperText: 'Tooltip shown on hover',
     group: 'Additional',
+    isContent: true,
   },
 
   // Spacing

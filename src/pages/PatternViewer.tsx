@@ -20,7 +20,6 @@ import {
   Badge,
   useTheme,
   alpha,
-  Divider,
   useMediaQuery,
   Modal,
 } from '@mui/material';
@@ -37,7 +36,7 @@ import {
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { IframePreview } from '../components/patterns/IframePreview';
-import { PatternPropsPanel, PropControl } from '../components/patterns/PatternPropsPanel';
+import { SettingsPanel, SettingControl } from '../components/patterns/SettingsPanel';
 
 interface Pattern {
   name: string;
@@ -85,7 +84,7 @@ export const PatternViewer: React.FC = () => {
   const [previewWidth, setPreviewWidth] = useState<number>(1200);
   const [selectedVariant, setSelectedVariant] = useState<string>('default');
   const [variantOptions, setVariantOptions] = useState<Array<{ label: string; value: string }>>([]);
-  const [patternConfig, setPatternConfig] = useState<PropControl[]>([]);
+  const [patternConfig, setPatternConfig] = useState<SettingControl[]>([]);
   const [componentProps, setComponentProps] = useState<Record<string, any>>({});
   const [configLoading, setConfigLoading] = useState(false);
 
@@ -199,8 +198,8 @@ export const PatternViewer: React.FC = () => {
     // Try to load pattern config
     try {
       const configPath = pattern.status === 'pending'
-        ? `../patterns/pending/${pattern.name}.config`
-        : `../patterns/${pattern.category}/${pattern.name}.config`;
+        ? `../patterns/pending/${pattern.name}.config.ts`
+        : `../patterns/${pattern.category}/${pattern.name}.config.ts`;
       
       try {
         const configModule = await import(configPath);
@@ -210,7 +209,7 @@ export const PatternViewer: React.FC = () => {
         
         // Initialize props with defaults
         const defaults: Record<string, any> = {};
-        controls.forEach((control: PropControl) => {
+        controls.forEach((control: SettingControl) => {
           if (control.defaultValue !== undefined) {
             defaults[control.name] = control.defaultValue;
           }
@@ -218,7 +217,7 @@ export const PatternViewer: React.FC = () => {
         setComponentProps(defaults);
         
         // Extract variant options
-        const variantControl = controls.find((c: PropControl) => c.type === 'variant');
+        const variantControl = controls.find((c: SettingControl) => c.type === 'variant');
         if (variantControl && variantControl.options) {
           setVariantOptions(variantControl.options);
           if (variantControl.defaultValue) {
@@ -254,21 +253,6 @@ export const PatternViewer: React.FC = () => {
       setSelectedVariant(value);
     }
   }, []);
-
-  const handleResetProps = useCallback(() => {
-    const defaults: Record<string, any> = {};
-    patternConfig.forEach((control) => {
-      if (control.defaultValue !== undefined) {
-        defaults[control.name] = control.defaultValue;
-      }
-    });
-    setComponentProps(defaults);
-    // Reset variant
-    const variantControl = patternConfig.find(c => c.type === 'variant');
-    if (variantControl && variantControl.defaultValue) {
-      setSelectedVariant(variantControl.defaultValue);
-    }
-  }, [patternConfig]);
 
   const PatternCard = ({ pattern }: { pattern: Pattern }) => (
     <Card 
@@ -513,23 +497,6 @@ export const PatternViewer: React.FC = () => {
                 />
               </Stack>
               <Stack direction="row" spacing={2} alignItems="center">
-                {!isMobile && variantOptions.length > 0 && (
-                  <>
-                    <ToggleButtonGroup
-                      value={selectedVariant}
-                      exclusive
-                      onChange={(_, value) => value && setSelectedVariant(value)}
-                      size="small"
-                    >
-                      {variantOptions.map((variant) => (
-                        <ToggleButton key={variant.value} value={variant.value}>
-                          {variant.label}
-                        </ToggleButton>
-                      ))}
-                    </ToggleButtonGroup>
-                    <Divider orientation="vertical" flexItem />
-                  </>
-                )}
                 <ToggleButtonGroup
                   value={previewDevice}
                   exclusive
@@ -566,11 +533,10 @@ export const PatternViewer: React.FC = () => {
                   display: isMobile ? 'none' : 'block', // Hide on mobile, show bottom sheet instead
                 }}
               >
-                <PatternPropsPanel
+                <SettingsPanel
                   controls={patternConfig}
                   values={componentProps}
                   onChange={handlePropChange}
-                  onReset={handleResetProps}
                 />
               </Box>
             )}
@@ -587,24 +553,6 @@ export const PatternViewer: React.FC = () => {
                 alignItems: 'center',
               }}
             >
-              {/* Mobile variant selector */}
-              {isMobile && variantOptions.length > 0 && (
-                <Box sx={{ width: '100%', mb: 2 }}>
-                  <ToggleButtonGroup
-                    value={selectedVariant}
-                    exclusive
-                    onChange={(_, value) => value && setSelectedVariant(value)}
-                    size="small"
-                    fullWidth
-                  >
-                    {variantOptions.map((variant) => (
-                      <ToggleButton key={variant.value} value={variant.value}>
-                        {variant.label}
-                      </ToggleButton>
-                    ))}
-                  </ToggleButtonGroup>
-                </Box>
-              )}
 
               <Box
                 sx={{ 
@@ -647,11 +595,10 @@ export const PatternViewer: React.FC = () => {
               }}
               elevation={8}
             >
-              <PatternPropsPanel
+              <SettingsPanel
                 controls={patternConfig}
                 values={componentProps}
                 onChange={handlePropChange}
-                onReset={handleResetProps}
               />
             </Paper>
           )}
