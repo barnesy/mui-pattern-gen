@@ -81,14 +81,14 @@ export const PatternViewer: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'accepted'>('all');
   const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null);
   const [loading, setLoading] = useState(true);
-  const [pendingContext, setPendingContext] = useState<any>(null);
+  const [_pendingContext, setPendingContext] = useState<any>(null);
   const [previewDevice, setPreviewDevice] = useState<string>('Desktop');
   const [previewWidth, setPreviewWidth] = useState<number>(1200);
-  const [selectedVariant, setSelectedVariant] = useState<string>('default');
-  const [variantOptions, setVariantOptions] = useState<Array<{ label: string; value: string }>>([]);
+  const [_selectedVariant, setSelectedVariant] = useState<string>('default');
+  const [_variantOptions, setVariantOptions] = useState<Array<{ label: string; value: string }>>([]);
   const [patternConfig, setPatternConfig] = useState<SettingControl[]>([]);
   const [componentProps, setComponentProps] = useState<Record<string, any>>({});
-  const [configLoading, setConfigLoading] = useState(false);
+  const [_configLoading, setConfigLoading] = useState(false);
   const [density, setDensity] = useState<'comfortable' | 'compact' | 'spacious'>('comfortable');
 
   // Handle Escape key to close preview

@@ -20,7 +20,16 @@ import {
 export const Home: React.FC = () => {
   const navigate = useNavigate();
 
-  const features = [
+  interface Feature {
+    title: string;
+    description: string;
+    icon: React.ReactElement;
+    action: () => void;
+    color: string;
+    disabled?: boolean;
+  }
+
+  const features: Feature[] = [
     {
       title: 'Component Showcase',
       description: 'Explore all MUI components organized by category with live examples and variants.',

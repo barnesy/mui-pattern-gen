@@ -9,7 +9,6 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  Chip,
   Stack,
   Avatar,
   List,
@@ -23,18 +22,13 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  LinearProgress,
   CircularProgress,
   Button,
-  Tooltip,
-  Paper,
   useTheme,
   alpha,
 } from '@mui/material';
 import {
   MoreVert as MoreVertIcon,
-  TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
   Info as InfoIcon,
   CheckCircle as CheckCircleIcon,
   Warning as WarningIcon,
@@ -167,16 +161,6 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
     setAnchorEl(null);
   };
 
-  const getTrendIcon = (trend?: 'up' | 'down' | 'neutral') => {
-    switch (trend) {
-      case 'up':
-        return <TrendingUpIcon sx={{ fontSize: 16, color: 'success.main' }} />;
-      case 'down':
-        return <TrendingDownIcon sx={{ fontSize: 16, color: 'error.main' }} />;
-      default:
-        return null;
-    }
-  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -216,8 +200,8 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
             value={stat.value}
             variant="stacked"
             size="large"
-            valueColor={stat.color || 'text.primary'}
-            trend={stat.trend}
+            valueColor={('color' in stat && stat.color ? stat.color as any : 'text.primary') as any}
+            trend={stat.trend === 'neutral' ? 'flat' : stat.trend as any}
             trendValue={stat.trendValue}
           />
         </Box>
@@ -237,10 +221,10 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
               },
             }}
           >
-            {item.avatar && (
+            {'avatar' in item && item.avatar && (
               <ListItemAvatar>
                 {typeof item.avatar === 'string' ? (
-                  <Avatar src={item.avatar} />
+                  <Avatar src={item.avatar as string} />
                 ) : (
                   <Avatar>{item.avatar}</Avatar>
                 )}
@@ -255,7 +239,7 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
               }
               secondary={item.secondary}
             />
-            {item.action && (
+            {'action' in item && item.action && (
               <ListItemSecondaryAction>
                 {item.action}
               </ListItemSecondaryAction>
@@ -290,7 +274,7 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
             >
               {finalTableColumns.map((column) => (
                 <TableCell key={column}>
-                  {row[column]}
+                  {(row as any)[column]}
                 </TableCell>
               ))}
             </TableRow>
@@ -464,8 +448,8 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
       <CardContent
         sx={{
           p: contentPadding ? 3 : 0,
-          maxHeight: maxHeight && maxHeight > 0 ? maxHeight : 'none',
-          overflow: maxHeight && maxHeight > 0 ? 'auto' : 'visible',
+          maxHeight: maxHeight && typeof maxHeight === 'number' && maxHeight > 0 ? maxHeight : 'none',
+          overflow: maxHeight && typeof maxHeight === 'number' && maxHeight > 0 ? 'auto' : 'visible',
           '&:last-child': {
             pb: contentPadding ? 3 : 0,
           },

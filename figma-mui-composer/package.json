@@ -4,7 +4,7 @@
   "description": "Figma plugin to compose patterns using MUI primitives",
   "main": "code.js",
   "scripts": {
-    "build": "webpack --mode=production",
+    "build": "webpack --mode=production && cp manifest.json dist/",
     "watch": "webpack --mode=development --watch"
   },
   "author": "",

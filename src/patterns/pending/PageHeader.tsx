@@ -7,7 +7,6 @@ import {
   Button,
   Stack,
   Chip,
-  Paper,
   useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -15,8 +14,6 @@ import {
   Home as HomeIcon,
   ChevronRight as ChevronRightIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon,
-  Add as AddIcon,
   Download as DownloadIcon,
   Share as ShareIcon,
 } from '@mui/icons-material';
@@ -40,7 +37,6 @@ export interface PageHeaderProps {
     icon?: React.ReactNode;
     onClick?: () => void;
   }>;
-  elevation?: number;
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({
@@ -69,7 +65,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     { label: 'Share', icon: <ShareIcon />, onClick: () => {} },
     { label: 'Export', icon: <DownloadIcon />, onClick: () => {} },
   ],
-  elevation = 0,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));

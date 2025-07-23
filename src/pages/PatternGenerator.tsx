@@ -12,7 +12,6 @@ import {
   ToggleButtonGroup,
   IconButton,
   Tooltip,
-  useMediaQuery,
   Grid,
   Dialog,
   DialogContent,
@@ -346,7 +345,9 @@ export const PatternGenerator: React.FC = () => {
                   {devicePresets.map((device) => (
                     <ToggleButton key={device.name} value={device.name}>
                       <Tooltip title={device.name}>
-                        {device.icon}
+                        <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
+                          {device.icon}
+                        </Box>
                       </Tooltip>
                     </ToggleButton>
                   ))}
@@ -403,7 +404,9 @@ export const PatternGenerator: React.FC = () => {
                   {devicePresets.map((device) => (
                     <ToggleButton key={device.name} value={device.name}>
                       <Tooltip title={device.name}>
-                        {device.icon}
+                        <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
+                          {device.icon}
+                        </Box>
                       </Tooltip>
                     </ToggleButton>
                   ))}

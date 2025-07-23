@@ -107,7 +107,7 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
 
     const valueContent = (
       <Typography
-        variant={currentSize.valueSize}
+        variant={currentSize.valueSize as any}
         color={valueColor}
         fontWeight={valueWeight === 'bold' ? 700 : valueWeight === 'medium' ? 500 : 400}
         component="span"
@@ -139,7 +139,7 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
           </Box>
         )}
         <Typography
-          variant={currentSize.labelSize}
+          variant={currentSize.labelSize as any}
           color={labelColor}
           component="span"
         >
@@ -192,7 +192,7 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
         justifyContent={align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'}
       >
         {renderLabel()}
-        <Typography variant={currentSize.labelSize} color="text.secondary">:</Typography>
+        <Typography variant={currentSize.labelSize as any} color="text.secondary">:</Typography>
         {renderValue()}
         {renderTrend()}
       </Stack>
@@ -209,7 +209,7 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
         justifyContent={align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'}
       >
         {renderValue()}
-        <Typography variant={currentSize.labelSize} color={labelColor}>
+        <Typography variant={currentSize.labelSize as any} color={labelColor}>
           {label}
         </Typography>
         {renderTrend()}

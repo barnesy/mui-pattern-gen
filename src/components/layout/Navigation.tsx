@@ -13,7 +13,6 @@ import {
   Palette as PaletteIcon,
   Edit as EditIcon,
   ViewModule as ViewModuleIcon,
-  SportsEsports as GameIcon,
   AddBox as AddBoxIcon,
 } from '@mui/icons-material';
 
@@ -34,7 +33,6 @@ const navigationItems: NavigationItem[] = [
   { text: 'Components', path: '/components', icon: <DashboardIcon /> },
   { text: 'Pattern Generator', path: '/pattern-generator', icon: <AddBoxIcon /> },
   { text: 'Pattern Library', path: '/patterns', icon: <ViewModuleIcon /> },
-  { text: 'Game Hub', path: '/game', icon: <GameIcon /> },
 ];
 
 export const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
