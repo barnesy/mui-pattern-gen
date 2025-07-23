@@ -66,8 +66,8 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
     <Box sx={{ 
       position: 'relative', 
       width, 
-      height: isFullscreen ? '100%' : 'auto',
-      minHeight: isFullscreen ? '100%' : iframeHeight 
+      height: isFullscreen ? '100vh' : 'auto',
+      minHeight: isFullscreen ? '100vh' : iframeHeight 
     }}>
       {isLoading && (
         <Box
@@ -87,8 +87,7 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
         src={iframeUrl}
         style={{
           width: '100%',
-          height: isFullscreen ? '100%' : iframeHeight,
-          minHeight: isFullscreen ? '100vh' : 'auto',
+          height: isFullscreen ? '100vh' : iframeHeight,
           border: 'none',
           opacity: isLoading ? 0 : 1,
           transition: 'opacity 0.2s, height 0.2s',
