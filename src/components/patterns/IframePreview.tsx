@@ -7,6 +7,7 @@ interface IframePreviewProps {
   theme: 'light' | 'dark';
   width: number | string;
   onLoad?: () => void;
+  isFullscreen?: boolean;
 }
 
 export const IframePreview: React.FC<IframePreviewProps> = ({
@@ -14,7 +15,8 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
   componentProps,
   theme,
   width,
-  onLoad
+  onLoad,
+  isFullscreen = false
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,7 +63,12 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
   }, [theme, iframeReady]);
 
   return (
-    <Box sx={{ position: 'relative', width, minHeight: iframeHeight }}>
+    <Box sx={{ 
+      position: 'relative', 
+      width, 
+      height: isFullscreen ? '100%' : 'auto',
+      minHeight: isFullscreen ? '100%' : iframeHeight 
+    }}>
       {isLoading && (
         <Box
           sx={{
@@ -80,7 +87,8 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
         src={iframeUrl}
         style={{
           width: '100%',
-          height: iframeHeight,
+          height: isFullscreen ? '100%' : iframeHeight,
+          minHeight: isFullscreen ? '100vh' : 'auto',
           border: 'none',
           opacity: isLoading ? 0 : 1,
           transition: 'opacity 0.2s, height 0.2s',

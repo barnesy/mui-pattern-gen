@@ -346,15 +346,16 @@ export const PatternGenerator: React.FC = () => {
                   zIndex: isFullscreen ? theme.zIndex.modal : 'auto',
                   width: isFullscreen ? '100vw' : 'auto',
                   height: isFullscreen ? '100vh' : 'auto',
+                  overflow: isFullscreen ? 'auto' : 'visible',
                 }}
               >
-                
                 {context.current ? (
                   <IframePreview
                     componentName={context.current}
                     componentProps={componentProps}
                     theme={previewTheme}
                     width="100%"
+                    isFullscreen={isFullscreen}
                   />
                 ) : (
                   <Box sx={{ p: 4, textAlign: 'center', minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
