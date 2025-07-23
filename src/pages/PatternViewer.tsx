@@ -22,6 +22,8 @@ import {
   alpha,
   useMediaQuery,
   Modal,
+  Divider,
+  Tooltip,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -87,6 +89,7 @@ export const PatternViewer: React.FC = () => {
   const [patternConfig, setPatternConfig] = useState<SettingControl[]>([]);
   const [componentProps, setComponentProps] = useState<Record<string, any>>({});
   const [configLoading, setConfigLoading] = useState(false);
+  const [density, setDensity] = useState<'comfortable' | 'compact' | 'spacious'>('comfortable');
 
   // Handle Escape key to close preview
   useEffect(() => {
@@ -128,6 +131,7 @@ export const PatternViewer: React.FC = () => {
         const pendingPatterns = [
           'PageHeader',
           'LabelValuePair',
+          'DataDisplayCard',
         ];
         
         pendingPatterns.forEach(pattern => {
@@ -243,6 +247,12 @@ export const PatternViewer: React.FC = () => {
       if (preset) {
         setPreviewWidth(preset.width);
       }
+    }
+  };
+
+  const handleDensityChange = (_event: React.MouseEvent<HTMLElement>, newDensity: 'comfortable' | 'compact' | 'spacious' | null) => {
+    if (newDensity) {
+      setDensity(newDensity);
     }
   };
 
@@ -509,6 +519,32 @@ export const PatternViewer: React.FC = () => {
                     </ToggleButton>
                   ))}
                 </ToggleButtonGroup>
+                
+                <Divider orientation="vertical" flexItem />
+                
+                <ToggleButtonGroup
+                  value={density}
+                  exclusive
+                  onChange={handleDensityChange}
+                  size="small"
+                >
+                  <ToggleButton value="compact">
+                    <Tooltip title="Compact">
+                      <Typography variant="caption">Compact</Typography>
+                    </Tooltip>
+                  </ToggleButton>
+                  <ToggleButton value="comfortable">
+                    <Tooltip title="Comfortable">
+                      <Typography variant="caption">Comfortable</Typography>
+                    </Tooltip>
+                  </ToggleButton>
+                  <ToggleButton value="spacious">
+                    <Tooltip title="Spacious">
+                      <Typography variant="caption">Spacious</Typography>
+                    </Tooltip>
+                  </ToggleButton>
+                </ToggleButtonGroup>
+                
                 <Button 
                   onClick={() => setSelectedPattern(null)}
                   startIcon={<CloseIcon />}
@@ -574,6 +610,7 @@ export const PatternViewer: React.FC = () => {
                     ? `../patterns/pending/${selectedPattern.name}.tsx`
                     : `../patterns/${selectedPattern.category}/${selectedPattern.name}.tsx`
                   }
+                  density={density}
                 />
               </Box>
             </Box>

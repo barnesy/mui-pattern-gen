@@ -9,6 +9,7 @@ interface IframePreviewProps {
   onLoad?: () => void;
   isFullscreen?: boolean;
   componentPath?: string;
+  density?: 'comfortable' | 'compact' | 'spacious';
 }
 
 export const IframePreview: React.FC<IframePreviewProps> = ({
@@ -18,7 +19,8 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
   width,
   onLoad,
   isFullscreen = false,
-  componentPath
+  componentPath,
+  density = 'comfortable'
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,6 +72,16 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
       }, '*');
     }
   }, [theme, iframeReady]);
+
+  // Send density updates
+  useEffect(() => {
+    if (iframeReady && iframeRef.current) {
+      iframeRef.current.contentWindow?.postMessage({
+        type: 'UPDATE_DENSITY',
+        density
+      }, '*');
+    }
+  }, [density, iframeReady]);
 
   return (
     <Box sx={{ 

@@ -16,7 +16,12 @@ interface UpdateThemeMessage {
   theme: 'light' | 'dark';
 }
 
-type PreviewMessage = UpdatePropsMessage | UpdateThemeMessage;
+interface UpdateDensityMessage {
+  type: 'UPDATE_DENSITY';
+  density: 'comfortable' | 'compact' | 'spacious';
+}
+
+type PreviewMessage = UpdatePropsMessage | UpdateThemeMessage | UpdateDensityMessage;
 
 function PatternPreviewApp() {
   const [component, setComponent] = useState<React.ComponentType<any> | null>(null);
@@ -31,19 +36,51 @@ function PatternPreviewApp() {
   const initialTheme = params.get('theme') as 'light' | 'dark' || 'light';
   
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>(initialTheme);
+  const [density, setDensity] = useState<'comfortable' | 'compact' | 'spacious'>('comfortable');
 
-  // Create theme
+  // Create theme with density
   const theme = React.useMemo(
     () =>
       createTheme({
         palette: themeMode === 'light' ? lightPalette : darkPalette,
         typography,
-        spacing: 8,
+        spacing: density === 'compact' ? 6 : density === 'spacious' ? 10 : 8,
         shape: {
           borderRadius: 4,
         },
+        components: {
+          MuiButton: {
+            styleOverrides: {
+              root: {
+                padding: density === 'compact' ? '4px 12px' : 
+                        density === 'spacious' ? '8px 20px' : 
+                        '6px 16px',
+              },
+            },
+          },
+          MuiTextField: {
+            defaultProps: {
+              size: density === 'compact' ? 'small' : 'medium',
+            },
+          },
+          MuiSelect: {
+            defaultProps: {
+              size: density === 'compact' ? 'small' : 'medium',
+            },
+          },
+          MuiChip: {
+            defaultProps: {
+              size: density === 'compact' ? 'small' : 'medium',
+            },
+          },
+          MuiIconButton: {
+            defaultProps: {
+              size: density === 'compact' ? 'small' : 'medium',
+            },
+          },
+        },
       }),
-    [themeMode]
+    [themeMode, density]
   );
 
   // Remove any background colors to let parent control styling
@@ -98,6 +135,8 @@ function PatternPreviewApp() {
         setProps(event.data.props);
       } else if (event.data.type === 'UPDATE_THEME') {
         setThemeMode(event.data.theme);
+      } else if (event.data.type === 'UPDATE_DENSITY') {
+        setDensity(event.data.density);
       }
     };
 
@@ -147,7 +186,7 @@ function PatternPreviewApp() {
       clearTimeout(timer);
       clearTimeout(initialTimer);
     };
-  }, [props, themeMode, component]);
+  }, [props, themeMode, component, density]);
 
   if (error) {
     return (
