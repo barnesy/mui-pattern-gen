@@ -20,8 +20,7 @@ import {
   Toolbar,
 } from '@mui/material';
 import { 
-  Pending, 
-  CheckCircle,
+  Pending,
   Smartphone,
   Tablet,
   Computer,
@@ -183,7 +182,7 @@ export const PatternGenerator: React.FC = () => {
     setComponentProps(defaults);
   }, [patternConfig]);
 
-  const handleDeviceChange = useCallback((event: React.MouseEvent<HTMLElement>, newDevice: string | null) => {
+  const handleDeviceChange = useCallback((_event: React.MouseEvent<HTMLElement>, newDevice: string | null) => {
     if (newDevice) {
       setPreviewDevice(newDevice);
       const preset = devicePresets.find(d => d.name === newDevice);
@@ -242,7 +241,7 @@ export const PatternGenerator: React.FC = () => {
     </Box>
   );
 
-  const PreviewContent = () => {
+  const PreviewContent = React.memo(() => {
     return context.current ? (
       <IframePreview
         componentName={context.current}
@@ -258,7 +257,7 @@ export const PatternGenerator: React.FC = () => {
         </Typography>
       </Box>
     );
-  };
+  });
 
   const PendingPattern = () => {
     return (
