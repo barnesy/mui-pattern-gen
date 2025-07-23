@@ -14,7 +14,10 @@ import {
   Tooltip,
   useMediaQuery,
   Grid,
-  Portal,
+  Dialog,
+  DialogContent,
+  AppBar,
+  Toolbar,
 } from '@mui/material';
 import { 
   Pending, 
@@ -239,6 +242,24 @@ export const PatternGenerator: React.FC = () => {
     </Box>
   );
 
+  const PreviewContent = () => {
+    return context.current ? (
+      <IframePreview
+        componentName={context.current}
+        componentProps={componentProps}
+        theme={previewTheme}
+        width="100%"
+        isFullscreen={isFullscreen}
+      />
+    ) : (
+      <Box sx={{ p: 4, textAlign: 'center', minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Typography color="text.secondary">
+          Loading pattern...
+        </Typography>
+      </Box>
+    );
+  };
+
   const PendingPattern = () => {
     return (
       <Box>
@@ -322,12 +343,12 @@ export const PatternGenerator: React.FC = () => {
                     </Tooltip>
 
                     {/* Fullscreen Toggle */}
-                    <Tooltip title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}>
+                    <Tooltip title="Fullscreen">
                       <IconButton
                         size="small"
-                        onClick={() => setIsFullscreen(!isFullscreen)}
+                        onClick={() => setIsFullscreen(true)}
                       >
-                        {isFullscreen ? <FullscreenExit /> : <Fullscreen />}
+                        <Fullscreen />
                       </IconButton>
                     </Tooltip>
                   </Stack>
@@ -338,32 +359,9 @@ export const PatternGenerator: React.FC = () => {
                 sx={{
                   flex: 1,
                   bgcolor: previewTheme === 'dark' ? 'grey.900' : 'grey.50',
-                  position: isFullscreen ? 'fixed' : 'relative',
-                  top: isFullscreen ? 0 : 'auto',
-                  left: isFullscreen ? 0 : 'auto',
-                  right: isFullscreen ? 0 : 'auto',
-                  bottom: isFullscreen ? 0 : 'auto',
-                  zIndex: isFullscreen ? theme.zIndex.modal : 'auto',
-                  width: isFullscreen ? '100vw' : 'auto',
-                  height: isFullscreen ? '100vh' : 'auto',
-                  overflow: isFullscreen ? 'auto' : 'visible',
                 }}
               >
-                {context.current ? (
-                  <IframePreview
-                    componentName={context.current}
-                    componentProps={componentProps}
-                    theme={previewTheme}
-                    width="100%"
-                    isFullscreen={isFullscreen}
-                  />
-                ) : (
-                  <Box sx={{ p: 4, textAlign: 'center', minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Typography color="text.secondary">
-                      Loading pattern...
-                    </Typography>
-                  </Box>
-                )}
+                <PreviewContent />
               </Box>
             </Box>
           </Grid>
@@ -382,6 +380,87 @@ export const PatternGenerator: React.FC = () => {
             </Grid>
           )}
         </Grid>
+
+        {/* Fullscreen Dialog */}
+        <Dialog
+          fullScreen
+          open={isFullscreen}
+          onClose={() => setIsFullscreen(false)}
+          TransitionProps={{
+            onEntered: () => {
+              // Ensure iframe resizes after dialog animation
+              window.dispatchEvent(new Event('resize'));
+            }
+          }}
+        >
+          <AppBar sx={{ position: 'relative' }}>
+            <Toolbar>
+              <Typography sx={{ flex: 1 }} variant="h6" component="div">
+                {context.current} Preview
+              </Typography>
+              
+              <Stack direction="row" spacing={1} alignItems="center">
+                {/* Device Selection */}
+                <ToggleButtonGroup
+                  value={previewDevice}
+                  exclusive
+                  onChange={handleDeviceChange}
+                  size="small"
+                  sx={{ 
+                    bgcolor: 'background.paper',
+                    '& .MuiToggleButton-root': {
+                      color: 'text.primary',
+                      borderColor: 'divider',
+                    }
+                  }}
+                >
+                  {devicePresets.map((device) => (
+                    <ToggleButton key={device.name} value={device.name}>
+                      <Tooltip title={device.name}>
+                        {device.icon}
+                      </Tooltip>
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+
+                {/* Theme Toggle */}
+                <Tooltip title={`Switch to ${previewTheme === 'light' ? 'dark' : 'light'} mode`}>
+                  <IconButton
+                    color="inherit"
+                    onClick={() => setPreviewTheme(prev => prev === 'light' ? 'dark' : 'light')}
+                  >
+                    {previewTheme === 'light' ? <DarkMode /> : <LightMode />}
+                  </IconButton>
+                </Tooltip>
+
+                {/* Exit Fullscreen */}
+                <Tooltip title="Exit fullscreen (Esc)">
+                  <IconButton
+                    edge="end"
+                    color="inherit"
+                    onClick={() => setIsFullscreen(false)}
+                    aria-label="close"
+                  >
+                    <FullscreenExit />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            </Toolbar>
+          </AppBar>
+          <DialogContent 
+            sx={{ 
+              p: 0, 
+              bgcolor: previewTheme === 'dark' ? 'grey.900' : 'grey.50',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Box sx={{ width: '100%', height: '100%' }}>
+              <PreviewContent />
+            </Box>
+          </DialogContent>
+        </Dialog>
       </Box>
     );
   };
@@ -399,39 +478,6 @@ export const PatternGenerator: React.FC = () => {
       )}
       
       {context.current ? <PendingPattern /> : <NoPendingPattern />}
-      
-      {/* Fullscreen exit button - rendered in a portal */}
-      {isFullscreen && (
-        <Portal>
-          <Box
-            sx={{
-              position: 'fixed',
-              top: 80, // Position below the header
-              right: 16,
-              zIndex: 9999,
-              bgcolor: 'background.paper',
-              borderRadius: 1,
-              boxShadow: 3,
-            }}
-          >
-            <Tooltip title="Exit fullscreen (Esc)">
-              <IconButton
-                onClick={() => setIsFullscreen(false)}
-                size="large"
-                color="primary"
-                sx={{ 
-                  p: 1.5,
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                  }
-                }}
-              >
-                <FullscreenExit fontSize="large" />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </Portal>
-      )}
     </Box>
   );
 };
