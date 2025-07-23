@@ -138,7 +138,7 @@ export const PatternGenerator: React.FC = () => {
       
       // Load config
       try {
-        const configModule = await import(`../patterns/pending/${componentName}.config.ts`);
+        const configModule = await import(/* @vite-ignore */ `../patterns/pending/${componentName}.config`);
         const controls = configModule[`${componentName.charAt(0).toLowerCase() + componentName.slice(1)}Controls`] || [];
         
         // Generate variations based on control types

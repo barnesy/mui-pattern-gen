@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* Reset body styles to ensure MUI theme takes precedence */
 body {
   margin: 0;
@@ -10,27 +6,13 @@ body {
   background-color: transparent;
 }
 
-/* 
-  Tailwind + MUI Integration
-  -------------------------
-  These styles complement MUI's theming system without overriding it.
-  We only add enhancements that MUI doesn't provide out of the box.
-*/
+/* Enhanced transitions for MUI components */
+.MuiButton-root {
+  transition: all 200ms ease-in-out;
+}
 
-@layer components {
-  /* Enhanced transitions and animations for MUI components */
-  .MuiButton-root {
-    @apply transition-all duration-200;
-  }
-  
-  .MuiChip-clickable:hover {
-    transform: translateY(-2px);
-  }
-  
-  /* Focus ring enhancements (complementary to MUI) */
-  .MuiOutlinedInput-root.Mui-focused {
-    @apply ring-2 ring-blue-500/20;
-  }
+.MuiChip-clickable:hover {
+  transform: translateY(-2px);
 }
 
 /* Density mode transitions */
@@ -43,34 +25,27 @@ body {
               height 0.2s ease-in-out;
 }
 
-/* Custom utility classes for use alongside MUI */
-@layer utilities {
-  /* Layout utilities */
-  .mui-container {
-    @apply container mx-auto px-4;
+/* Custom animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes slideIn {
+  from { 
+    transform: translateX(-20px);
+    opacity: 0;
   }
-  
-  /* Gradient utilities for custom use */
-  .gradient-primary {
-    @apply bg-gradient-to-r from-blue-500 to-blue-600;
+  to { 
+    transform: translateX(0);
+    opacity: 1;
   }
-  
-  .gradient-secondary {
-    @apply bg-gradient-to-r from-pink-500 to-pink-600;
-  }
-  
-  /* Animation utilities */
-  .animate-fade-in {
-    @apply animate-[fadeIn_0.3s_ease-in-out];
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  /* Responsive spacing utilities */
-  .section-spacing {
-    @apply py-8 md:py-12 lg:py-16;
-  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
 }

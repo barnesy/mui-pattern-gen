@@ -63,7 +63,7 @@ function PatternPreviewApp() {
         if (componentPath) {
           // Try the provided path
           try {
-            module = await import(componentPath);
+            module = await import(/* @vite-ignore */ componentPath);
           } catch (err) {
             // If custom path fails, try default pending path
             console.warn(`Failed to load from ${componentPath}, trying pending directory`);

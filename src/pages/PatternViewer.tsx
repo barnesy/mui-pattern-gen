@@ -198,11 +198,11 @@ export const PatternViewer: React.FC = () => {
     // Try to load pattern config
     try {
       const configPath = pattern.status === 'pending'
-        ? `../patterns/pending/${pattern.name}.config.ts`
-        : `../patterns/${pattern.category}/${pattern.name}.config.ts`;
+        ? `../patterns/pending/${pattern.name}.config`
+        : `../patterns/${pattern.category}/${pattern.name}.config`;
       
       try {
-        const configModule = await import(configPath);
+        const configModule = await import(/* @vite-ignore */ configPath);
         const controlsKey = `${pattern.name.charAt(0).toLowerCase() + pattern.name.slice(1)}Controls`;
         const controls = configModule[controlsKey] || [];
         setPatternConfig(controls);
