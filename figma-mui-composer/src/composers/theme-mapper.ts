@@ -296,7 +296,7 @@ export async function applyThemeTypography(
   if (!theme.typography) return;
   
   const typography = theme.typography[variant];
-  if (!typography) return;
+  if (!typography || typeof typography === 'string') return;
   
   try {
     // Load font
@@ -305,16 +305,19 @@ export async function applyThemeTypography(
       style: 'Regular'
     };
     
+    // Create a new font object to modify
+    let targetFont = { ...fontName };
+    
     if (typography.fontWeight) {
       if (typography.fontWeight >= 700) {
-        fontName.style = 'Bold';
+        targetFont.style = 'Bold';
       } else if (typography.fontWeight >= 500) {
-        fontName.style = 'Medium';
+        targetFont.style = 'Medium';
       }
     }
     
-    await figma.loadFontAsync(fontName);
-    node.fontName = fontName;
+    await figma.loadFontAsync(targetFont);
+    node.fontName = targetFont;
     
     // Apply size
     if (typography.fontSize) {

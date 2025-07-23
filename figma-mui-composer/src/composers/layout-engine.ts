@@ -68,7 +68,7 @@ export function muiLayoutToFigma(muiProps: Record<string, any>): Partial<FrameNo
   }
   
   if (muiProps.alignItems) {
-    figmaFrame.counterAxisAlignItems = mapAlignItems(muiProps.alignItems);
+    figmaFrame.counterAxisAlignItems = mapAlignItems(muiProps.alignItems) as 'MIN' | 'CENTER' | 'MAX' | 'BASELINE';
   }
   
   // Handle sizing
@@ -105,18 +105,18 @@ function mapJustifyContent(value: string): 'MIN' | 'CENTER' | 'MAX' | 'SPACE_BET
 }
 
 // Map MUI alignItems to Figma counterAxisAlignItems
-function mapAlignItems(value: string): 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' {
-  const mappings: Record<string, 'MIN' | 'CENTER' | 'MAX' | 'STRETCH'> = {
+function mapAlignItems(value: string): 'MIN' | 'CENTER' | 'MAX' | 'BASELINE' {
+  const mappings: Record<string, 'MIN' | 'CENTER' | 'MAX' | 'BASELINE'> = {
     'flex-start': 'MIN',
     'start': 'MIN',
     'center': 'CENTER',
     'flex-end': 'MAX',
     'end': 'MAX',
-    'stretch': 'STRETCH',
-    'baseline': 'CENTER' // Approximation
+    'stretch': 'CENTER', // Approximation - Figma doesn't have STRETCH for counterAxis
+    'baseline': 'BASELINE'
   };
   
-  return mappings[value] || 'STRETCH';
+  return mappings[value] || 'CENTER';
 }
 
 // Convert MUI Grid to Figma

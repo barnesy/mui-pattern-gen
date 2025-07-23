@@ -28,7 +28,6 @@ interface NavigationProps {
 
 const navigationItems: NavigationItem[] = [
   { text: 'Home', path: '/', icon: <HomeIcon /> },
-  { text: 'Pattern Arena', path: '/game', icon: <GameIcon /> },
   { text: 'Editor', path: '/theme-editor', icon: <EditIcon /> },
   { text: 'Theme', path: '/theme', icon: <PaletteIcon /> },
   { text: 'Components', path: '/components', icon: <DashboardIcon /> },

@@ -355,7 +355,7 @@ export const muiComponentMappings: Record<string, MUIComponentMapping> = {
     },
     variantMapping: {
       variant: ['text', 'circular', 'rectangular'],
-      animation: ['pulse', 'wave', false]
+      animation: ['pulse', 'wave', 'false']
     }
   }
 };

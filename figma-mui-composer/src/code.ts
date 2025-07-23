@@ -68,7 +68,10 @@ async function discoverMUIComponents() {
   
   const componentMap: MUIComponentMap = {};
   
-  components.forEach((component: ComponentNode | ComponentSetNode) => {
+  components.forEach((component) => {
+    if (component.type !== 'COMPONENT' && component.type !== 'COMPONENT_SET') {
+      return;
+    }
     // Extract component name and category from Figma naming convention
     const name = component.name;
     const cleanName = extractComponentName(name);
@@ -220,7 +223,26 @@ async function createElement(
       }
       
       // Create instance
-      const instance = component.createInstance();
+      let instance: InstanceNode;
+      
+      if (component.type === 'COMPONENT') {
+        instance = component.createInstance();
+      } else {
+        // For ComponentSet, get the default variant
+        const defaultVariant = component.defaultVariant;
+        if (defaultVariant && defaultVariant.type === 'COMPONENT') {
+          instance = defaultVariant.createInstance();
+        } else {
+          // Find first component child
+          const firstComponent = component.children.find(child => child.type === 'COMPONENT') as ComponentNode;
+          if (firstComponent) {
+            instance = firstComponent.createInstance();
+          } else {
+            console.error('No component found in component set');
+            return null;
+          }
+        }
+      }
       
       // Apply props if available
       if (element.props && instance.type === 'INSTANCE') {
@@ -271,9 +293,10 @@ function applyPropsToInstance(instance: InstanceNode, props: Record<string, any>
   // Handle variant properties
   if (props.variant && instance.componentProperties) {
     try {
-      instance.setProperties({
-        variant: { value: props.variant }
-      });
+      const propValue: { [key: string]: string | boolean } = {
+        'variant': String(props.variant)
+      };
+      instance.setProperties(propValue);
     } catch (error) {
       console.warn('Could not set variant property:', error);
     }
@@ -282,9 +305,10 @@ function applyPropsToInstance(instance: InstanceNode, props: Record<string, any>
   // Handle other common props
   if (props.size && instance.componentProperties) {
     try {
-      instance.setProperties({
-        size: { value: props.size }
-      });
+      const propValue: { [key: string]: string | boolean } = {
+        'size': String(props.size)
+      };
+      instance.setProperties(propValue);
     } catch (error) {
       console.warn('Could not set size property:', error);
     }
@@ -292,9 +316,10 @@ function applyPropsToInstance(instance: InstanceNode, props: Record<string, any>
   
   if (props.color && instance.componentProperties) {
     try {
-      instance.setProperties({
-        color: { value: props.color }
-      });
+      const propValue: { [key: string]: string | boolean } = {
+        'color': String(props.color)
+      };
+      instance.setProperties(propValue);
     } catch (error) {
       console.warn('Could not set color property:', error);
     }
