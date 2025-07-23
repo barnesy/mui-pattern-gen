@@ -1,0 +1,1 @@
+// Dashboard patterns - stats cards, charts, widgets, analytics

@@ -1,0 +1,1 @@
+// Navigation patterns - headers, sidebars, breadcrumbs, menus

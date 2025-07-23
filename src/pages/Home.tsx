@@ -37,11 +37,10 @@ export const Home: React.FC = () => {
     },
     {
       title: 'Pattern Generator',
-      description: 'Coming soon: Generate component patterns and boilerplate code.',
+      description: 'Generate and manage reusable component patterns with MUI.',
       icon: <CodeIcon sx={{ fontSize: 48 }} />,
-      action: () => {},
-      color: 'grey.400',
-      disabled: true,
+      action: () => navigate('/patterns'),
+      color: 'success.main',
     },
   ];
 
@@ -132,6 +131,10 @@ export const Home: React.FC = () => {
             <Typography component="li" variant="body1" paragraph>
               <strong>Theme Viewer:</strong> Inspect theme values including color palettes,
               typography settings, spacing units, shadows, and breakpoints
+            </Typography>
+            <Typography component="li" variant="body1" paragraph>
+              <strong>Pattern Generator:</strong> Create reusable component patterns using MUI components.
+              Tell Claude to generate patterns via the terminal and manage them through the UI
             </Typography>
           </Box>
           <Typography variant="body1">

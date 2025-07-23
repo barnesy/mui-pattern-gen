@@ -52,7 +52,7 @@ export const darkPalette: PaletteOptions = {
   },
   "background": {
     "default": "#1A1F25",
-    "paper": "#1f2933"
+    "paper": "#181f25"
   },
   "text": {
     "primary": "#FFFFFF",

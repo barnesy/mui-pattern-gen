@@ -9,6 +9,7 @@ import { Home } from './pages/Home';
 import { ComponentShowcase } from './pages/ComponentShowcase';
 import { ThemeViewer } from './pages/ThemeViewer';
 import { ThemeEditor } from './pages/ThemeEditor';
+import { PatternGenerator } from './pages/PatternGenerator';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { theme as baseTheme } from './theme/theme';
 import { darkPalette } from './theme';
@@ -110,6 +111,7 @@ function AppWithDensity() {
             <Route path="components" element={<ComponentShowcase />} />
             <Route path="theme" element={<ThemeViewer />} />
             <Route path="theme-editor" element={<ThemeEditor />} />
+            <Route path="patterns" element={<PatternGenerator />} />
           </Route>
         </Routes>
       </BrowserRouter>

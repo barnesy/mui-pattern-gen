@@ -12,6 +12,7 @@ import {
   Dashboard as DashboardIcon,
   Palette as PaletteIcon,
   Edit as EditIcon,
+  ViewModule as ViewModuleIcon,
 } from '@mui/icons-material';
 
 interface NavigationItem {
@@ -29,6 +30,7 @@ const navigationItems: NavigationItem[] = [
   { text: 'Editor', path: '/theme-editor', icon: <EditIcon /> },
   { text: 'Theme', path: '/theme', icon: <PaletteIcon /> },
   { text: 'Components', path: '/components', icon: <DashboardIcon /> },
+  { text: 'Patterns', path: '/patterns', icon: <ViewModuleIcon /> },
 ];
 
 export const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {

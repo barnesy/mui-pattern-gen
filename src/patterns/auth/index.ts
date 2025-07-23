@@ -1,0 +1,1 @@
+// Authentication patterns - login, register, password reset
