@@ -24,7 +24,7 @@ import {
 export interface PageHeaderProps {
   title?: string;
   subtitle?: string;
-  variant?: 'default' | 'minimal' | 'card' | 'transparent';
+  variant?: 'default' | 'minimal' | 'transparent';
   showBreadcrumbs?: boolean;
   breadcrumbs?: Array<{ label: string; href?: string }>;
   status?: string;
@@ -75,7 +75,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
 
-  const isCard = variant === 'card';
   const isMinimal = variant === 'minimal';
   const isTransparent = variant === 'transparent';
 
@@ -238,21 +237,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       </Stack>
     </>
   );
-
-  if (isCard) {
-    return (
-      <Paper
-        elevation={elevation}
-        sx={{
-          p: { xs: 2, sm: 3, md: 4 },
-          mb: 3,
-          borderRadius: 2,
-        }}
-      >
-        {headerContent}
-      </Paper>
-    );
-  }
 
   return (
     <Box

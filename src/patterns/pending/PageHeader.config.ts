@@ -10,7 +10,6 @@ export const pageHeaderControls: PropControl[] = [
     options: [
       { label: 'Default', value: 'default' },
       { label: 'Minimal', value: 'minimal' },
-      { label: 'Card', value: 'card' },
       { label: 'Transparent', value: 'transparent' },
     ],
     group: 'General',
@@ -85,7 +84,7 @@ export const pageHeaderControls: PropControl[] = [
     min: 0,
     max: 8,
     step: 1,
-    helperText: 'Shadow depth for Card variant',
+    helperText: 'Shadow depth (only applies to default variant)',
     group: 'Appearance',
   },
 ];

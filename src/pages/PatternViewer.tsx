@@ -78,6 +78,8 @@ export const PatternViewer: React.FC = () => {
   const [pendingContext, setPendingContext] = useState<any>(null);
   const [previewDevice, setPreviewDevice] = useState<string>('Desktop');
   const [previewWidth, setPreviewWidth] = useState<number>(1200);
+  const [selectedVariant, setSelectedVariant] = useState<string>('default');
+  const [variantOptions, setVariantOptions] = useState<Array<{ label: string; value: string }>>([]);
 
   // Load patterns from file system
   useEffect(() => {
@@ -105,7 +107,7 @@ export const PatternViewer: React.FC = () => {
         // List of pending patterns - KEEP THIS UPDATED when patterns are added/removed
         // This should match the actual files in src/patterns/pending/
         const pendingPatterns = [
-          // Currently no pending patterns
+          'PageHeader',
         ];
         
         pendingPatterns.forEach(pattern => {
@@ -165,8 +167,43 @@ export const PatternViewer: React.FC = () => {
   const pendingCount = patterns.filter(p => p.status === 'pending').length;
   const acceptedCount = patterns.filter(p => p.status === 'accepted').length;
 
-  const handleViewPattern = (pattern: Pattern) => {
+  const handleViewPattern = async (pattern: Pattern) => {
     setSelectedPattern(pattern);
+    setSelectedVariant('default');
+    setVariantOptions([]);
+    
+    // Try to load pattern config to get variants
+    try {
+      const configPath = pattern.status === 'pending'
+        ? `/src/patterns/pending/${pattern.name}.config.ts`
+        : `/src/patterns/${pattern.category}/${pattern.name}.config.ts`;
+      
+      const response = await fetch(configPath);
+      if (response.ok) {
+        const configText = await response.text();
+        
+        // Extract variant options from config (simple regex approach)
+        const variantMatch = configText.match(/type:\s*['"]variant['"]/i);
+        if (variantMatch) {
+          // Look for options array after variant type
+          const optionsMatch = configText.match(/options:\s*\[((?:[^\[\]]|\[[^\]]*\])*?)\]/s);
+          if (optionsMatch) {
+            // Parse the options array
+            const optionsStr = optionsMatch[1];
+            const optionMatches = optionsStr.matchAll(/\{\s*label:\s*['"]([^'"]+)['"],\s*value:\s*['"]([^'"]+)['"]/g);
+            const options = Array.from(optionMatches).map(match => ({
+              label: match[1],
+              value: match[2]
+            }));
+            if (options.length > 0) {
+              setVariantOptions(options);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.log('No config file found for pattern:', pattern.name);
+    }
   };
 
   const handleDeviceChange = (_event: React.MouseEvent<HTMLElement>, newDevice: string | null) => {
@@ -398,6 +435,21 @@ export const PatternViewer: React.FC = () => {
             <Stack direction="row" alignItems="center" justifyContent="space-between">
               <Typography variant="h5">{selectedPattern.name} Preview</Typography>
               <Stack direction="row" spacing={2} alignItems="center">
+                {variantOptions.length > 0 && (
+                  <ToggleButtonGroup
+                    value={selectedVariant}
+                    exclusive
+                    onChange={(_, value) => value && setSelectedVariant(value)}
+                    size="small"
+                  >
+                    {variantOptions.map((variant) => (
+                      <ToggleButton key={variant.value} value={variant.value}>
+                        {variant.label}
+                      </ToggleButton>
+                    ))}
+                  </ToggleButtonGroup>
+                )}
+                <Divider orientation="vertical" flexItem />
                 <ToggleButtonGroup
                   value={previewDevice}
                   exclusive
@@ -439,7 +491,7 @@ export const PatternViewer: React.FC = () => {
               >
                 <IframePreview
                   componentName={selectedPattern.name}
-                  componentProps={{}}
+                  componentProps={{ variant: selectedVariant }}
                   theme={theme.palette.mode}
                   width="100%"
                   componentPath={selectedPattern.status === 'pending' 
