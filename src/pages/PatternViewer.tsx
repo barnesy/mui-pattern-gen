@@ -108,6 +108,7 @@ export const PatternViewer: React.FC = () => {
         // This should match the actual files in src/patterns/pending/
         const pendingPatterns = [
           'PageHeader',
+          'LabelValuePair',
         ];
         
         pendingPatterns.forEach(pattern => {
@@ -449,7 +450,7 @@ export const PatternViewer: React.FC = () => {
                     ))}
                   </ToggleButtonGroup>
                 )}
-                <Divider orientation="vertical" flexItem />
+                {variantOptions.length > 0 && <Divider orientation="vertical" flexItem />}
                 <ToggleButtonGroup
                   value={previewDevice}
                   exclusive
