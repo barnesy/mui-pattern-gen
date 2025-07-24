@@ -13,7 +13,6 @@ import {
   Home as HomeIcon,
   Dashboard as DashboardIcon,
   Palette as PaletteIcon,
-  Edit as EditIcon,
   ViewModule as ViewModuleIcon,
   AddBox as AddBoxIcon,
 } from '@mui/icons-material';
@@ -30,7 +29,6 @@ interface NavigationProps {
 
 const navigationItems: NavigationItem[] = [
   { text: 'Home', path: '/', icon: <HomeIcon /> },
-  { text: 'Editor', path: '/theme-editor', icon: <EditIcon /> },
   { text: 'Theme', path: '/theme', icon: <PaletteIcon /> },
   { text: 'Components', path: '/components', icon: <DashboardIcon /> },
   { text: 'Pattern Generator', path: '/pattern-generator', icon: <AddBoxIcon /> },
