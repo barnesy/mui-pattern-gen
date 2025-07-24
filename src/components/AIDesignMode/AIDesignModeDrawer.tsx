@@ -11,6 +11,8 @@ import {
   Toolbar,
   FormControlLabel,
   Switch,
+  Breadcrumbs,
+  Link,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -19,6 +21,7 @@ import {
   CheckCircle as CheckIcon,
   Warning as WarningIcon,
   Layers as LayersIcon,
+  NavigateNext as NavigateNextIcon,
 } from '@mui/icons-material';
 import { useAIDesignMode } from '../../contexts/AIDesignModeContext';
 import { PatternInstance, PatternInstanceManager } from '../../services/PatternInstanceManager';
@@ -54,6 +57,14 @@ export const AIDesignModeDrawer: React.FC = () => {
     }
 
     const loadConfig = async () => {
+      // Skip loading config for sub-components
+      if (selectedPattern.isSubComponent) {
+        setConfigLoading(false);
+        setPatternConfig([]);
+        setComponentProps(selectedPattern.props || {});
+        return;
+      }
+      
       setConfigLoading(true);
       try {
         const configPath = selectedPattern.status === 'pending'
@@ -184,16 +195,76 @@ Requirements:
           <>
             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
               <Stack direction="row" alignItems="center" spacing={1}>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  {selectedPattern.name}
-                </Typography>
-                <Chip
-                  icon={selectedPattern.status === 'pending' ? <WarningIcon /> : <CheckIcon />}
-                  label={selectedPattern.status}
-                  size="small"
-                  color={selectedPattern.status === 'pending' ? 'warning' : 'success'}
-                  variant="outlined"
-                />
+                {selectedPattern.isSubComponent ? (
+                  <Box>
+                    <Breadcrumbs 
+                      separator={<NavigateNextIcon fontSize="small" />}
+                      aria-label="component hierarchy"
+                      sx={{ mb: 1 }}
+                    >
+                      <Link
+                        component="button"
+                        variant="body2"
+                        underline="hover"
+                        color="inherit"
+                        onClick={() => {
+                          // Find parent pattern element and select it
+                          const parentInstanceId = selectedPattern.parentInstanceId;
+                          if (parentInstanceId) {
+                            const instances = getPatternInstances();
+                            const parentInstance = instances.find(inst => inst.id === parentInstanceId);
+                            if (parentInstance && parentInstance.element) {
+                              const patternName = parentInstance.element.getAttribute('data-pattern-name');
+                              const status = parentInstance.element.getAttribute('data-pattern-status') as 'pending' | 'accepted';
+                              const category = parentInstance.element.getAttribute('data-pattern-category') || '';
+                              const propsStr = parentInstance.element.getAttribute('data-pattern-props');
+                              
+                              let props = {};
+                              try {
+                                props = propsStr ? JSON.parse(propsStr) : {};
+                              } catch (e) {
+                                console.error('Failed to parse pattern props:', e);
+                              }
+                              
+                              setSelectedPattern({
+                                name: patternName || '',
+                                status,
+                                category,
+                                instanceId: parentInstanceId,
+                                props,
+                                element: parentInstance.element,
+                                rect: parentInstance.element.getBoundingClientRect(),
+                              });
+                              setSelectedInstanceId(parentInstanceId);
+                            }
+                          }
+                        }}
+                      >
+                        Parent Component
+                      </Link>
+                      <Typography color="text.primary">{selectedPattern.name}</Typography>
+                    </Breadcrumbs>
+                    <Chip
+                      label="Sub-component"
+                      size="small"
+                      color="secondary"
+                      variant="outlined"
+                    />
+                  </Box>
+                ) : (
+                  <>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {selectedPattern.name}
+                    </Typography>
+                    <Chip
+                      icon={selectedPattern.status === 'pending' ? <WarningIcon /> : <CheckIcon />}
+                      label={selectedPattern.status}
+                      size="small"
+                      color={selectedPattern.status === 'pending' ? 'warning' : 'success'}
+                      variant="outlined"
+                    />
+                  </>
+                )}
               </Stack>
               <IconButton
                 size="small"
@@ -308,6 +379,33 @@ Requirements:
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 2, py: 4 }}>
             <CircularProgress />
           </Box>
+        ) : selectedPattern.isSubComponent ? (
+          <Stack spacing={2} sx={{ p: 2 }}>
+            <Alert severity="info">
+              <Typography variant="body2">
+                Sub-component properties
+              </Typography>
+            </Alert>
+            
+            {/* Show sub-component props in a simple view */}
+            <Box sx={{ bgcolor: 'background.paper', p: 2, borderRadius: 1, border: 1, borderColor: 'divider' }}>
+              <Typography variant="subtitle2" gutterBottom>
+                Current Props:
+              </Typography>
+              <pre style={{ 
+                margin: 0, 
+                fontSize: '0.75rem',
+                overflow: 'auto',
+                maxHeight: '300px'
+              }}>
+                {JSON.stringify(componentProps, null, 2)}
+              </pre>
+            </Box>
+            
+            <Typography variant="caption" color="text.secondary">
+              Sub-component editing is coming soon. For now, edit the parent component to modify these properties.
+            </Typography>
+          </Stack>
         ) : patternConfig.length > 0 ? (
           <Stack spacing={3}>
             <SettingsPanel

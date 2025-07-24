@@ -37,22 +37,31 @@ npm run dev
 3. Now the entire DataDisplayCard is selected
 4. Click back on a label-value pair - back to sub-component selection
 
+#### Demo 4: Breadcrumb Navigation
+1. Click on a label-value pair to select it
+2. Look at the AI Design drawer - you'll see "Parent Component > labelValuePair-..."
+3. Click "Parent Component" in the breadcrumb
+4. Now the entire DataDisplayCard is selected
+5. The breadcrumb disappears since you're at the top level
+
 ## What's Happening Behind the Scenes
 
 1. **SubComponentWrapper** - Each LabelValuePair is wrapped with a special component that tracks selection
 2. **Hierarchical Tracking** - The system knows which sub-components belong to which parent
 3. **Smart Click Detection** - Clicks are intercepted and routed to the most specific component
 4. **Visual Feedback** - CSS outlines provide clear selection indicators
+5. **Breadcrumb Navigation** - Shows component hierarchy with clickable parent link
 
 ## Current Capabilities
 - ✅ Select individual LabelValuePairs within DataDisplayCards
 - ✅ Visual feedback for hover and selection states
 - ✅ Proper parent-child relationship tracking
 - ✅ Clean selection switching between components
+- ✅ Breadcrumb navigation showing component hierarchy
+- ✅ View sub-component properties in the drawer
 
 ## Coming Soon
 - 🚧 Edit props for selected sub-components
-- 🚧 Breadcrumb navigation showing component hierarchy
 - 🚧 Support for more sub-component types
 - 🚧 Keyboard navigation support
 
