@@ -22,19 +22,59 @@ This project uses a simple file-based pattern generation system. Patterns are Re
 import React from 'react';
 import { /* MUI imports */ } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { SpacingConfig, getSpacingValue } from '../../types/PatternVariant';
+import { TypographyVariant } from '../../types/TypographyConfig';
 
 export interface ComponentNameProps {
   // Define all props with proper types
   // Make props optional when appropriate
+  
+  // Component toggles (for major UI components)
+  showHeader?: boolean;
+  showFooter?: boolean;
+  
+  // Typography variants
+  titleVariant?: TypographyVariant;
+  subtitleVariant?: TypographyVariant;
+  
+  // Spacing
+  padding?: SpacingConfig;
+  margin?: SpacingConfig;
+  // etc.
 }
 
 export const ComponentName: React.FC<ComponentNameProps> = ({
   // Destructure props with defaults
+  showHeader = true,
+  showFooter = true,
+  titleVariant = 'h4',
+  subtitleVariant = 'body1',
+  padding,
+  margin,
+  // other props...
 }) => {
   const theme = useTheme();
   
   return (
-    // Implementation using MUI components
+    <Box
+      sx={{
+        padding: padding ? getSpacingValue(padding) : undefined,
+        margin: margin ? getSpacingValue(margin) : undefined,
+      }}
+    >
+      {showHeader && (
+        <Typography variant={titleVariant} component="h1">
+          {title}
+        </Typography>
+      )}
+      <Typography variant={subtitleVariant} color="text.secondary">
+        {subtitle}
+      </Typography>
+      {/* Main content */}
+      {showFooter && (
+        <Footer />
+      )}
+    </Box>
   );
 };
 ```
@@ -103,6 +143,41 @@ export const componentNameControls: PropControl[] = [
     helperText: 'Adjust component spacing',
     group: 'Layout',
   },
+  
+  // Typography controls
+  {
+    name: 'titleVariant',
+    type: 'typography',
+    label: 'Title Typography',
+    defaultValue: 'h4',
+    options: [
+      { label: 'H2', value: 'h2' },
+      { label: 'H3', value: 'h3' },
+      { label: 'H4', value: 'h4' },
+      { label: 'H5', value: 'h5' },
+      { label: 'H6', value: 'h6' },
+    ],
+    helperText: 'Select title style from theme',
+    group: 'Typography',
+  },
+  
+  // REQUIRED: Spacing controls - All patterns must have padding and margin
+  {
+    name: 'padding',
+    type: 'padding',
+    label: 'Padding',
+    defaultValue: { top: 16, right: 16, bottom: 16, left: 16 },
+    helperText: 'Internal spacing',
+    group: 'Layout',
+  },
+  {
+    name: 'margin',
+    type: 'margin',
+    label: 'Margin',
+    defaultValue: { top: 0, right: 0, bottom: 0, left: 0 },
+    helperText: 'External spacing',
+    group: 'Layout',
+  },
 ];
 ```
 
@@ -113,8 +188,60 @@ export const componentNameControls: PropControl[] = [
 - `select`: Dropdown selection
 - `slider`: Slider for numeric ranges
 - `variant`: Toggle button group for variants
+- `typography`: Chip-based typography variant selector
+- `spacing`: Spacing control with individual side adjustments
+- `size`: Size control with mode selection (auto/100%/custom)
+- `padding`/`margin`: Specific spacing controls
 
-**Important:** The export name must be `{componentName}Controls` where componentName is camelCase.
+**Typography Controls:**
+Use typography controls to let users select from theme typography variants:
+- Set `type: 'typography'` for the control
+- Provide `options` array with label/value pairs for available variants
+- Common typography variants: h1-h6, subtitle1-2, body1-2, caption, overline
+- Always provide a sensible `defaultValue` that matches the component's purpose
+
+Example:
+```typescript
+{
+  name: 'headingVariant',
+  type: 'typography',
+  label: 'Heading Style',
+  defaultValue: 'h5',
+  options: [
+    { label: 'H4', value: 'h4' },
+    { label: 'H5', value: 'h5' },
+    { label: 'H6', value: 'h6' },
+    { label: 'Subtitle 1', value: 'subtitle1' },
+  ],
+  helperText: 'Choose heading typography',
+  group: 'Typography',
+}
+```
+
+**Component Toggle Controls:**
+When creating boolean controls that toggle major components on/off, use these additional properties:
+- `isComponent: true` - Marks the control as a component toggle
+- `componentGroup: string` - Groups related components (e.g., "Structure", "Content", "Actions")
+- Always set `group: 'Components'` for component toggles
+
+Example:
+```typescript
+{
+  name: 'showHeader',
+  type: 'boolean',
+  label: 'Show Header',
+  defaultValue: true,
+  isComponent: true,
+  componentGroup: 'Structure',
+  helperText: 'Toggle header visibility',
+  group: 'Components',
+}
+```
+
+**Important Requirements:**
+- The export name must be `{componentName}Controls` where componentName is camelCase
+- ALL patterns MUST include both `padding` and `margin` controls for consistent spacing
+- Place spacing controls in the 'Layout' group after typography controls
 
 ### 5. **Update the context file** at `src/patterns/pending/.context.json`:
 ```json
@@ -216,16 +343,22 @@ The Pattern Generator now includes these interactive features:
 ## Best Practices for Interactive Patterns:
 
 1. **Always create a config file** with prop controls for every pattern
-2. **Group related props** using the `group` property (General, Features, Appearance, Layout, etc.)
-3. **Provide helpful `helperText`** for complex props
-4. **Use appropriate control types**:
+2. **Always include padding and margin controls**:
+   - Use appropriate default values based on component type
+   - Cards/containers: padding 16-24px
+   - Inline components: padding 8-12px
+   - Headers: padding responsive to screen size
+3. **Group related props** using the `group` property (General, Features, Appearance, Layout, etc.)
+4. **Provide helpful `helperText`** for complex props
+5. **Use appropriate control types**:
    - `variant` for main component variations
-   - `slider` for numeric ranges (spacing, size, etc.)
+   - `typography` for text style selection
+   - `padding`/`margin` for spacing (REQUIRED)
    - `boolean` for feature toggles
    - `select` for predefined options
    - `text` for user-provided content
-5. **Set sensible `defaultValue`** for all props
-6. **Make components responsive** - they should work at all preview sizes
+6. **Set sensible `defaultValue`** for all props
+7. **Make components responsive** - they should work at all preview sizes
 
 ## Important Notes:
 - Always use absolute imports from '@mui/material'

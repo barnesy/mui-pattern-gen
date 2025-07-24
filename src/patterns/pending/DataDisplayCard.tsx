@@ -88,6 +88,11 @@ export interface DataDisplayCardProps {
   error?: string;
   emptyMessage?: string;
   
+  // Component toggles
+  showHeader?: boolean;
+  showDivider?: boolean;
+  showSubheader?: boolean;
+  
   // Demo data
   demoDataType?: string;
   showMenuItems?: boolean;
@@ -100,6 +105,10 @@ export interface DataDisplayCardProps {
   // Spacing props
   padding?: SpacingConfig;
   margin?: SpacingConfig;
+  
+  // Typography
+  titleVariant?: string;
+  subtitleVariant?: string;
 }
 
 export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
@@ -117,6 +126,9 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
   loading = false,
   error,
   emptyMessage = 'No data available',
+  showHeader = true,
+  showDivider = true,
+  showSubheader = true,
   demoDataType,
   showMenuItems = true,
   showAction = false,
@@ -124,6 +136,8 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
   height,
   padding,
   margin,
+  titleVariant = 'h6',
+  subtitleVariant = 'body2',
 }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -375,7 +389,7 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
     if (error) {
       return (
         <Box sx={{ textAlign: 'center', py: 4 }}>
-          <ErrorIcon color="error" sx={{ fontSize: 48, mb: 2 }} />
+          <ErrorIcon color="error" fontSize="large" sx={{ mb: 2 }} />
           <Typography color="error">{error}</Typography>
         </Box>
       );
@@ -434,46 +448,50 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
         margin: margin ? getSpacingValue(margin) : undefined,
       }}
     >
-      <CardHeader
-        title={title}
-        subheader={subtitle}
-        action={
-          <Stack direction="row" spacing={1}>
-            {finalAction}
-            {finalMenuItems && finalMenuItems.length > 0 && (
-              <>
-                <IconButton size="small" onClick={handleMenuOpen}>
-                  <MoreVertIcon />
-                </IconButton>
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                >
-                  {finalMenuItems.map((item, index) => (
-                    <MenuItem
-                      key={index}
-                      onClick={() => {
-                        item.onClick();
-                        handleMenuClose();
-                      }}
-                    >
-                      {item.label}
-                    </MenuItem>
-                  ))}
-                </Menu>
-              </>
-            )}
-          </Stack>
-        }
-        sx={{
-          '& .MuiCardHeader-action': {
-            alignSelf: 'center',
-          },
-        }}
-      />
+      {showHeader && (
+        <CardHeader
+          title={title}
+          titleTypographyProps={{ variant: titleVariant as any }}
+          subheader={showSubheader ? subtitle : undefined}
+          subheaderTypographyProps={{ variant: subtitleVariant as any }}
+          action={
+            <Stack direction="row" spacing={1}>
+              {finalAction}
+              {finalMenuItems && finalMenuItems.length > 0 && (
+                <>
+                  <IconButton size="small" onClick={handleMenuOpen}>
+                    <MoreVertIcon />
+                  </IconButton>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                  >
+                    {finalMenuItems.map((item, index) => (
+                      <MenuItem
+                        key={index}
+                        onClick={() => {
+                          item.onClick();
+                          handleMenuClose();
+                        }}
+                      >
+                        {item.label}
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </>
+              )}
+            </Stack>
+          }
+          sx={{
+            '& .MuiCardHeader-action': {
+              alignSelf: 'center',
+            },
+          }}
+        />
+      )}
       
-      <Divider />
+      {showHeader && showDivider && <Divider />}
       
       <CardContent
         sx={{

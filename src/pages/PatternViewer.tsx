@@ -3,19 +3,13 @@ import {
   Box,
   Typography,
   Chip,
-  TextField,
-  InputAdornment,
   Stack,
-  Paper,
   Alert,
   Tab,
   Tabs,
   Badge,
   CircularProgress,
 } from '@mui/material';
-import {
-  Search as SearchIcon,
-} from '@mui/icons-material';
 import { withPatternWrapper } from '../utils/withPatternWrapper';
 
 interface Pattern {
@@ -96,7 +90,6 @@ const PatternRenderer: React.FC<{ pattern: Pattern }> = ({ pattern }) => {
 
 export const PatternViewer: React.FC = () => {
   const [patterns, setPatterns] = useState<Pattern[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'accepted'>('all');
   const [loading, setLoading] = useState(true);
@@ -177,13 +170,12 @@ export const PatternViewer: React.FC = () => {
     loadPatterns();
   }, []);
 
-  // Filter patterns based on search, category, and status
+  // Filter patterns based on category and status
   const filteredPatterns = patterns.filter(pattern => {
-    const matchesSearch = pattern.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || pattern.category === selectedCategory;
     const matchesStatus = statusFilter === 'all' || pattern.status === statusFilter;
     
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesCategory && matchesStatus;
   });
 
   // Count patterns by status
@@ -192,7 +184,7 @@ export const PatternViewer: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h1" gutterBottom>
         Pattern Library
       </Typography>
       
@@ -200,54 +192,37 @@ export const PatternViewer: React.FC = () => {
         Click on any pattern while AI Design Mode is active to customize it
       </Typography>
       
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Stack spacing={3}>
-          <TextField
-            fullWidth
-            placeholder="Search patterns..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
+      <Box sx={{ mb: 3 }}>
+        <Tabs 
+          value={statusFilter} 
+          onChange={(_, value) => setStatusFilter(value)}
+        >
+          <Tab 
+            label={
+              <Badge badgeContent={patterns.length} color="primary">
+                All
+              </Badge>
+            } 
+            value="all" 
           />
-          
-          <Tabs 
-            value={statusFilter} 
-            onChange={(_, value) => setStatusFilter(value)}
-            variant="fullWidth"
-          >
-            <Tab 
-              label={
-                <Badge badgeContent={patterns.length} color="primary">
-                  All
-                </Badge>
-              } 
-              value="all" 
-            />
-            <Tab 
-              label={
-                <Badge badgeContent={pendingCount} color="warning">
-                  Pending
-                </Badge>
-              } 
-              value="pending" 
-            />
-            <Tab 
-              label={
-                <Badge badgeContent={acceptedCount} color="success">
-                  Accepted
-                </Badge>
-              } 
-              value="accepted" 
-            />
-          </Tabs>
-        </Stack>
-      </Paper>
+          <Tab 
+            label={
+              <Badge badgeContent={pendingCount} color="warning">
+                Pending
+              </Badge>
+            } 
+            value="pending" 
+          />
+          <Tab 
+            label={
+              <Badge badgeContent={acceptedCount} color="success">
+                Accepted
+              </Badge>
+            } 
+            value="accepted" 
+          />
+        </Tabs>
+      </Box>
 
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>

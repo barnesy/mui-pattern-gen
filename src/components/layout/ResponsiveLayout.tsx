@@ -110,14 +110,6 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             MUI Pattern Generator
           </Typography>
-          <IconButton
-            color="inherit"
-            aria-label="toggle right drawer"
-            onClick={toggleRightDrawer}
-            sx={{ mr: 1 }}
-          >
-            <SidebarIcon sx={{ transform: 'scaleX(-1)' }} />
-          </IconButton>
           <AIDesignModeToggle variant="icon" />
           <Tooltip title={`Density: ${density}`}>
             <IconButton

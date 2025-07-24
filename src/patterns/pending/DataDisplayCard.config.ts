@@ -45,6 +45,36 @@ export const dataDisplayCardControls: PropControl[] = [
     isContent: true,
   },
 
+  // Typography
+  {
+    name: 'titleVariant',
+    type: 'typography',
+    label: 'Title Typography',
+    defaultValue: 'h6',
+    options: [
+      { label: 'H4', value: 'h4' },
+      { label: 'H5', value: 'h5' },
+      { label: 'H6', value: 'h6' },
+      { label: 'Subtitle 1', value: 'subtitle1' },
+      { label: 'Subtitle 2', value: 'subtitle2' },
+    ],
+    helperText: 'Select card title typography style',
+    group: 'Typography',
+  },
+  {
+    name: 'subtitleVariant',
+    type: 'typography',
+    label: 'Subtitle Typography',
+    defaultValue: 'body2',
+    options: [
+      { label: 'Body 2', value: 'body2' },
+      { label: 'Caption', value: 'caption' },
+      { label: 'Overline', value: 'overline' },
+    ],
+    helperText: 'Select card subtitle typography style',
+    group: 'Typography',
+  },
+
   // Appearance
   {
     name: 'padding',
@@ -100,6 +130,40 @@ export const dataDisplayCardControls: PropControl[] = [
     helperText: 'Override demo data or use auto based on variant',
     group: 'Demo Data',
   },
+
+  // Component toggles
+  {
+    name: 'showHeader',
+    type: 'boolean',
+    label: 'Show Header',
+    defaultValue: true,
+    isComponent: true,
+    componentGroup: 'Structure',
+    helperText: 'Toggle card header visibility',
+    group: 'Components',
+  },
+  {
+    name: 'showDivider',
+    type: 'boolean',
+    label: 'Show Divider',
+    defaultValue: true,
+    isComponent: true,
+    componentGroup: 'Structure',
+    helperText: 'Show divider between header and content',
+    group: 'Components',
+  },
+  {
+    name: 'showSubheader',
+    type: 'boolean',
+    label: 'Show Subtitle',
+    defaultValue: true,
+    isComponent: true,
+    componentGroup: 'Header',
+    helperText: 'Display subtitle in header',
+    group: 'Components',
+  },
+
+  // Features
   {
     name: 'showMenuItems',
     type: 'boolean',

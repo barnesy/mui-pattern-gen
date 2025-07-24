@@ -101,7 +101,7 @@ export const FeedbackShowcase: React.FC = () => {
               Skeleton
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+              <Skeleton variant="text" />
               <Skeleton variant="circular" width={40} height={40} />
               <Skeleton variant="rectangular" height={60} />
               <Skeleton variant="rounded" height={60} />

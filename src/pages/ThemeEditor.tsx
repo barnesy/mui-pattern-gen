@@ -184,7 +184,7 @@ export const ThemeEditor: React.FC = () => {
   return (
     <Box>
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Theme Editor</Typography>
+        <Typography variant="h1">Theme Editor</Typography>
         <Stack direction="row" spacing={2}>
           <Button
             variant="outlined"
@@ -365,9 +365,9 @@ export const ThemeEditor: React.FC = () => {
                   <CopyIcon fontSize="small" />
                 </IconButton>
               </Box>
-              <Box component="pre" sx={{ overflow: 'auto', fontSize: '0.875rem', m: 0 }}>
+              <Typography component="pre" variant="body2" sx={{ overflow: 'auto', m: 0, fontFamily: 'monospace' }}>
                 {generateThemeFiles(themeState).palette}
-              </Box>
+              </Typography>
             </Paper>
           )}
 
@@ -379,9 +379,9 @@ export const ThemeEditor: React.FC = () => {
                   <CopyIcon fontSize="small" />
                 </IconButton>
               </Box>
-              <Box component="pre" sx={{ overflow: 'auto', fontSize: '0.875rem', m: 0 }}>
+              <Typography component="pre" variant="body2" sx={{ overflow: 'auto', m: 0, fontFamily: 'monospace' }}>
                 {generateThemeFiles(themeState).darkPalette}
-              </Box>
+              </Typography>
             </Paper>
           )}
 
@@ -393,9 +393,9 @@ export const ThemeEditor: React.FC = () => {
                   <CopyIcon fontSize="small" />
                 </IconButton>
               </Box>
-              <Box component="pre" sx={{ overflow: 'auto', fontSize: '0.875rem', m: 0 }}>
+              <Typography component="pre" variant="body2" sx={{ overflow: 'auto', m: 0, fontFamily: 'monospace' }}>
                 {generateThemeFiles(themeState).typography}
-              </Box>
+              </Typography>
             </Paper>
           )}
 
@@ -407,9 +407,9 @@ export const ThemeEditor: React.FC = () => {
                   <CopyIcon fontSize="small" />
                 </IconButton>
               </Box>
-              <Box component="pre" sx={{ overflow: 'auto', fontSize: '0.875rem', m: 0 }}>
+              <Typography component="pre" variant="body2" sx={{ overflow: 'auto', m: 0, fontFamily: 'monospace' }}>
                 {generateThemeFiles(themeState).theme}
-              </Box>
+              </Typography>
             </Paper>
           )}
         </DialogContent>

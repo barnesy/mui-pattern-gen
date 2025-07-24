@@ -17,7 +17,7 @@ import { SpacingConfig } from '../../types/PatternVariant';
 
 export interface PropControl {
   name: string;
-  type: 'text' | 'number' | 'boolean' | 'select' | 'slider' | 'variant' | 'spacing' | 'size' | 'padding' | 'margin';
+  type: 'text' | 'number' | 'boolean' | 'select' | 'slider' | 'variant' | 'spacing' | 'size' | 'padding' | 'margin' | 'typography';
   label: string;
   defaultValue?: any;
   options?: { label: string; value: any }[];
@@ -27,6 +27,8 @@ export interface PropControl {
   helperText?: string;
   group?: string;
   isContent?: boolean; // Mark text/number fields as content vs settings
+  isComponent?: boolean; // Mark boolean fields as component toggles
+  componentGroup?: string; // Group related component controls (e.g., "Header", "Content", "Footer")
   sides?: ('top' | 'right' | 'bottom' | 'left')[]; // For spacing controls
   unit?: 'px' | '%'; // For size controls
 }

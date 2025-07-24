@@ -94,7 +94,7 @@ export const SpacingControl: React.FC<SpacingControlProps> = React.memo(({
               value={value.top}
               onChange={(e) => handleLinkedChange(Number(e.target.value))}
               inputProps={{ min: 0, max: 100, step: 4 }}
-              sx={{ width: 70 }}
+              sx={{ width: 90 }}
             />
           )}
           <Tooltip title={linked ? "Unlink sides" : "Link all sides"}>
@@ -120,7 +120,7 @@ export const SpacingControl: React.FC<SpacingControlProps> = React.memo(({
               gridTemplateRows: '1fr 1fr 1fr',
               gap: 1,
               alignItems: 'center',
-              maxWidth: 200,
+              maxWidth: 280,
               mx: 'auto',
             }}
           >

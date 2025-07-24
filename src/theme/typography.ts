@@ -3,24 +3,24 @@ import { TypographyOptions } from '@mui/material/styles/createTypography';
 export const typography: TypographyOptions = {
   "fontFamily": "\"DM Sans\",-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\"",
   "h1": {
-    "fontSize": "3.5rem",
+    "fontSize": "3rem",
     "@media (min-width:600px)": {
-      "fontSize": "4.5rem"
+      "fontSize": "1.8rem"
     },
     "@media (min-width:900px)": {
-      "fontSize": "6rem"
+      "fontSize": "2.4rem"
     },
-    "fontWeight": 400,
+    "fontWeight": 600,
     "lineHeight": 1.167,
     "letterSpacing": "-0.01562em"
   },
   "h2": {
-    "fontSize": "2.5rem",
+    "fontSize": "2.2rem",
     "@media (min-width:600px)": {
-      "fontSize": "3rem"
+      "fontSize": "1.6rem"
     },
     "@media (min-width:900px)": {
-      "fontSize": "3.75rem"
+      "fontSize": "2.2rem"
     },
     "fontWeight": 400,
     "lineHeight": 1.2,
@@ -29,22 +29,22 @@ export const typography: TypographyOptions = {
   "h3": {
     "fontSize": "2rem",
     "@media (min-width:600px)": {
-      "fontSize": "2.5rem"
+      "fontSize": "1.4rem"
     },
     "@media (min-width:900px)": {
-      "fontSize": "3rem"
+      "fontSize": "2rem"
     },
     "fontWeight": 400,
     "lineHeight": 1.167,
     "letterSpacing": "0em"
   },
   "h4": {
-    "fontSize": "1.5rem",
+    "fontSize": "1.6rem",
     "@media (min-width:600px)": {
-      "fontSize": "1.75rem"
+      "fontSize": "1.4rem"
     },
     "@media (min-width:900px)": {
-      "fontSize": "2.125rem"
+      "fontSize": "1.6rem",
     },
     "fontWeight": 400,
     "lineHeight": 1.235,

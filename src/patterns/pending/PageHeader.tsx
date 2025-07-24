@@ -17,12 +17,18 @@ import {
   Download as DownloadIcon,
   Share as ShareIcon,
 } from '@mui/icons-material';
+import { SpacingConfig, getSpacingValue } from '../../types/PatternVariant';
+import { TypographyVariant } from '../../types/TypographyConfig';
 
 export interface PageHeaderProps {
   title?: string;
   subtitle?: string;
   variant?: 'default' | 'minimal' | 'transparent';
   showBreadcrumbs?: boolean;
+  showSubtitle?: boolean;
+  showStatus?: boolean;
+  showMetadata?: boolean;
+  showActions?: boolean;
   breadcrumbs?: Array<{ label: string; href?: string }>;
   status?: string;
   statusColor?: 'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
@@ -37,6 +43,10 @@ export interface PageHeaderProps {
     icon?: React.ReactNode;
     onClick?: () => void;
   }>;
+  padding?: SpacingConfig;
+  margin?: SpacingConfig;
+  titleVariant?: TypographyVariant;
+  subtitleVariant?: TypographyVariant;
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({
@@ -44,6 +54,10 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   subtitle = 'This is a page description that provides context about the content below',
   variant = 'default',
   showBreadcrumbs = true,
+  showSubtitle = true,
+  showStatus = true,
+  showMetadata = true,
+  showActions = true,
   breadcrumbs = [
     { label: 'Dashboard', href: '/' },
     { label: 'Section', href: '/section' },
@@ -65,6 +79,10 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     { label: 'Share', icon: <ShareIcon />, onClick: () => {} },
     { label: 'Export', icon: <DownloadIcon />, onClick: () => {} },
   ],
+  padding,
+  margin,
+  titleVariant = 'h4',
+  subtitleVariant = 'body1',
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -80,7 +98,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         <Box sx={{ mb: 2 }}>
           <Breadcrumbs
             separator={<ChevronRightIcon fontSize="small" />}
-            sx={{ fontSize: '0.875rem' }}
           >
             <Link
               underline="hover"
@@ -88,7 +105,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
               href="/"
               sx={{ display: 'flex', alignItems: 'center' }}
             >
-              <HomeIcon sx={{ mr: 0.5, fontSize: 18 }} />
+              <HomeIcon fontSize="small" sx={{ mr: 0.5 }} />
               {!isMobile && 'Home'}
             </Link>
             {breadcrumbs.map((crumb, index) => {
@@ -96,8 +113,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
               return isLast ? (
                 <Typography
                   key={index}
+                  variant="body2"
                   color="text.primary"
-                  sx={{ fontSize: '0.875rem' }}
                 >
                   {crumb.label}
                 </Typography>
@@ -107,7 +124,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                   underline="hover"
                   color="inherit"
                   href={crumb.href}
-                  sx={{ fontSize: '0.875rem' }}
+                  variant="body2"
                 >
                   {crumb.label}
                 </Link>
@@ -128,10 +145,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         <Box sx={{ flexGrow: 1, minWidth: 0 }}>
           <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
             <Typography
-              variant={isMobile ? 'h5' : 'h4'}
+              variant={titleVariant}
               component="h1"
               sx={{
-                fontWeight: 600,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -139,7 +155,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             >
               {title}
             </Typography>
-            {status && (
+            {status && showStatus && (
               <Chip
                 label={status}
                 color={statusColor}
@@ -149,18 +165,20 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             )}
           </Stack>
 
-          {subtitle && !isMinimal && (
+          {subtitle && showSubtitle && !isMinimal && (
             <Typography
-              variant="body1"
+              variant={subtitleVariant}
               color="text.secondary"
-              sx={{ mb: 2 }}
+              sx={{ 
+                mb: 2,
+              }}
             >
               {subtitle}
             </Typography>
           )}
 
           {/* Metadata */}
-          {metadata.length > 0 && !isMinimal && (
+          {metadata.length > 0 && showMetadata && !isMinimal && (
             <Stack
               direction="row"
               spacing={3}
@@ -190,6 +208,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         </Box>
 
         {/* Actions Section */}
+        {showActions && (
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
           spacing={1}
@@ -229,16 +248,24 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             </Button>
           )}
         </Stack>
+        )}
       </Stack>
     </>
   );
 
+  // Use provided padding or default responsive padding
+  const effectivePadding = padding || {
+    top: isMobile ? 16 : isTablet ? 24 : 24,
+    right: isMobile ? 16 : isTablet ? 24 : 32,
+    bottom: isMobile ? 16 : isTablet ? 24 : 24,
+    left: isMobile ? 16 : isTablet ? 24 : 32,
+  };
+
   return (
     <Box
       sx={{
-        px: { xs: 2, sm: 3, md: 4 },
-        py: { xs: 2, sm: 3 },
-        mb: 3,
+        padding: getSpacingValue(effectivePadding),
+        margin: margin ? getSpacingValue(margin) : undefined,
         backgroundColor: isTransparent
           ? 'transparent'
           : theme.palette.background.default,

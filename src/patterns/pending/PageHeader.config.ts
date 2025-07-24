@@ -60,13 +60,107 @@ export const pageHeaderControls: PropControl[] = [
     group: 'Status',
   },
 
-  // Features
+  // Typography controls
+  {
+    name: 'titleVariant',
+    type: 'typography',
+    label: 'Title Typography',
+    defaultValue: 'h4',
+    options: [
+      { label: 'H1', value: 'h1' },
+      { label: 'H2', value: 'h2' },
+      { label: 'H3', value: 'h3' },
+      { label: 'H4', value: 'h4' },
+      { label: 'H5', value: 'h5' },
+      { label: 'H6', value: 'h6' },
+    ],
+    helperText: 'Select title typography style',
+    group: 'Typography',
+  },
+  {
+    name: 'subtitleVariant',
+    type: 'typography',
+    label: 'Subtitle Typography',
+    defaultValue: 'body1',
+    options: [
+      { label: 'Subtitle 1', value: 'subtitle1' },
+      { label: 'Subtitle 2', value: 'subtitle2' },
+      { label: 'Body 1', value: 'body1' },
+      { label: 'Body 2', value: 'body2' },
+      { label: 'Caption', value: 'caption' },
+    ],
+    helperText: 'Select subtitle typography style',
+    group: 'Typography',
+  },
+
+  // Spacing controls (at the top of settings)
+  {
+    name: 'padding',
+    type: 'padding',
+    label: 'Padding',
+    defaultValue: { top: 24, right: 32, bottom: 24, left: 32 },
+    helperText: 'Internal spacing of the header',
+    group: 'Layout',
+  },
+  {
+    name: 'margin',
+    type: 'margin',
+    label: 'Margin',
+    defaultValue: { top: 0, right: 0, bottom: 24, left: 0 },
+    helperText: 'External spacing around the header',
+    group: 'Layout',
+  },
+
+  // Component toggles
   {
     name: 'showBreadcrumbs',
     type: 'boolean',
     label: 'Show Breadcrumbs',
     defaultValue: true,
-    group: 'Features',
+    isComponent: true,
+    componentGroup: 'Navigation',
+    helperText: 'Toggle breadcrumb navigation',
+    group: 'Components',
+  },
+  {
+    name: 'showSubtitle',
+    type: 'boolean',
+    label: 'Show Subtitle',
+    defaultValue: true,
+    isComponent: true,
+    componentGroup: 'Content',
+    helperText: 'Toggle subtitle/description display',
+    group: 'Components',
+  },
+  {
+    name: 'showStatus',
+    type: 'boolean',
+    label: 'Show Status',
+    defaultValue: true,
+    isComponent: true,
+    componentGroup: 'Content',
+    helperText: 'Toggle status chip display',
+    group: 'Components',
+  },
+  {
+    name: 'showMetadata',
+    type: 'boolean',
+    label: 'Show Metadata',
+    defaultValue: true,
+    isComponent: true,
+    componentGroup: 'Content',
+    helperText: 'Toggle metadata section',
+    group: 'Components',
+  },
+  {
+    name: 'showActions',
+    type: 'boolean',
+    label: 'Show Actions',
+    defaultValue: true,
+    isComponent: true,
+    componentGroup: 'Actions',
+    helperText: 'Toggle action buttons',
+    group: 'Components',
   },
 
   // Primary Action
@@ -77,18 +171,5 @@ export const pageHeaderControls: PropControl[] = [
     defaultValue: 'Edit Page',
     group: 'Actions',
     isContent: true,
-  },
-
-  // Appearance
-  {
-    name: 'elevation',
-    type: 'slider',
-    label: 'Elevation',
-    defaultValue: 0,
-    min: 0,
-    max: 8,
-    step: 1,
-    helperText: 'Shadow depth (only applies to default variant)',
-    group: 'Appearance',
   },
 ];

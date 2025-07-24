@@ -14,6 +14,8 @@ import {
   TrendingDown as TrendingDownIcon,
   TrendingFlat as TrendingFlatIcon,
 } from '@mui/icons-material';
+import { SpacingConfig, getSpacingValue } from '../../types/PatternVariant';
+import { TypographyVariant } from '../../types/TypographyConfig';
 
 export interface LabelValuePairProps {
   label: string;
@@ -32,6 +34,14 @@ export interface LabelValuePairProps {
   icon?: React.ReactNode;
   align?: 'left' | 'center' | 'right';
   spacing?: number;
+  showLabel?: boolean;
+  showValue?: boolean;
+  showTrend?: boolean;
+  showHelpIcon?: boolean;
+  padding?: SpacingConfig;
+  margin?: SpacingConfig;
+  labelVariant?: TypographyVariant;
+  valueVariant?: TypographyVariant;
 }
 
 export const LabelValuePair: React.FC<LabelValuePairProps> = ({
@@ -51,6 +61,14 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
   icon,
   align = 'left',
   spacing = 0.5,
+  showLabel = true,
+  showValue = true,
+  showTrend = true,
+  showHelpIcon = true,
+  padding,
+  margin,
+  labelVariant = 'body2',
+  valueVariant = 'body1',
 }) => {
   const theme = useTheme();
 
@@ -80,13 +98,13 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
   const getTrendIcon = () => {
     if (!trend) return null;
     const iconProps = { 
+      fontSize: size === 'small' ? 'small' : size === 'large' ? 'medium' : 'small',
       sx: { 
-        fontSize: currentSize.iconSize,
         color: trend === 'up' ? theme.palette.success.main : 
                trend === 'down' ? theme.palette.error.main : 
                theme.palette.text.secondary
       } 
-    };
+    } as const;
     
     switch (trend) {
       case 'up':
@@ -107,7 +125,7 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
 
     const valueContent = (
       <Typography
-        variant={currentSize.valueSize as any}
+        variant={valueVariant}
         color={valueColor}
         fontWeight={valueWeight === 'bold' ? 700 : valueWeight === 'medium' ? 500 : 400}
         component="span"
@@ -139,15 +157,15 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
           </Box>
         )}
         <Typography
-          variant={currentSize.labelSize as any}
+          variant={labelVariant}
           color={labelColor}
           component="span"
         >
           {label}
         </Typography>
-        {helpText && (
+        {helpText && showHelpIcon && (
           <Tooltip title={helpText} arrow placement="top">
-            <InfoIcon sx={{ fontSize: currentSize.iconSize - 2, color: 'text.disabled', cursor: 'help' }} />
+            <InfoIcon fontSize="small" sx={{ color: 'text.disabled', cursor: 'help' }} />
           </Tooltip>
         )}
       </Stack>
@@ -161,7 +179,7 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
   };
 
   const renderTrend = () => {
-    if (!trend || loading) return null;
+    if (!trend || !showTrend || loading) return null;
 
     return (
       <Stack direction="row" alignItems="center" spacing={0.5}>
@@ -182,67 +200,84 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
     );
   };
 
-  // Inline variant
-  if (variant === 'inline') {
-    return (
-      <Stack 
-        direction="row" 
-        alignItems="center" 
-        spacing={spacing}
-        justifyContent={align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'}
-      >
-        {renderLabel()}
-        <Typography variant={currentSize.labelSize as any} color="text.secondary">:</Typography>
-        {renderValue()}
-        {renderTrend()}
-      </Stack>
-    );
-  }
-
-  // Minimal variant
-  if (variant === 'minimal') {
-    return (
-      <Stack 
-        direction="row" 
-        alignItems="baseline" 
-        spacing={spacing}
-        justifyContent={align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'}
-      >
-        {renderValue()}
-        <Typography variant={currentSize.labelSize as any} color={labelColor}>
-          {label}
-        </Typography>
-        {renderTrend()}
-      </Stack>
-    );
-  }
-
-  // Stacked variant
-  if (variant === 'stacked') {
-    return (
-      <Stack 
-        spacing={spacing}
-        alignItems={align}
-      >
-        {renderLabel()}
-        <Stack direction="row" alignItems="center" spacing={1}>
-          {renderValue()}
-          {renderTrend()}
+  // Render the content based on variant
+  const renderContent = () => {
+    // Inline variant
+    if (variant === 'inline') {
+      return (
+        <Stack 
+          direction="row" 
+          alignItems="center" 
+          spacing={spacing}
+          justifyContent={align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'}
+        >
+          {showLabel && renderLabel()}
+          <Typography variant={labelVariant} color="text.secondary">:</Typography>
+          {showValue && renderValue()}
+          {showTrend && renderTrend()}
         </Stack>
-      </Stack>
-    );
-  }
+      );
+    }
 
-  // Default variant
-  return (
-    <Box textAlign={align}>
-      {renderLabel()}
-      <Box mt={spacing}>
-        <Stack direction="row" alignItems="center" spacing={1} justifyContent={align}>
-          {renderValue()}
-          {renderTrend()}
+    // Minimal variant
+    if (variant === 'minimal') {
+      return (
+        <Stack 
+          direction="row" 
+          alignItems="baseline" 
+          spacing={spacing}
+          justifyContent={align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'}
+        >
+          {showValue && renderValue()}
+          {showLabel && (
+            <Typography variant={labelVariant} color={labelColor}>
+              {label}
+            </Typography>
+          )}
+          {showTrend && renderTrend()}
         </Stack>
+      );
+    }
+
+    // Stacked variant
+    if (variant === 'stacked') {
+      return (
+        <Stack 
+          spacing={spacing}
+          alignItems={align}
+        >
+          {showLabel && renderLabel()}
+          <Stack direction="row" alignItems="center" spacing={1}>
+            {showValue && renderValue()}
+            {showTrend && renderTrend()}
+          </Stack>
+        </Stack>
+      );
+    }
+
+    // Default variant
+    return (
+      <Box textAlign={align}>
+        {showLabel && renderLabel()}
+        <Box mt={spacing}>
+          <Stack direction="row" alignItems="center" spacing={1} justifyContent={align}>
+            {showValue && renderValue()}
+            {showTrend && renderTrend()}
+          </Stack>
+        </Box>
       </Box>
+    );
+  };
+
+  // Wrap content with padding and margin
+  return (
+    <Box
+      sx={{
+        padding: padding ? getSpacingValue(padding) : undefined,
+        margin: margin ? getSpacingValue(margin) : undefined,
+      }}
+    >
+      {renderContent()}
     </Box>
   );
 };

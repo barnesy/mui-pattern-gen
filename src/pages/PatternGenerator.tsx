@@ -243,7 +243,7 @@ export const PatternGenerator: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h1" gutterBottom>
         Pattern Generator
       </Typography>
       

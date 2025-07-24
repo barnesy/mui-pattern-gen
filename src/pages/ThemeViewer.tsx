@@ -53,7 +53,7 @@ export const ThemeViewer: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h1" gutterBottom>
         Theme Viewer
       </Typography>
 

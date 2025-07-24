@@ -109,6 +109,99 @@ export const labelValuePairControls: PropControl[] = [
     group: 'Layout',
   },
 
+  // Typography controls
+  {
+    name: 'labelVariant',
+    type: 'typography',
+    label: 'Label Typography',
+    defaultValue: 'body2',
+    options: [
+      { label: 'Caption', value: 'caption' },
+      { label: 'Body 2', value: 'body2' },
+      { label: 'Body 1', value: 'body1' },
+      { label: 'Subtitle 2', value: 'subtitle2' },
+      { label: 'Subtitle 1', value: 'subtitle1' },
+    ],
+    helperText: 'Select label typography style',
+    group: 'Typography',
+  },
+  {
+    name: 'valueVariant',
+    type: 'typography',
+    label: 'Value Typography',
+    defaultValue: 'body1',
+    options: [
+      { label: 'Body 2', value: 'body2' },
+      { label: 'Body 1', value: 'body1' },
+      { label: 'Subtitle 2', value: 'subtitle2' },
+      { label: 'Subtitle 1', value: 'subtitle1' },
+      { label: 'H6', value: 'h6' },
+      { label: 'H5', value: 'h5' },
+    ],
+    helperText: 'Select value typography style',
+    group: 'Typography',
+  },
+
+  // Spacing controls (at the top of settings)
+  {
+    name: 'padding',
+    type: 'padding',
+    label: 'Padding',
+    defaultValue: { top: 8, right: 8, bottom: 8, left: 8 },
+    helperText: 'Internal spacing',
+    group: 'Layout',
+  },
+  {
+    name: 'margin',
+    type: 'margin',
+    label: 'Margin',
+    defaultValue: { top: 0, right: 0, bottom: 0, left: 0 },
+    helperText: 'External spacing',
+    group: 'Layout',
+  },
+
+  // Component toggles
+  {
+    name: 'showLabel',
+    type: 'boolean',
+    label: 'Show Label',
+    defaultValue: true,
+    isComponent: true,
+    componentGroup: 'Display',
+    helperText: 'Toggle label visibility',
+    group: 'Components',
+  },
+  {
+    name: 'showValue',
+    type: 'boolean',
+    label: 'Show Value',
+    defaultValue: true,
+    isComponent: true,
+    componentGroup: 'Display',
+    helperText: 'Toggle value visibility',
+    group: 'Components',
+  },
+  {
+    name: 'showTrend',
+    type: 'boolean',
+    label: 'Show Trend',
+    defaultValue: true,
+    isComponent: true,
+    componentGroup: 'Display',
+    helperText: 'Toggle trend indicator visibility',
+    group: 'Components',
+  },
+  {
+    name: 'showHelpIcon',
+    type: 'boolean',
+    label: 'Show Help Icon',
+    defaultValue: true,
+    isComponent: true,
+    componentGroup: 'Display',
+    helperText: 'Toggle help icon visibility',
+    group: 'Components',
+  },
+
   // Features
   {
     name: 'chip',

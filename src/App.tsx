@@ -14,6 +14,7 @@ import { PatternViewer } from './pages/PatternViewer';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { theme as baseTheme } from './theme/theme';
 import { darkPalette } from './theme';
+import './styles/darkMode.css';
 
 function AppWithDensity() {
   const [mode, setMode] = React.useState<PaletteMode>('light');
@@ -50,6 +51,12 @@ function AppWithDensity() {
               size: density === 'compact' ? 'small' : 'medium',
             },
           },
+          MuiChip: {
+            ...baseTheme.components?.MuiChip,
+            defaultProps: {
+              size: density === 'compact' ? 'small' : 'medium',
+            },
+          },
         },
       }),
     [mode, density, densitySpacing]
@@ -79,12 +86,14 @@ function AppWithDensity() {
     });
   };
 
-  // Set initial dark mode class
+  // Set initial dark mode class and data attribute
   React.useEffect(() => {
     if (mode === 'dark') {
       document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-mui-color-scheme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-mui-color-scheme', 'light');
     }
   }, [mode]);
 

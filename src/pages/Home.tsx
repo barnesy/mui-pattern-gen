@@ -33,21 +33,21 @@ export const Home: React.FC = () => {
     {
       title: 'Component Showcase',
       description: 'Explore all MUI components organized by category with live examples and variants.',
-      icon: <DashboardIcon sx={{ fontSize: 48 }} />,
+      icon: <DashboardIcon fontSize="large" />,
       action: () => navigate('/components'),
       color: 'primary.main',
     },
     {
       title: 'Theme Viewer',
       description: 'View and copy all theme values including colors, typography, spacing, and more.',
-      icon: <PaletteIcon sx={{ fontSize: 48 }} />,
+      icon: <PaletteIcon fontSize="large" />,
       action: () => navigate('/theme'),
       color: 'secondary.main',
     },
     {
       title: 'Pattern Generator',
       description: 'Generate and manage reusable component patterns with MUI.',
-      icon: <CodeIcon sx={{ fontSize: 48 }} />,
+      icon: <CodeIcon fontSize="large" />,
       action: () => navigate('/patterns'),
       color: 'success.main',
     },
@@ -57,24 +57,18 @@ export const Home: React.FC = () => {
     <Container maxWidth="lg">
       <Box sx={{ py: 4 }}>
         <Typography 
-          variant="h2" 
+          variant="h1" 
           component="h1" 
           gutterBottom 
           align="center"
-          sx={{ 
-            fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' } 
-          }}
         >
           MUI Pattern Generator
         </Typography>
         <Typography 
-          variant="h5" 
+          variant="body1" 
           color="text.secondary" 
           align="center" 
           paragraph
-          sx={{ 
-            fontSize: { xs: '1.125rem', sm: '1.25rem', md: '1.5rem' } 
-          }}
         >
           A comprehensive toolkit for Material-UI theme development and component exploration
         </Typography>
