@@ -217,6 +217,12 @@ export const getDemoData = (type: string) => {
           { label: 'Avg Order Value', value: '$89.50', trend: 'down', trendValue: '-2.1%', color: 'warning' },
           { label: 'Conversion Rate', value: '3.45%', trend: 'neutral', color: 'info' },
         ],
+        labelValuePairs: [
+          { label: 'Region', value: 'North America', variant: 'inline' },
+          { label: 'Currency', value: 'USD', variant: 'inline' },
+          { label: 'Period', value: 'Q4 2024', variant: 'inline', chip: true },
+          { label: 'Growth Rate', value: '+15.2%', variant: 'default', valueColor: 'success', trend: 'up' },
+        ],
       };
     
     case 'users':
@@ -333,6 +339,12 @@ export const getDemoData = (type: string) => {
         stats: [
           { label: 'Active Users', value: '2,345', trend: 'up', trendValue: '+5.2%' },
           { label: 'Revenue', value: '$45,678', trend: 'up', trendValue: '+12.3%' },
+        ],
+        labelValuePairs: [
+          { label: 'Server Status', value: 'Operational', variant: 'inline', valueColor: 'success', chip: true },
+          { label: 'API Latency', value: '142ms', variant: 'inline' },
+          { label: 'Database', value: 'PostgreSQL 14.5', variant: 'minimal' },
+          { label: 'Last Backup', value: '2 hours ago', variant: 'inline', helpText: 'Automated backup successful' },
         ],
         listItems: [
           {

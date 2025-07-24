@@ -49,6 +49,7 @@ import { LabelValuePair } from './LabelValuePair';
 import { getDemoData } from './DataDisplayCard.config';
 import { SpacingConfig, getSpacingValue } from '../../types/PatternVariant';
 import { getDemoDataForVariant } from '../../utils/variantDemoData';
+import { SubComponentWrapper } from '../../components/AIDesignMode/SubComponentWrapper';
 
 export interface DataDisplayCardProps {
   variant?: 'stats' | 'list' | 'table' | 'workflow' | 'mixed';
@@ -64,6 +65,19 @@ export interface DataDisplayCardProps {
     trend?: 'up' | 'down' | 'neutral';
     trendValue?: string;
     color?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info';
+  }>;
+  
+  // Label-Value pairs (can be used in stats or mixed variants)
+  labelValuePairs?: Array<{
+    label: string;
+    value: string | number;
+    variant?: 'default' | 'inline' | 'stacked' | 'minimal';
+    size?: 'small' | 'medium' | 'large';
+    valueColor?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'text.primary' | 'text.secondary';
+    helpText?: string;
+    trend?: 'up' | 'down' | 'flat';
+    trendValue?: string;
+    chip?: boolean;
   }>;
   
   // List variant props
@@ -127,6 +141,7 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
   action,
   menuItems,
   stats = [],
+  labelValuePairs = [],
   listItems = [],
   tableColumns = [],
   tableData = [],
@@ -167,6 +182,7 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
   
   const demoData = effectiveDemoType !== 'empty' ? getDemoData(effectiveDemoType) : {};
   const finalStats = stats.length > 0 ? stats : (demoData.stats || []);
+  const finalLabelValuePairs = labelValuePairs.length > 0 ? labelValuePairs : (demoData.labelValuePairs || []);
   const finalListItems = listItems.length > 0 ? listItems : (demoData.listItems || []);
   const finalTableColumns = tableColumns.length > 0 ? tableColumns : (demoData.tableColumns || []);
   const finalTableData = tableData.length > 0 ? tableData : (demoData.tableData || []);
@@ -228,15 +244,64 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
     >
       {finalStats.map((stat, index) => (
         <Box key={index}>
-          <LabelValuePair
-            label={stat.label}
-            value={stat.value}
-            variant="stacked"
-            size="large"
-            valueColor={('color' in stat && stat.color ? stat.color as any : 'text.primary') as any}
-            trend={stat.trend === 'neutral' ? 'flat' : stat.trend as any}
-            trendValue={stat.trendValue}
-          />
+          <SubComponentWrapper
+            componentName={`stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}
+            componentType="LabelValuePair"
+            index={index}
+            componentProps={{
+              ...stat,
+              variant: 'stacked',
+              size: 'large',
+            }}
+          >
+            <LabelValuePair
+              label={stat.label}
+              value={stat.value}
+              variant="stacked"
+              size="large"
+              valueColor={('color' in stat && stat.color ? stat.color as any : 'text.primary') as any}
+              trend={stat.trend === 'neutral' ? 'flat' : stat.trend as any}
+              trendValue={stat.trendValue}
+            />
+          </SubComponentWrapper>
+        </Box>
+      ))}
+    </Box>
+  );
+
+  const renderLabelValuePairs = () => (
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: {
+          xs: '1fr',
+          sm: 'repeat(2, 1fr)',
+          md: finalLabelValuePairs.length > 3 ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)',
+        },
+        gap: 2,
+      }}
+    >
+      {finalLabelValuePairs.map((pair, index) => (
+        <Box key={index}>
+          <SubComponentWrapper
+            componentName={`labelValuePair-${pair.label.toLowerCase().replace(/\s+/g, '-')}`}
+            componentType="LabelValuePair"
+            index={index}
+            componentProps={pair}
+          >
+            <LabelValuePair
+              label={pair.label}
+              value={pair.value}
+              variant={pair.variant || 'default'}
+              size={pair.size || 'medium'}
+              valueColor={pair.valueColor}
+              helpText={pair.helpText}
+              trend={pair.trend}
+              trendValue={pair.trendValue}
+              chip={pair.chip}
+              showTrend={!!pair.trend}
+            />
+          </SubComponentWrapper>
         </Box>
       ))}
     </Box>
@@ -390,7 +455,9 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
   const renderMixed = () => (
     <Stack spacing={3}>
       {finalStats.length > 0 && renderStats()}
-      {finalStats.length > 0 && (finalListItems.length > 0 || finalTableData.length > 0) && <Divider />}
+      {finalLabelValuePairs.length > 0 && renderLabelValuePairs()}
+      {(finalStats.length > 0 || finalLabelValuePairs.length > 0) && 
+        (finalListItems.length > 0 || finalTableData.length > 0) && <Divider />}
       {finalListItems.length > 0 && renderList()}
       {finalTableData.length > 0 && renderTable()}
       {customContent}
@@ -416,11 +483,12 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
     }
 
     const isEmpty = 
-      (variant === 'stats' && finalStats.length === 0) ||
+      (variant === 'stats' && finalStats.length === 0 && finalLabelValuePairs.length === 0) ||
       (variant === 'list' && finalListItems.length === 0) ||
       (variant === 'table' && finalTableData.length === 0) ||
       (variant === 'workflow' && finalWorkflowSteps.length === 0) ||
-      (variant === 'mixed' && finalStats.length === 0 && finalListItems.length === 0 && finalTableData.length === 0 && !customContent);
+      (variant === 'mixed' && finalStats.length === 0 && finalLabelValuePairs.length === 0 && 
+        finalListItems.length === 0 && finalTableData.length === 0 && !customContent);
 
     if (isEmpty) {
       return (
@@ -432,7 +500,8 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
 
     switch (variant) {
       case 'stats':
-        return renderStats();
+        // If labelValuePairs are provided, use them instead of stats
+        return finalLabelValuePairs.length > 0 ? renderLabelValuePairs() : renderStats();
       case 'list':
         return renderList();
       case 'table':

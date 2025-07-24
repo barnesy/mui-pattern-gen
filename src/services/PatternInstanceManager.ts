@@ -28,6 +28,16 @@ class BrowserEventEmitter {
   }
 }
 
+export interface SubComponentInstance {
+  id: string;
+  componentName: string;
+  componentType: string;
+  parentInstanceId: string;
+  index?: number;
+  element: HTMLElement | any;
+  props: Record<string, unknown>;
+}
+
 export interface PatternInstance {
   id: string;
   patternName: string;
@@ -38,6 +48,7 @@ export interface PatternInstance {
   };
   element: HTMLElement | any; // WeakRef not available in all environments
   timestamp: number;
+  subComponents?: Map<string, SubComponentInstance>;
 }
 
 export interface PatternUpdateEvent {
@@ -50,6 +61,7 @@ export interface PatternUpdateEvent {
 class PatternInstanceManagerClass extends BrowserEventEmitter {
   private static instance: PatternInstanceManagerClass;
   private registry: Map<string, Set<PatternInstance>> = new Map();
+  private subComponentRegistry: Map<string, SubComponentInstance> = new Map();
   private broadcastChannel: BroadcastChannel | null = null;
   private frameMessageHandlers: Map<string, (event: MessageEvent) => void> = new Map();
 
@@ -111,6 +123,13 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
     for (const [patternName, instances] of this.registry.entries()) {
       const instance = Array.from(instances).find(inst => inst.id === instanceId);
       if (instance) {
+        // Unregister all sub-components first
+        if (instance.subComponents) {
+          instance.subComponents.forEach(subComponent => {
+            this.unregisterSubComponent(subComponent.id);
+          });
+        }
+        
         instances.delete(instance);
         if (instances.size === 0) {
           this.registry.delete(patternName);
@@ -119,6 +138,48 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
         break;
       }
     }
+  }
+
+  registerSubComponent(subComponent: SubComponentInstance) {
+    // Find parent instance and add sub-component
+    const parentInstance = this.findInstanceById(subComponent.parentInstanceId);
+    if (parentInstance) {
+      if (!parentInstance.subComponents) {
+        parentInstance.subComponents = new Map();
+      }
+      parentInstance.subComponents.set(subComponent.id, subComponent);
+    }
+    
+    // Also register in flat registry for quick lookup
+    this.subComponentRegistry.set(subComponent.id, subComponent);
+    this.emit('subcomponent-registered', subComponent);
+  }
+
+  unregisterSubComponent(subComponentId: string) {
+    const subComponent = this.subComponentRegistry.get(subComponentId);
+    if (subComponent) {
+      // Remove from parent
+      const parentInstance = this.findInstanceById(subComponent.parentInstanceId);
+      if (parentInstance && parentInstance.subComponents) {
+        parentInstance.subComponents.delete(subComponentId);
+      }
+      
+      // Remove from registry
+      this.subComponentRegistry.delete(subComponentId);
+      this.emit('subcomponent-unregistered', { subComponentId });
+    }
+  }
+
+  findSubComponentById(subComponentId: string): SubComponentInstance | undefined {
+    return this.subComponentRegistry.get(subComponentId);
+  }
+
+  getSubComponents(parentInstanceId: string): SubComponentInstance[] {
+    const parentInstance = this.findInstanceById(parentInstanceId);
+    if (parentInstance && parentInstance.subComponents) {
+      return Array.from(parentInstance.subComponents.values());
+    }
+    return [];
   }
 
   notifyInstanceUpdate(instanceId: string) {

@@ -3,7 +3,7 @@ import { PatternInstanceManager, PatternInstance } from '../services/PatternInst
 
 export interface PatternInfo {
   name: string;
-  status: 'pending' | 'accepted';
+  status: 'pending' | 'accepted' | 'subcomponent';
   category: string;
   instanceId: string;
   props: Record<string, unknown>;
@@ -11,6 +11,10 @@ export interface PatternInfo {
   rect: DOMRect;
   hasConfig?: boolean;
   configPath?: string;
+  // Sub-component specific fields
+  isSubComponent?: boolean;
+  parentInstanceId?: string;
+  componentType?: string;
 }
 
 interface AIDesignModeContextType {

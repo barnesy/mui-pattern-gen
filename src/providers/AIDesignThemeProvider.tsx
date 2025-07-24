@@ -147,6 +147,44 @@ const AIDesignModeInjector: React.FC<{ children: ReactNode }> = ({ children }) =
         return;
       }
       
+      // First check for sub-component selection
+      const subComponentElement = target.closest('[data-subcomponent-id]') as HTMLElement;
+      if (subComponentElement) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const subComponentId = subComponentElement.getAttribute('data-subcomponent-id');
+        const subComponentName = subComponentElement.getAttribute('data-subcomponent-name') || '';
+        const subComponentType = subComponentElement.getAttribute('data-subcomponent-type') || '';
+        const parentInstanceId = subComponentElement.getAttribute('data-parent-instance') || '';
+        const propsAttr = subComponentElement.getAttribute('data-subcomponent-props');
+        
+        let props = {};
+        try {
+          if (propsAttr) {
+            props = JSON.parse(propsAttr);
+          }
+        } catch (err) {
+          console.error('Failed to parse sub-component props:', err);
+        }
+        
+        // Set selected pattern with sub-component info
+        setSelectedPattern({
+          name: subComponentName,
+          status: 'subcomponent' as any,
+          category: subComponentType,
+          instanceId: subComponentId,
+          parentInstanceId,
+          props,
+          element: subComponentElement,
+          rect: subComponentElement.getBoundingClientRect(),
+          isSubComponent: true,
+        });
+        
+        setSelectedInstanceId(subComponentId);
+        return;
+      }
+      
       const patternElement = target.closest('[data-pattern-name]') as HTMLElement;
       
       if (patternElement) {
