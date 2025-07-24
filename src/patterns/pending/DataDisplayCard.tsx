@@ -28,6 +28,15 @@ import {
   alpha,
 } from '@mui/material';
 import {
+  Timeline,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineOppositeContent,
+} from '@mui/lab';
+import {
   MoreVert as MoreVertIcon,
   Info as InfoIcon,
   CheckCircle as CheckCircleIcon,
@@ -309,41 +318,52 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
   );
 
   const renderWorkflow = () => (
-    <Box sx={{ position: 'relative' }}>
+    <Timeline 
+      position="right"
+      sx={{
+        padding: 0,
+        margin: 0,
+        [`& .MuiTimelineItem-root:before`]: {
+          flex: 0,
+          padding: 0,
+        },
+      }}
+    >
       {finalWorkflowSteps.map((step, index) => (
-        <Box
-          key={step.id}
-          sx={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            position: 'relative',
-            pb: index < finalWorkflowSteps.length - 1 ? 3 : 0,
-          }}
-        >
-          {/* Connector line */}
-          {index < finalWorkflowSteps.length - 1 && (
-            <Box
+        <TimelineItem key={step.id}>
+          {/* Timeline dot with status icon */}
+          <TimelineSeparator>
+            <TimelineDot
+              color={
+                step.status === 'completed' ? 'success' :
+                step.status === 'active' ? 'primary' :
+                step.status === 'error' ? 'error' :
+                'grey'
+              }
+              variant={step.status === 'active' ? 'filled' : 'outlined'}
               sx={{
-                position: 'absolute',
-                left: 20,
-                top: 40,
-                bottom: 0,
-                width: 2,
-                bgcolor: step.status === 'completed' ? 'success.main' : 'divider',
-                zIndex: 0,
+                boxShadow: step.status === 'active' ? 2 : 0,
               }}
-            />
-          )}
+            >
+              {step.status === 'completed' && <CheckCircleIcon sx={{ fontSize: 16 }} />}
+              {step.status === 'active' && <InfoIcon sx={{ fontSize: 16 }} />}
+              {step.status === 'pending' && <ScheduleIcon sx={{ fontSize: 16 }} />}
+              {step.status === 'error' && <ErrorIcon sx={{ fontSize: 16 }} />}
+            </TimelineDot>
+            {index < finalWorkflowSteps.length - 1 && (
+              <TimelineConnector 
+                sx={{
+                  bgcolor: step.status === 'completed' ? 'success.main' : 'grey.300',
+                }}
+              />
+            )}
+          </TimelineSeparator>
           
-          {/* Step icon */}
-          <Box sx={{ mr: 2, zIndex: 1 }}>
-            {getStatusIcon(step.status)}
-          </Box>
-          
-          {/* Step content */}
-          <Box sx={{ flex: 1 }}>
+          {/* Timeline content */}
+          <TimelineContent sx={{ py: '12px', px: 2 }}>
             <Typography
               variant="subtitle1"
+              component="span"
               sx={{
                 fontWeight: step.status === 'active' ? 600 : 400,
                 color: step.status === 'pending' ? 'text.secondary' : 'text.primary',
@@ -357,14 +377,14 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
               </Typography>
             )}
             {step.timestamp && (
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                 {step.timestamp}
               </Typography>
             )}
-          </Box>
-        </Box>
+          </TimelineContent>
+        </TimelineItem>
       ))}
-    </Box>
+    </Timeline>
   );
 
   const renderMixed = () => (
