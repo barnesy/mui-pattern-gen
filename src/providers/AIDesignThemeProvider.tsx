@@ -18,7 +18,8 @@ const AIDesignModeInjector: React.FC<{ children: ReactNode }> = ({ children }) =
     selectedPattern, 
     hoveredPattern,
     registerPatternInstance,
-    unregisterPatternInstance 
+    unregisterPatternInstance,
+    setSelectedInstanceId 
   } = useAIDesignMode();
 
   // Add data attributes to pattern components when AI mode is enabled

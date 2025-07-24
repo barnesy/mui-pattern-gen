@@ -7,7 +7,7 @@ export interface PatternPropsContextValue {
   updateProp: (name: string, value: unknown) => void;
 }
 
-const PatternPropsContext = createContext<PatternPropsContextValue | undefined>(undefined);
+export const PatternPropsContext = createContext<PatternPropsContextValue | undefined>(undefined);
 
 export const usePatternProps = () => {
   const context = useContext(PatternPropsContext);
