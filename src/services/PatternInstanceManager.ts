@@ -1,4 +1,32 @@
-import { EventEmitter } from 'events';
+// Browser-compatible event system
+interface EventHandler {
+  (data: any): void;
+}
+
+class BrowserEventEmitter {
+  private events: Map<string, Set<EventHandler>> = new Map();
+
+  on(event: string, handler: EventHandler): void {
+    if (!this.events.has(event)) {
+      this.events.set(event, new Set());
+    }
+    this.events.get(event)!.add(handler);
+  }
+
+  off(event: string, handler: EventHandler): void {
+    const handlers = this.events.get(event);
+    if (handlers) {
+      handlers.delete(handler);
+    }
+  }
+
+  emit(event: string, data: any): void {
+    const handlers = this.events.get(event);
+    if (handlers) {
+      handlers.forEach(handler => handler(data));
+    }
+  }
+}
 
 export interface PatternInstance {
   id: string;
@@ -8,7 +36,7 @@ export interface PatternInstance {
     componentTree: string[];
     iframe?: string;
   };
-  element: WeakRef<HTMLElement>;
+  element: HTMLElement | any; // WeakRef not available in all environments
   timestamp: number;
 }
 
@@ -19,7 +47,7 @@ export interface PatternUpdateEvent {
   updateAll?: boolean;
 }
 
-class PatternInstanceManagerClass extends EventEmitter {
+class PatternInstanceManagerClass extends BrowserEventEmitter {
   private static instance: PatternInstanceManagerClass;
   private registry: Map<string, Set<PatternInstance>> = new Map();
   private broadcastChannel: BroadcastChannel | null = null;

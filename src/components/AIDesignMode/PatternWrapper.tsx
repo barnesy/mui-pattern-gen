@@ -58,7 +58,7 @@ export const PatternWrapper: React.FC<PatternWrapperProps> = ({
         componentTree: [],
         iframe: window.parent !== window ? window.location.href : undefined,
       },
-      element: new WeakRef(element),
+      element: element as any, // WeakRef type not available in all environments
     }, instanceId); // Pass our instanceId to ensure consistency
 
     // Register with AI Design Mode context (only in main app)
@@ -128,7 +128,7 @@ export const PatternWrapper: React.FC<PatternWrapperProps> = ({
   // This prevents external prop changes from overwriting AI Design Mode updates
 
   // Add debug info in development
-  const showDebug = process.env.NODE_ENV === 'development' && window.location.search.includes('debug=true');
+  const showDebug = import.meta.env.DEV && window.location.search.includes('debug=true');
 
   return (
     <PatternPropsProvider
