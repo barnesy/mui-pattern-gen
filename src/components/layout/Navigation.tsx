@@ -16,9 +16,6 @@ import {
   Edit as EditIcon,
   ViewModule as ViewModuleIcon,
   AddBox as AddBoxIcon,
-  AutoAwesome as AutoAwesomeIcon,
-  Science as ScienceIcon,
-  VerifiedUser as VerifiedUserIcon,
 } from '@mui/icons-material';
 
 interface NavigationItem {
@@ -38,9 +35,6 @@ const navigationItems: NavigationItem[] = [
   { text: 'Components', path: '/components', icon: <DashboardIcon /> },
   { text: 'Pattern Generator', path: '/pattern-generator', icon: <AddBoxIcon /> },
   { text: 'Pattern Library', path: '/patterns', icon: <ViewModuleIcon /> },
-  { text: 'Pattern AI Demo', path: '/pattern-ai-demo', icon: <AutoAwesomeIcon /> },
-  { text: 'Update Test', path: '/pattern-update-test', icon: <ScienceIcon /> },
-  { text: 'AI Validation', path: '/ai-validation', icon: <VerifiedUserIcon /> },
 ];
 
 export const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
