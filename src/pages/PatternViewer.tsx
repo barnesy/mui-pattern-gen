@@ -25,6 +25,7 @@ import {
   Check as CheckIcon,
   Pending as PendingIcon,
 } from '@mui/icons-material';
+import { withPatternWrapper } from '../utils/withPatternWrapper';
 
 interface Pattern {
   name: string;
@@ -44,7 +45,7 @@ const categories = [
   { id: 'dashboards', label: 'Dashboards', color: 'error' },
 ];
 
-// Component to dynamically load and render patterns
+// Component to dynamically load and render patterns with AI Design Mode
 const PatternRenderer: React.FC<{ pattern: Pattern }> = ({ pattern }) => {
   const [Component, setComponent] = useState<React.ComponentType<any> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -61,7 +62,16 @@ const PatternRenderer: React.FC<{ pattern: Pattern }> = ({ pattern }) => {
           : `../patterns/${pattern.category}/${pattern.name}`;
         
         const module = await import(/* @vite-ignore */ modulePath);
-        setComponent(() => module[pattern.name] || module.default);
+        const OriginalComponent = module[pattern.name] || module.default;
+        
+        // Wrap the component with PatternWrapper for AI Design Mode
+        const WrappedComponent = withPatternWrapper(OriginalComponent, {
+          patternName: pattern.name,
+          status: pattern.status,
+          category: pattern.category,
+        });
+        
+        setComponent(() => WrappedComponent);
       } catch (err) {
         console.error(`Failed to load pattern ${pattern.name}:`, err);
         setError(`Failed to load ${pattern.name}`);
@@ -97,7 +107,7 @@ const PatternRenderer: React.FC<{ pattern: Pattern }> = ({ pattern }) => {
     );
   }
 
-  // Render the component with default props
+  // Render the component with AI Design Mode wrapper
   return (
     <Suspense fallback={<CircularProgress size={24} />}>
       <Component />
@@ -242,7 +252,7 @@ export const PatternViewer: React.FC = () => {
           </Typography>
         )}
         
-        {/* Direct Component Render */}
+        {/* Direct Component Render with AI Design Mode */}
         <Box sx={{ mt: 2 }}>
           <PatternRenderer pattern={pattern} />
         </Box>
@@ -254,6 +264,10 @@ export const PatternViewer: React.FC = () => {
     <Box>
       <Typography variant="h4" gutterBottom>
         Pattern Library
+      </Typography>
+      
+      <Typography variant="body1" color="text.secondary" gutterBottom>
+        Click on any pattern while AI Design Mode is active to customize it
       </Typography>
       
       <Paper sx={{ p: 3, mb: 3 }}>
