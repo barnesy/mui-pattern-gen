@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { PatternInstanceManager, PatternInstance } from '../services/PatternInstanceManager';
 
 export interface PatternInfo {
   name: string;
   status: 'pending' | 'accepted';
   category: string;
   instanceId: string;
-  props: Record<string, any>;
+  props: Record<string, unknown>;
   element: HTMLElement;
   rect: DOMRect;
   hasConfig?: boolean;
@@ -19,6 +20,8 @@ interface AIDesignModeContextType {
   setHoveredPattern: (info: PatternInfo | null) => void;
   selectedPattern: PatternInfo | null;
   setSelectedPattern: (info: PatternInfo | null) => void;
+  selectedInstanceId: string | null;
+  setSelectedInstanceId: (id: string | null) => void;
   drawerOpen: boolean;
   setDrawerOpen: (open: boolean) => void;
   drawerWidth: number;
@@ -26,9 +29,13 @@ interface AIDesignModeContextType {
   patternInstances: Map<string, PatternInfo[]>;
   registerPatternInstance: (pattern: PatternInfo) => void;
   unregisterPatternInstance: (instanceId: string) => void;
+  updatePatternInstance: (instanceId: string, props: Record<string, unknown>) => void;
+  updateAllPatternInstances: (patternName: string, props: Record<string, unknown>) => void;
+  getPatternInstances: (patternName: string) => PatternInstance[];
+  getPatternInstanceCount: (patternName: string) => number;
 }
 
-const AIDesignModeContext = createContext<AIDesignModeContextType | undefined>(undefined);
+export const AIDesignModeContext = createContext<AIDesignModeContextType | undefined>(undefined);
 
 export const useAIDesignMode = () => {
   const context = useContext(AIDesignModeContext);
@@ -46,9 +53,10 @@ export const AIDesignModeProvider: React.FC<AIDesignModeProviderProps> = ({ chil
   const [isEnabled, setIsEnabled] = useState(false);
   const [hoveredPattern, setHoveredPattern] = useState<PatternInfo | null>(null);
   const [selectedPattern, setSelectedPattern] = useState<PatternInfo | null>(null);
+  const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerWidth, setDrawerWidth] = useState(400);
-  const [patternInstances] = useState<Map<string, PatternInfo[]>>(new Map());
+  const [patternInstances, setPatternInstances] = useState<Map<string, PatternInfo[]>>(new Map());
 
   const toggleEnabled = useCallback(() => {
     setIsEnabled(prev => !prev);
@@ -56,26 +64,83 @@ export const AIDesignModeProvider: React.FC<AIDesignModeProviderProps> = ({ chil
       // Clear states when disabling
       setHoveredPattern(null);
       setSelectedPattern(null);
+      setSelectedInstanceId(null);
       setDrawerOpen(false);
     }
   }, [isEnabled]);
 
   const registerPatternInstance = useCallback((pattern: PatternInfo) => {
-    const instances = patternInstances.get(pattern.name) || [];
-    instances.push(pattern);
-    patternInstances.set(pattern.name, instances);
-  }, [patternInstances]);
+    setPatternInstances(prev => {
+      const newMap = new Map(prev);
+      const instances = newMap.get(pattern.name) || [];
+      
+      // Check if instance already exists
+      const existingIndex = instances.findIndex(p => p.instanceId === pattern.instanceId);
+      if (existingIndex >= 0) {
+        // Update existing instance
+        instances[existingIndex] = pattern;
+      } else {
+        // Add new instance
+        instances.push(pattern);
+      }
+      
+      newMap.set(pattern.name, instances);
+      return newMap;
+    });
+    
+  }, []);
 
   const unregisterPatternInstance = useCallback((instanceId: string) => {
-    patternInstances.forEach((instances, patternName) => {
-      const filtered = instances.filter(p => p.instanceId !== instanceId);
-      if (filtered.length === 0) {
-        patternInstances.delete(patternName);
-      } else {
-        patternInstances.set(patternName, filtered);
-      }
+    setPatternInstances(prev => {
+      const newMap = new Map(prev);
+      
+      newMap.forEach((instances, patternName) => {
+        const filtered = instances.filter(p => p.instanceId !== instanceId);
+        if (filtered.length === 0) {
+          newMap.delete(patternName);
+        } else {
+          newMap.set(patternName, filtered);
+        }
+      });
+      
+      return newMap;
     });
-  }, [patternInstances]);
+    
+  }, []);
+
+  const updatePatternInstance = useCallback((instanceId: string, props: Record<string, unknown>) => {
+    
+    // Notify the pattern instance that it should update
+    PatternInstanceManager.notifyInstanceUpdate(instanceId);
+    
+    // Also emit a custom event for the specific instance
+    const event = new CustomEvent('pattern-update-request', {
+      detail: { instanceId, props },
+      bubbles: true,
+    });
+    window.dispatchEvent(event);
+  }, []);
+
+  const updateAllPatternInstances = useCallback((patternName: string, props: Record<string, unknown>) => {
+    
+    // Notify all instances of this pattern
+    PatternInstanceManager.notifyAllInstancesUpdate(patternName);
+    
+    // Also emit a custom event for all instances
+    const event = new CustomEvent('pattern-update-request', {
+      detail: { patternName, props, updateAll: true },
+      bubbles: true,
+    });
+    window.dispatchEvent(event);
+  }, []);
+
+  const getPatternInstances = useCallback((patternName: string) => {
+    return PatternInstanceManager.getInstances(patternName);
+  }, []);
+
+  const getPatternInstanceCount = useCallback((patternName: string) => {
+    return PatternInstanceManager.getInstanceCount(patternName);
+  }, []);
 
   // Load drawer width from localStorage
   React.useEffect(() => {
@@ -98,6 +163,8 @@ export const AIDesignModeProvider: React.FC<AIDesignModeProviderProps> = ({ chil
     setHoveredPattern,
     selectedPattern,
     setSelectedPattern,
+    selectedInstanceId,
+    setSelectedInstanceId,
     drawerOpen,
     setDrawerOpen,
     drawerWidth,
@@ -105,6 +172,10 @@ export const AIDesignModeProvider: React.FC<AIDesignModeProviderProps> = ({ chil
     patternInstances,
     registerPatternInstance,
     unregisterPatternInstance,
+    updatePatternInstance,
+    updateAllPatternInstances,
+    getPatternInstances,
+    getPatternInstanceCount,
   };
 
   return (

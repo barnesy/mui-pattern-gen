@@ -86,10 +86,21 @@ const AIDesignModeInjector: React.FC<{ children: ReactNode }> = ({ children }) =
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       
-      // Skip if we're over any overlay element or drawer
-      if (target.closest('[data-ai-ignore="true"], .MuiDrawer-root, .MuiPopper-root, .MuiTooltip-popper, .MuiModal-root, [role="tooltip"], [role="dialog"], [aria-label="toggle AI Design Mode"]')) {
+      // Skip if hovering over AI-ignore elements or any MUI overlay component
+      if (target.closest('[data-ai-ignore="true"]')) {
         setHoveredPattern(null);
         return;
+      }
+      
+      // Check if hover is on a MUI portal/overlay
+      const isPortalHover = !!(
+        target.closest('.MuiPopper-root') ||
+        target.closest('.MuiModal-root') ||
+        target.closest('[role="presentation"]')
+      );
+      
+      if (isPortalHover) {
+        return; // Don't change hover state for portal elements
       }
       
       const patternElement = target.closest('[data-pattern-name]') as HTMLElement;
@@ -118,8 +129,21 @@ const AIDesignModeInjector: React.FC<{ children: ReactNode }> = ({ children }) =
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       
-      // Skip if clicking on overlay elements or drawer
-      if (target.closest('[data-ai-ignore="true"], .MuiDrawer-root, .MuiPopper-root, .MuiTooltip-popper, .MuiModal-root, [role="tooltip"], [role="dialog"], [aria-label="toggle AI Design Mode"]')) {
+      // Skip if clicking on AI-ignore elements or any MUI overlay component
+      if (target.closest('[data-ai-ignore="true"]')) {
+        return;
+      }
+      
+      // Check if click is from a MUI portal/overlay (Select dropdown, Menu, etc)
+      const isPortalClick = !!(
+        target.closest('.MuiPopper-root') ||
+        target.closest('.MuiModal-root') ||
+        target.closest('[role="presentation"]') ||
+        // Select dropdowns often have this structure
+        (target.closest('.MuiPaper-root') && !target.closest('[data-pattern-name]'))
+      );
+      
+      if (isPortalClick) {
         return;
       }
       

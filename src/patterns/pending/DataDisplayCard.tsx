@@ -38,6 +38,8 @@ import {
 } from '@mui/icons-material';
 import { LabelValuePair } from './LabelValuePair';
 import { getDemoData } from './DataDisplayCard.config';
+import { SpacingConfig, getSpacingValue } from '../../types/PatternVariant';
+import { getDemoDataForVariant } from '../../utils/variantDemoData';
 
 export interface DataDisplayCardProps {
   variant?: 'stats' | 'list' | 'table' | 'workflow' | 'mixed';
@@ -85,10 +87,6 @@ export interface DataDisplayCardProps {
   loading?: boolean;
   error?: string;
   emptyMessage?: string;
-  maxHeight?: number | string;
-  elevation?: number;
-  headerDivider?: boolean;
-  contentPadding?: boolean;
   
   // Demo data
   demoDataType?: string;
@@ -98,6 +96,10 @@ export interface DataDisplayCardProps {
   // Size props
   width?: { mode: 'auto' | '100%' | 'custom'; customValue?: number; unit?: 'px' | '%' };
   height?: { mode: 'auto' | '100%' | 'custom'; customValue?: number; unit?: 'px' | '%' };
+  
+  // Spacing props
+  padding?: SpacingConfig;
+  margin?: SpacingConfig;
 }
 
 export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
@@ -115,21 +117,19 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
   loading = false,
   error,
   emptyMessage = 'No data available',
-  maxHeight,
-  elevation = 1,
-  headerDivider = true,
-  contentPadding = true,
   demoDataType,
   showMenuItems = true,
   showAction = false,
   width,
   height,
+  padding,
+  margin,
 }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   
   // Determine effective demo data type based on variant if not explicitly set
-  const effectiveDemoType = demoDataType || (
+  const effectiveDemoType = demoDataType || getDemoDataForVariant('DataDisplayCard', variant) || (
     variant === 'stats' ? 'revenue' : 
     variant === 'list' ? 'users' : 
     variant === 'table' ? 'sales' : 
@@ -137,6 +137,10 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
     variant === 'mixed' ? 'dashboard' : 
     'empty'
   );
+  
+  // Get default padding
+  const defaultPadding = { top: 16, right: 16, bottom: 16, left: 16 };
+  const effectivePadding = padding || defaultPadding;
   
   const demoData = effectiveDemoType !== 'empty' ? getDemoData(effectiveDemoType) : {};
   const finalStats = stats.length > 0 ? stats : (demoData.stats || []);
@@ -421,12 +425,13 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
 
   return (
     <Card 
-      elevation={elevation}
+      elevation={1}
       sx={{
         width: getSizeValue(width),
         height: getSizeValue(height),
         display: 'flex',
         flexDirection: 'column',
+        margin: margin ? getSpacingValue(margin) : undefined,
       }}
     >
       <CardHeader
@@ -468,16 +473,15 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
         }}
       />
       
-      {headerDivider && <Divider />}
+      <Divider />
       
       <CardContent
         sx={{
-          p: contentPadding ? 3 : 0,
-          maxHeight: maxHeight && typeof maxHeight === 'number' && maxHeight > 0 ? maxHeight : 'none',
-          overflow: maxHeight && typeof maxHeight === 'number' && maxHeight > 0 ? 'auto' : 'visible',
+          p: getSpacingValue(effectivePadding),
           flex: height ? 1 : 'none',
+          overflow: 'auto',
           '&:last-child': {
-            pb: contentPadding ? 3 : 0,
+            pb: effectivePadding.bottom + 'px',
           },
         }}
       >

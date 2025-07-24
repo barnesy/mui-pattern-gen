@@ -3,28 +3,21 @@ import {
   Box,
   Typography,
   Switch,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   FormControlLabel,
   Slider,
   Stack,
   Paper,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Chip,
-  ToggleButton,
-  ToggleButtonGroup,
   Button,
 } from '@mui/material';
-import { ExpandMore, Save, Cancel } from '@mui/icons-material';
+import { Save, Cancel } from '@mui/icons-material';
 import { TextFieldWithDebounce } from './TextFieldWithDebounce';
+import { SpacingControl } from './SpacingControl';
+import { SpacingConfig } from '../../types/PatternVariant';
 
 export interface PropControl {
   name: string;
-  type: 'text' | 'number' | 'boolean' | 'select' | 'slider' | 'variant' | 'spacing' | 'size';
+  type: 'text' | 'number' | 'boolean' | 'select' | 'slider' | 'variant' | 'spacing' | 'size' | 'padding' | 'margin';
   label: string;
   defaultValue?: any;
   options?: { label: string; value: any }[];
@@ -51,9 +44,6 @@ export const PatternPropsPanel: React.FC<PatternPropsPanelProps> = ({
   onChange,
   onReset,
 }) => {
-  // Track expanded accordions with stable state
-  const [expandedPanels, setExpandedPanels] = useState<string[]>(['General']);
-  
   // Local state for props that haven't been saved yet
   const [localValues, setLocalValues] = useState<Record<string, any>>(values);
   const [hasChanges, setHasChanges] = useState(false);
@@ -84,23 +74,9 @@ export const PatternPropsPanel: React.FC<PatternPropsPanelProps> = ({
     setHasChanges(false);
   }, [values]);
   
-  const handleAccordionChange = useCallback((panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
-    setExpandedPanels(prev => {
-      if (isExpanded) {
-        return [...prev, panel];
-      } else {
-        return prev.filter(p => p !== panel);
-      }
-    });
-  }, []);
-
-  // Group controls by their group property
-  const groupedControls = controls.reduce((acc, control) => {
-    const group = control.group || 'General';
-    if (!acc[group]) acc[group] = [];
-    acc[group].push(control);
-    return acc;
-  }, {} as Record<string, PropControl[]>);
+  // Separate content controls from settings controls
+  const contentControls = controls.filter(c => c.isContent);
+  const settingsControls = controls.filter(c => !c.isContent);
 
   const renderControl = useCallback((control: PropControl) => {
     const value = localValues[control.name] ?? control.defaultValue;
@@ -146,25 +122,54 @@ export const PatternPropsPanel: React.FC<PatternPropsPanelProps> = ({
 
       case 'select':
         return (
-          <FormControl fullWidth size="small">
-            <InputLabel>{control.label}</InputLabel>
-            <Select
-              value={value || ''}
-              label={control.label}
-              onChange={(e) => handleLocalChange(control.name, e.target.value)}
-            >
+          <Box>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              {control.label}
+            </Typography>
+            <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
               {control.options?.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
+                <Chip
+                  key={option.value}
+                  label={option.label}
+                  size="small"
+                  onClick={() => handleLocalChange(control.name, option.value)}
+                  data-ai-ignore="true"
+                  sx={(theme) => ({
+                    bgcolor: value === option.value 
+                      ? theme.palette.mode === 'dark' 
+                        ? 'primary.dark' 
+                        : 'primary.light' 
+                      : theme.palette.mode === 'dark'
+                        ? 'grey.800'
+                        : 'grey.200',
+                    color: value === option.value 
+                      ? theme.palette.mode === 'dark'
+                        ? 'primary.contrastText'
+                        : 'primary.main'
+                      : 'text.secondary',
+                    fontWeight: value === option.value ? 600 : 400,
+                    border: value === option.value 
+                      ? `1px solid ${theme.palette.primary.main}` 
+                      : '1px solid transparent',
+                    '&:hover': {
+                      bgcolor: value === option.value 
+                        ? theme.palette.mode === 'dark'
+                          ? 'primary.dark' 
+                          : 'primary.light'
+                        : theme.palette.mode === 'dark'
+                          ? 'grey.700'
+                          : 'grey.300',
+                    },
+                  })}
+                />
               ))}
-            </Select>
+            </Stack>
             {control.helperText && (
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                 {control.helperText}
               </Typography>
             )}
-          </FormControl>
+          </Box>
         );
 
       case 'slider':
@@ -193,32 +198,70 @@ export const PatternPropsPanel: React.FC<PatternPropsPanelProps> = ({
       case 'variant':
         return (
           <Box>
-            <Typography variant="body2" gutterBottom>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
               {control.label}
             </Typography>
-            <ToggleButtonGroup
-              value={value || control.defaultValue}
-              exclusive
-              onChange={(_, newValue) => {
-                if (newValue !== null) {
-                  handleLocalChange(control.name, newValue);
-                }
-              }}
-              size="small"
-              fullWidth
-            >
+            <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
               {control.options?.map((option) => (
-                <ToggleButton key={option.value} value={option.value}>
-                  {option.label}
-                </ToggleButton>
+                <Chip
+                  key={option.value}
+                  label={option.label}
+                  size="small"
+                  onClick={() => handleLocalChange(control.name, option.value)}
+                  data-ai-ignore="true"
+                  sx={(theme) => ({
+                    bgcolor: value === option.value 
+                      ? theme.palette.mode === 'dark' 
+                        ? 'primary.dark' 
+                        : 'primary.light' 
+                      : theme.palette.mode === 'dark'
+                        ? 'grey.800'
+                        : 'grey.200',
+                    color: value === option.value 
+                      ? theme.palette.mode === 'dark'
+                        ? 'primary.contrastText'
+                        : 'primary.main'
+                      : 'text.secondary',
+                    fontWeight: value === option.value ? 600 : 400,
+                    border: value === option.value 
+                      ? `1px solid ${theme.palette.primary.main}` 
+                      : '1px solid transparent',
+                    '&:hover': {
+                      bgcolor: value === option.value 
+                        ? theme.palette.mode === 'dark'
+                          ? 'primary.dark' 
+                          : 'primary.light'
+                        : theme.palette.mode === 'dark'
+                          ? 'grey.700'
+                          : 'grey.300',
+                    },
+                  })}
+                />
               ))}
-            </ToggleButtonGroup>
+            </Stack>
             {control.helperText && (
               <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                 {control.helperText}
               </Typography>
             )}
           </Box>
+        );
+
+      case 'padding':
+      case 'margin':
+        const spacingValue = value as SpacingConfig || {
+          top: control.defaultValue?.top || 16,
+          right: control.defaultValue?.right || 16,
+          bottom: control.defaultValue?.bottom || 16,
+          left: control.defaultValue?.left || 16,
+        };
+        return (
+          <SpacingControl
+            label={control.label}
+            value={spacingValue}
+            onChange={(newValue) => handleLocalChange(control.name, newValue)}
+            helperText={control.helperText}
+          />
         );
 
       default:
@@ -254,44 +297,52 @@ export const PatternPropsPanel: React.FC<PatternPropsPanelProps> = ({
             </>
           )}
           {onReset && !hasChanges && (
-            <Chip
-              label="Reset"
+            <Button
               size="small"
-              onClick={onReset}
-              clickable
-              color="primary"
               variant="outlined"
-            />
+              onClick={onReset}
+              color="inherit"
+            >
+              Reset
+            </Button>
           )}
         </Stack>
       </Box>
 
-      <Stack spacing={2}>
-        {Object.entries(groupedControls).map(([group, groupControls]) => (
-          <Accordion 
-            key={group} 
-            expanded={expandedPanels.includes(group)}
-            onChange={handleAccordionChange(group)}
-          >
-            <AccordionSummary expandIcon={<ExpandMore />}>
-              <Typography variant="subtitle2">{group}</Typography>
-              <Chip
-                label={groupControls.length}
-                size="small"
-                sx={{ ml: 'auto', mr: 1 }}
-              />
-            </AccordionSummary>
-            <AccordionDetails>
-              <Stack spacing={2}>
-                {groupControls.map((control) => (
-                  <Box key={control.name}>
-                    {renderControl(control)}
-                  </Box>
-                ))}
-              </Stack>
-            </AccordionDetails>
-          </Accordion>
-        ))}
+      <Stack spacing={3}>
+        {/* Content controls (text/number inputs) */}
+        {contentControls.length > 0 && (
+          <Box>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+              Content
+            </Typography>
+            <Stack spacing={2}>
+              {contentControls.map((control) => (
+                <Box key={control.name}>
+                  {renderControl(control)}
+                </Box>
+              ))}
+            </Stack>
+          </Box>
+        )}
+        
+        {/* Settings controls (everything else) */}
+        {settingsControls.length > 0 && (
+          <Box>
+            {contentControls.length > 0 && (
+              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                Settings
+              </Typography>
+            )}
+            <Stack spacing={2}>
+              {settingsControls.map((control) => (
+                <Box key={control.name}>
+                  {renderControl(control)}
+                </Box>
+              ))}
+            </Stack>
+          </Box>
+        )}
       </Stack>
     </Paper>
   );

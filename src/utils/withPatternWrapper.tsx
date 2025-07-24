@@ -1,11 +1,31 @@
 import React from 'react';
 import { PatternWrapper } from '../components/AIDesignMode/PatternWrapper';
+import { usePatternProps } from '../contexts/PatternPropsContext';
 
 export interface WithPatternWrapperOptions {
   patternName: string;
   status: 'pending' | 'accepted';
   category: string;
 }
+
+/**
+ * Component that uses pattern props from context
+ * This ensures props are properly injected without cloning issues
+ */
+const PatternPropsInjector = React.forwardRef<any, {
+  Component: React.ComponentType<any>;
+  fallbackProps: any;
+}>(({ Component, fallbackProps }, ref) => {
+  const patternContext = usePatternProps();
+  
+  // Use context props if available, otherwise use fallback
+  const props = patternContext ? patternContext.props : fallbackProps;
+  
+  
+  return <Component {...props} ref={ref} />;
+});
+
+PatternPropsInjector.displayName = 'PatternPropsInjector';
 
 /**
  * Higher-order component that wraps patterns with the PatternWrapper
@@ -23,7 +43,7 @@ export function withPatternWrapper<P extends Record<string, any>>(
         category={options.category}
         patternProps={props}
       >
-        <Component {...props} ref={ref} />
+        <PatternPropsInjector Component={Component} fallbackProps={props} ref={ref} />
       </PatternWrapper>
     );
   });

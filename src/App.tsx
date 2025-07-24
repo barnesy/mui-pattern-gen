@@ -12,6 +12,8 @@ import { ThemeEditor } from './pages/ThemeEditor';
 import { PatternGenerator } from './pages/PatternGenerator';
 import { PatternViewer } from './pages/PatternViewer';
 import { PatternAIDemo } from './pages/PatternAIDemo';
+import { PatternUpdateTest } from './pages/PatternUpdateTest';
+import { AIDesignValidation } from './pages/AIDesignValidation';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { theme as baseTheme } from './theme/theme';
 import { darkPalette } from './theme';
@@ -117,6 +119,8 @@ function AppWithDensity() {
             <Route path="pattern-generator" element={<PatternGenerator />} />
             <Route path="pattern-studio" element={<PatternGenerator />} />
             <Route path="pattern-ai-demo" element={<PatternAIDemo />} />
+            <Route path="pattern-update-test" element={<PatternUpdateTest />} />
+            <Route path="ai-validation" element={<AIDesignValidation />} />
           </Route>
         </Routes>
       </BrowserRouter>
