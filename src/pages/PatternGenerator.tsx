@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import {
   Box,
   Typography,
@@ -10,23 +10,18 @@ import {
   Stack,
   ToggleButton,
   ToggleButtonGroup,
-  IconButton,
   Tooltip,
   Grid,
-  Dialog,
-  DialogContent,
-  AppBar,
-  Toolbar,
+  CircularProgress,
 } from '@mui/material';
 import { 
   Pending,
   Smartphone,
   Tablet,
   Computer,
-  FullscreenExit
 } from '@mui/icons-material';
 import { SettingControl } from '../components/patterns/SettingsPanel';
-import { IframePreview } from '../components/patterns/IframePreview';
+import { withPatternWrapper } from '../utils/withPatternWrapper';
 
 interface PatternContext {
   current: string | null;
@@ -101,6 +96,77 @@ const generateVariations = (controls: SettingControl[]): Array<{name: string; pr
   return variations.slice(0, 9);
 };
 
+// Component renderer with AI Design Mode support
+const PatternRenderer: React.FC<{ 
+  componentName: string; 
+  componentProps: Record<string, any>;
+  previewWidth?: number;
+}> = ({ componentName, componentProps, previewWidth }) => {
+  const [Component, setComponent] = useState<React.ComponentType<any> | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadComponent = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const module = await import(/* @vite-ignore */ `../patterns/pending/${componentName}`);
+        const OriginalComponent = module[componentName] || module.default;
+        
+        // Wrap with AI Design Mode support
+        const WrappedComponent = withPatternWrapper(OriginalComponent, {
+          patternName: componentName,
+          status: 'pending',
+          category: 'pending',
+        });
+        
+        setComponent(() => WrappedComponent);
+      } catch (err) {
+        console.error(`Failed to load pattern ${componentName}:`, err);
+        setError(`Failed to load ${componentName}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadComponent();
+  }, [componentName]);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" p={4}>
+        <CircularProgress size={24} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box p={2}>
+        <Typography variant="body2" color="error">{error}</Typography>
+      </Box>
+    );
+  }
+
+  if (!Component) {
+    return (
+      <Box p={2}>
+        <Typography variant="body2" color="text.secondary">Component not found</Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ width: previewWidth ? `${previewWidth}px` : '100%', mx: 'auto' }}>
+      <Suspense fallback={<CircularProgress size={24} />}>
+        <Component {...componentProps} />
+      </Suspense>
+    </Box>
+  );
+};
+
 export const PatternGenerator: React.FC = () => {
   const theme = useTheme();
   const [context, setContext] = useState<PatternContext>({ current: null, category: null });
@@ -108,22 +174,9 @@ export const PatternGenerator: React.FC = () => {
   const [componentVariations, setComponentVariations] = useState<Array<{name: string; props: Record<string, any>}>>([]);
   const [previewDevice, setPreviewDevice] = useState<string>('Desktop');
   const [previewWidth, setPreviewWidth] = useState<number>(1200);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   
   const loadedComponentRef = useRef<string | null>(null);
   const intervalRef = useRef<number | null>(null);
-  
-  // Handle Escape key to exit fullscreen
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isFullscreen) {
-        setIsFullscreen(false);
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isFullscreen]);
 
   // Load pattern config only
   const loadPattern = useCallback(async (componentName: string) => {
@@ -270,12 +323,10 @@ export const PatternGenerator: React.FC = () => {
         <Box sx={{ p: 1.5, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
           <Typography variant="subtitle2" noWrap>{variation.name}</Typography>
         </Box>
-        <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden', minHeight: 300 }}>
-          <IframePreview
+        <Box sx={{ flex: 1, p: 2, overflow: 'auto', minHeight: 300 }}>
+          <PatternRenderer
             componentName={context.current}
             componentProps={variation.props}
-            theme={theme.palette.mode}
-            width="100%"
           />
         </Box>
       </Paper>
@@ -356,102 +407,31 @@ export const PatternGenerator: React.FC = () => {
             </Stack>
           </Box>
 
-          <Grid container spacing={3}>
-            {componentVariations.map((variation, index) => (
-              <Grid item key={index} xs={12} md={6} lg={4}>
-                <VariationPreview variation={variation} />
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-
-        {/* Fullscreen Dialog */}
-        <Dialog
-          fullScreen
-          open={isFullscreen}
-          onClose={() => setIsFullscreen(false)}
-          sx={{
-            zIndex: 10000, // Higher than Debug panel (9999) and AI overlay (9999)
-          }}
-          TransitionProps={{
-            onEntered: () => {
-              // Ensure iframe resizes after dialog animation
-              window.dispatchEvent(new Event('resize'));
-            }
-          }}
-        >
-          <AppBar sx={{ position: 'relative' }}>
-            <Toolbar>
-              <Typography sx={{ flex: 1 }} variant="h6" component="div">
-                {context.current} Preview
+          {componentVariations.length === 1 ? (
+            // Single component display
+            <Box sx={{ maxWidth: previewWidth, mx: 'auto' }}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Click the pattern while AI Design Mode is active to customize it
               </Typography>
-              
-              <Stack direction="row" spacing={1} alignItems="center">
-                {/* Device Selection */}
-                <ToggleButtonGroup
-                  value={previewDevice}
-                  exclusive
-                  onChange={handleDeviceChange}
-                  size="small"
-                  sx={{ 
-                    bgcolor: 'background.paper',
-                    '& .MuiToggleButton-root': {
-                      color: 'text.primary',
-                      borderColor: 'divider',
-                    }
-                  }}
-                >
-                  {devicePresets.map((device) => (
-                    <ToggleButton key={device.name} value={device.name}>
-                      <Tooltip title={device.name}>
-                        <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
-                          {device.icon}
-                        </Box>
-                      </Tooltip>
-                    </ToggleButton>
-                  ))}
-                </ToggleButtonGroup>
-
-                {/* Exit Fullscreen */}
-                <Tooltip title="Exit fullscreen (Esc)">
-                  <IconButton
-                    edge="end"
-                    color="inherit"
-                    onClick={() => setIsFullscreen(false)}
-                    aria-label="close"
-                  >
-                    <FullscreenExit />
-                  </IconButton>
-                </Tooltip>
-              </Stack>
-            </Toolbar>
-          </AppBar>
-          <DialogContent 
-            sx={{ 
-              p: 2, 
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'center',
-              overflow: 'auto'
-            }}
-          >
-            <Box sx={{ 
-              width: '100%', 
-              maxWidth: previewWidth,
-              transition: 'max-width 0.3s ease-in-out'
-            }}>
-              {context.current && (
-                <IframePreview
-                  componentName={context.current}
-                  componentProps={componentVariations[0]?.props || {}}
-                  theme={theme.palette.mode}
-                  width="100%"
-                  isFullscreen={true}
+              <Box sx={{ mt: 2 }}>
+                <PatternRenderer
+                  componentName={context.current!}
+                  componentProps={componentVariations[0].props}
+                  previewWidth={previewWidth}
                 />
-              )}
+              </Box>
             </Box>
-          </DialogContent>
-        </Dialog>
+          ) : (
+            // Multiple variations grid
+            <Grid container spacing={3}>
+              {componentVariations.map((variation, index) => (
+                <Grid item key={index} xs={12} md={6} lg={4}>
+                  <VariationPreview variation={variation} />
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </Box>
       </Box>
     );
   };
