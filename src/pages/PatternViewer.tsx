@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import {
   Box,
   Typography,
@@ -16,7 +16,7 @@ import {
   Tab,
   Tabs,
   Badge,
-  useTheme,
+  CircularProgress,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -25,7 +25,6 @@ import {
   Check as CheckIcon,
   Pending as PendingIcon,
 } from '@mui/icons-material';
-import { IframePreview } from '../components/patterns/IframePreview';
 
 interface Pattern {
   name: string;
@@ -45,8 +44,68 @@ const categories = [
   { id: 'dashboards', label: 'Dashboards', color: 'error' },
 ];
 
+// Component to dynamically load and render patterns
+const PatternRenderer: React.FC<{ pattern: Pattern }> = ({ pattern }) => {
+  const [Component, setComponent] = useState<React.ComponentType<any> | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadComponent = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const modulePath = pattern.status === 'pending'
+          ? `../patterns/pending/${pattern.name}`
+          : `../patterns/${pattern.category}/${pattern.name}`;
+        
+        const module = await import(/* @vite-ignore */ modulePath);
+        setComponent(() => module[pattern.name] || module.default);
+      } catch (err) {
+        console.error(`Failed to load pattern ${pattern.name}:`, err);
+        setError(`Failed to load ${pattern.name}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadComponent();
+  }, [pattern]);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" p={4}>
+        <CircularProgress size={24} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box p={2}>
+        <Typography variant="body2" color="error">{error}</Typography>
+      </Box>
+    );
+  }
+
+  if (!Component) {
+    return (
+      <Box p={2}>
+        <Typography variant="body2" color="text.secondary">Component not found</Typography>
+      </Box>
+    );
+  }
+
+  // Render the component with default props
+  return (
+    <Suspense fallback={<CircularProgress size={24} />}>
+      <Component />
+    </Suspense>
+  );
+};
+
 export const PatternViewer: React.FC = () => {
-  const theme = useTheme();
   const [patterns, setPatterns] = useState<Pattern[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -183,27 +242,9 @@ export const PatternViewer: React.FC = () => {
           </Typography>
         )}
         
-        {/* Inline Preview */}
-        <Box
-          sx={{
-            border: `1px solid ${theme.palette.divider}`,
-            borderRadius: 1,
-            overflow: 'hidden',
-            bgcolor: 'background.paper',
-            minHeight: 200,
-          }}
-        >
-          <IframePreview
-            componentName={pattern.name}
-            componentProps={{ variant: 'default' }}
-            theme={theme.palette.mode}
-            width="100%"
-            componentPath={pattern.status === 'pending' 
-              ? `../patterns/pending/${pattern.name}.tsx`
-              : `../patterns/${pattern.category}/${pattern.name}.tsx`
-            }
-            density="comfortable"
-          />
+        {/* Direct Component Render */}
+        <Box sx={{ mt: 2 }}>
+          <PatternRenderer pattern={pattern} />
         </Box>
       </CardContent>
     </Card>
@@ -317,46 +358,28 @@ export const PatternViewer: React.FC = () => {
               <Stack spacing={2}>
                 {filteredPatterns.map(pattern => (
                   <Paper key={pattern.name} sx={{ p: 2 }}>
-                    <Grid container spacing={2} alignItems="center">
-                      <Grid item xs={12} md={3}>
-                        <Stack direction="row" alignItems="center" spacing={2}>
+                    <Grid container spacing={2} alignItems="stretch">
+                      <Grid item xs={12} md={4}>
+                        <Stack spacing={1}>
                           <Typography variant="h6">{pattern.name}</Typography>
-                          <Chip
-                            icon={pattern.status === 'pending' ? <PendingIcon /> : <CheckIcon />}
-                            label={pattern.status}
-                            size="small"
-                            color={pattern.status === 'pending' ? 'warning' : 'success'}
-                            variant="outlined"
-                          />
-                          <Chip 
-                            label={pattern.category} 
-                            size="small" 
-                            color={categories.find(c => c.id === pattern.category)?.color as any || 'default'}
-                          />
+                          <Stack direction="row" spacing={1}>
+                            <Chip
+                              icon={pattern.status === 'pending' ? <PendingIcon /> : <CheckIcon />}
+                              label={pattern.status}
+                              size="small"
+                              color={pattern.status === 'pending' ? 'warning' : 'success'}
+                              variant="outlined"
+                            />
+                            <Chip 
+                              label={pattern.category} 
+                              size="small" 
+                              color={categories.find(c => c.id === pattern.category)?.color as any || 'default'}
+                            />
+                          </Stack>
                         </Stack>
                       </Grid>
-                      <Grid item xs={12} md={9}>
-                        <Box
-                          sx={{
-                            border: `1px solid ${theme.palette.divider}`,
-                            borderRadius: 1,
-                            overflow: 'hidden',
-                            bgcolor: 'background.paper',
-                            height: 150,
-                          }}
-                        >
-                          <IframePreview
-                            componentName={pattern.name}
-                            componentProps={{ variant: 'default' }}
-                            theme={theme.palette.mode}
-                            width="100%"
-                            componentPath={pattern.status === 'pending' 
-                              ? `../patterns/pending/${pattern.name}.tsx`
-                              : `../patterns/${pattern.category}/${pattern.name}.tsx`
-                            }
-                            density="comfortable"
-                          />
-                        </Box>
+                      <Grid item xs={12} md={8}>
+                        <PatternRenderer pattern={pattern} />
                       </Grid>
                     </Grid>
                   </Paper>
