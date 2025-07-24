@@ -228,7 +228,7 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
     const instance = this.findInstanceById(instanceId);
     if (!instance) return;
 
-    const element = instance.element.deref();
+    const element = instance.element;
     if (!element) return;
 
     // Scroll into view
@@ -249,7 +249,7 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
       
       instances.forEach(instance => {
         // Check if element still exists
-        if (instance.element.deref()) {
+        if (instance.element && document.contains(instance.element)) {
           aliveInstances.add(instance);
         }
       });

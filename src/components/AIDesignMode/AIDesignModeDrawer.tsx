@@ -101,7 +101,7 @@ export const AIDesignModeDrawer: React.FC = () => {
     const instance = patternInstances.find(inst => inst.id === selectedInstanceId);
     if (instance) {
       // Get the element and extract props
-      const element = instance.element.deref();
+      const element = instance.element; // Direct reference, not WeakRef
       if (element) {
         const propsAttr = element.getAttribute('data-pattern-props');
         if (propsAttr) {
