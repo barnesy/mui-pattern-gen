@@ -210,16 +210,51 @@ Requirements:
             </Stack>
             
             <Stack direction="row" spacing={1} mb={2}>
-              <Chip label={selectedPattern.category} size="small" color="primary" />
+              <Chip 
+                label={selectedPattern.category} 
+                size="small" 
+                variant="filled"
+                sx={(theme) => ({
+                  bgcolor: theme.palette.mode === 'dark' 
+                    ? theme.palette.primary.dark 
+                    : theme.palette.primary.light,
+                  color: theme.palette.mode === 'dark'
+                    ? theme.palette.primary.contrastText
+                    : theme.palette.primary.dark,
+                })}
+              />
               {selectedPattern.hasConfig !== false && (
-                <Chip label="Interactive" size="small" variant="outlined" />
+                <Chip 
+                  label="Interactive" 
+                  size="small" 
+                  variant="outlined"
+                  sx={(theme) => ({
+                    borderColor: theme.palette.mode === 'dark'
+                      ? theme.palette.grey[600]
+                      : theme.palette.grey[400],
+                    color: theme.palette.mode === 'dark'
+                      ? theme.palette.grey[300]
+                      : theme.palette.grey[700],
+                  })}
+                />
               )}
               {patternInstances.length > 1 && (
                 <Chip 
                   icon={<LayersIcon />} 
                   label={`${patternInstances.length} instances`} 
                   size="small" 
-                  color="secondary" 
+                  variant="filled"
+                  sx={(theme) => ({
+                    bgcolor: theme.palette.mode === 'dark' 
+                      ? theme.palette.secondary.dark 
+                      : theme.palette.secondary.light,
+                    color: theme.palette.mode === 'dark'
+                      ? theme.palette.secondary.contrastText
+                      : theme.palette.secondary.dark,
+                    '& .MuiChip-icon': {
+                      color: 'inherit',
+                    },
+                  })}
                 />
               )}
             </Stack>
