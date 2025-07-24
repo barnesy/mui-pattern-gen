@@ -7,7 +7,7 @@ export const theme = createTheme({
   palette,
   typography,
   components,
-  spacing: 8,
+  spacing: 2,
   shape: {
     borderRadius: 4,
   },

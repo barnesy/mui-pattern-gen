@@ -20,6 +20,8 @@ import {
 } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import { PropControl } from './PatternPropsPanel';
+import { SpacingControl } from '../AIDesignMode/SpacingControl';
+import { SizeControl } from '../AIDesignMode/SizeControl';
 
 // Re-export for compatibility
 export type SettingControl = PropControl;
@@ -36,7 +38,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onChange,
 }) => {
   // Filter out content controls (text/number)
-  const settingsControls = controls.filter(c => !c.isContent && ['boolean', 'select', 'slider', 'variant'].includes(c.type));
+  const settingsControls = controls.filter(c => !c.isContent && ['boolean', 'select', 'slider', 'variant', 'spacing', 'size'].includes(c.type));
   
   // Group controls by their group property
   const groupedControls = settingsControls.reduce((acc, control) => {
@@ -152,6 +154,30 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               </Typography>
             )}
           </Box>
+        );
+
+      case 'spacing':
+        return (
+          <SpacingControl
+            label={control.label}
+            value={value || control.defaultValue || { top: 0, right: 0, bottom: 0, left: 0 }}
+            onChange={(newValue) => onChange(control.name, newValue)}
+            type={control.name as 'margin' | 'padding'}
+            helperText={control.helperText}
+          />
+        );
+
+      case 'size':
+        return (
+          <SizeControl
+            label={control.label}
+            value={value || control.defaultValue || { mode: 'auto' }}
+            onChange={(newValue) => onChange(control.name, newValue)}
+            min={control.min}
+            max={control.max}
+            step={control.step}
+            helperText={control.helperText}
+          />
         );
 
       default:

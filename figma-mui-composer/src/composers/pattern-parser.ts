@@ -1,4 +1,5 @@
-import { PatternInfo } from '../utils/pattern-analyzer';
+// Remove Node.js dependency that doesn't work in browser
+// import { PatternInfo } from '../utils/pattern-analyzer';
 
 export interface FigmaPatternDefinition {
   name: string;
@@ -254,7 +255,7 @@ const patternTemplates: Record<string, FigmaPatternDefinition> = {
 };
 
 // Parse pattern info and generate Figma definition
-export function parsePatternToFigma(patternInfo: PatternInfo): FigmaPatternDefinition {
+export function parsePatternToFigma(patternInfo: any): FigmaPatternDefinition {
   // Check if we have a template for this pattern
   const template = patternTemplates[patternInfo.name];
   if (template) {
@@ -266,7 +267,7 @@ export function parsePatternToFigma(patternInfo: PatternInfo): FigmaPatternDefin
 }
 
 // Generate pattern structure from component analysis
-function generatePatternStructure(patternInfo: PatternInfo): FigmaPatternDefinition {
+function generatePatternStructure(patternInfo: any): FigmaPatternDefinition {
   const children: FigmaElement[] = [];
   
   // Analyze MUI components and create a reasonable structure
@@ -336,7 +337,7 @@ function generatePatternStructure(patternInfo: PatternInfo): FigmaPatternDefinit
   }
   
   // Add other components
-  patternInfo.muiComponents.forEach(component => {
+  patternInfo.muiComponents.forEach((component: string) => {
     if (!['Card', 'Paper', 'Typography', 'Button', 'TextField'].includes(component)) {
       contentFrame.children!.push({
         type: `mui:${component}`,

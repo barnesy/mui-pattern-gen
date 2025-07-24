@@ -94,6 +94,10 @@ export interface DataDisplayCardProps {
   demoDataType?: string;
   showMenuItems?: boolean;
   showAction?: boolean;
+  
+  // Size props
+  width?: { mode: 'auto' | '100%' | 'custom'; customValue?: number; unit?: 'px' | '%' };
+  height?: { mode: 'auto' | '100%' | 'custom'; customValue?: number; unit?: 'px' | '%' };
 }
 
 export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
@@ -118,6 +122,8 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
   demoDataType,
   showMenuItems = true,
   showAction = false,
+  width,
+  height,
 }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -402,8 +408,27 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
     }
   };
 
+  // Calculate size styles
+  const getSizeValue = (size?: { mode: string; customValue?: number; unit?: string }) => {
+    if (!size) return 'auto';
+    if (size.mode === 'auto') return 'auto';
+    if (size.mode === '100%') return '100%';
+    if (size.mode === 'custom' && size.customValue) {
+      return `${size.customValue}${size.unit || 'px'}`;
+    }
+    return 'auto';
+  };
+
   return (
-    <Card elevation={elevation}>
+    <Card 
+      elevation={elevation}
+      sx={{
+        width: getSizeValue(width),
+        height: getSizeValue(height),
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <CardHeader
         title={title}
         subheader={subtitle}
@@ -450,6 +475,7 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
           p: contentPadding ? 3 : 0,
           maxHeight: maxHeight && typeof maxHeight === 'number' && maxHeight > 0 ? maxHeight : 'none',
           overflow: maxHeight && typeof maxHeight === 'number' && maxHeight > 0 ? 'auto' : 'visible',
+          flex: height ? 1 : 'none',
           '&:last-child': {
             pb: contentPadding ? 3 : 0,
           },

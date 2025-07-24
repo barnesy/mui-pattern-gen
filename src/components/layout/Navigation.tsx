@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
+  Box,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Toolbar,
 } from '@mui/material';
 import {
   Home as HomeIcon,
@@ -14,6 +16,7 @@ import {
   Edit as EditIcon,
   ViewModule as ViewModuleIcon,
   AddBox as AddBoxIcon,
+  AutoAwesome as AutoAwesomeIcon,
 } from '@mui/icons-material';
 
 interface NavigationItem {
@@ -33,13 +36,16 @@ const navigationItems: NavigationItem[] = [
   { text: 'Components', path: '/components', icon: <DashboardIcon /> },
   { text: 'Pattern Generator', path: '/pattern-generator', icon: <AddBoxIcon /> },
   { text: 'Pattern Library', path: '/patterns', icon: <ViewModuleIcon /> },
+  { text: 'Pattern AI Demo', path: '/pattern-ai-demo', icon: <AutoAwesomeIcon /> },
 ];
 
 export const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
   const location = useLocation();
 
   return (
-    <List>
+    <Box>
+      <Toolbar /> {/* Spacer for app bar */}
+      <List>
       {navigationItems.map((item) => (
         <ListItem key={item.text} disablePadding>
           <ListItemButton
@@ -53,6 +59,7 @@ export const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
           </ListItemButton>
         </ListItem>
       ))}
-    </List>
+      </List>
+    </Box>
   );
 };

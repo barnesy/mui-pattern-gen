@@ -135,6 +135,30 @@ export const dataDisplayCardControls: PropControl[] = [
     helperText: 'Adds custom action to header',
     group: 'Features',
   },
+
+  // Size controls
+  {
+    name: 'width',
+    type: 'size',
+    label: 'Width',
+    defaultValue: { mode: 'auto' },
+    min: 200,
+    max: 1200,
+    step: 10,
+    helperText: 'Card width',
+    group: 'Layout',
+  },
+  {
+    name: 'height',
+    type: 'size',
+    label: 'Height',
+    defaultValue: { mode: 'auto' },
+    min: 100,
+    max: 800,
+    step: 10,
+    helperText: 'Card height',
+    group: 'Layout',
+  },
 ];
 
 // Helper function to generate demo data based on type

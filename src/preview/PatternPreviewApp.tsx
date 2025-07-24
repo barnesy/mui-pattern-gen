@@ -4,6 +4,7 @@ import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
 import { palette as lightPalette } from '../theme/palette';
 import { darkPalette } from '../theme/darkPalette';
 import { typography } from '../theme/typography';
+import { withPatternWrapper } from '../utils/withPatternWrapper';
 
 // Message types
 interface UpdatePropsMessage {
@@ -112,7 +113,19 @@ function PatternPreviewApp() {
         }
         
         const Component = module[componentName] || module.default;
-        setComponent(() => Component);
+        
+        // Wrap component with pattern wrapper for AI Design Mode
+        const status = componentPath?.includes('/pending/') ? 'pending' : 'accepted';
+        const category = componentPath?.includes('/pending/') ? 'pending' : 
+                       componentPath?.match(/\/patterns\/([^/]+)\//)?.[1] || 'unknown';
+        
+        const WrappedComponent = withPatternWrapper(Component, {
+          patternName: componentName,
+          status,
+          category,
+        });
+        
+        setComponent(() => WrappedComponent);
         setError(null);
         
         // Notify parent that preview is ready
@@ -128,7 +141,7 @@ function PatternPreviewApp() {
     loadComponent();
   }, [componentName, componentPath]);
 
-  // Listen for messages from parent
+  // Listen for messages from parent and pattern prop updates
   useEffect(() => {
     const handleMessage = (event: MessageEvent<PreviewMessage>) => {
       if (event.data.type === 'UPDATE_PROPS') {
@@ -140,8 +153,23 @@ function PatternPreviewApp() {
       }
     };
 
+    // Listen for pattern prop updates from AI Design Mode
+    const handlePatternUpdate = (event: CustomEvent) => {
+      const { instanceId, props: newProps } = event.detail;
+      // Check if this update is for our component instance
+      const patternElement = document.querySelector(`[data-pattern-instance="${instanceId}"]`);
+      if (patternElement) {
+        setProps(newProps);
+      }
+    };
+
     window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    window.addEventListener('pattern-props-update', handlePatternUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('message', handleMessage);
+      window.removeEventListener('pattern-props-update', handlePatternUpdate as EventListener);
+    };
   }, []);
 
   // Report content height changes

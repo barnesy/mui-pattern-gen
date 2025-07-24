@@ -22,8 +22,12 @@ This plugin allows you to:
    ```bash
    npm run build
    ```
-4. In Figma, go to Plugins → Development → Import plugin from manifest
-5. Select the `manifest.json` file from this directory
+4. **IMPORTANT:** Import the plugin from the `dist` directory:
+   - In Figma, go to Plugins → Development → Import plugin from manifest
+   - Navigate to the `dist` folder: `figma-mui-composer/dist/`
+   - Select the `manifest.json` file from the `dist` directory
+
+⚠️ **Common Error:** If you see "ENOENT: no such file or directory" errors, you've imported from the wrong directory. Remove the plugin and reimport from `dist/`.
 
 ## Usage
 

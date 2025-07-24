@@ -24,7 +24,7 @@ import { TextFieldWithDebounce } from './TextFieldWithDebounce';
 
 export interface PropControl {
   name: string;
-  type: 'text' | 'number' | 'boolean' | 'select' | 'slider' | 'variant';
+  type: 'text' | 'number' | 'boolean' | 'select' | 'slider' | 'variant' | 'spacing' | 'size';
   label: string;
   defaultValue?: any;
   options?: { label: string; value: any }[];
@@ -34,6 +34,8 @@ export interface PropControl {
   helperText?: string;
   group?: string;
   isContent?: boolean; // Mark text/number fields as content vs settings
+  sides?: ('top' | 'right' | 'bottom' | 'left')[]; // For spacing controls
+  unit?: 'px' | '%'; // For size controls
 }
 
 interface PatternPropsPanelProps {

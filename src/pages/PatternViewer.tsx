@@ -270,10 +270,8 @@ export const PatternViewer: React.FC = () => {
         height: '100%', 
         display: 'flex', 
         flexDirection: 'column',
-        borderColor: pattern.status === 'pending' ? 'warning.main' : 'divider',
-        borderWidth: pattern.status === 'pending' ? 2 : 1,
       }}
-      variant="outlined"
+      elevation={1}
     >
       <CardContent sx={{ flex: 1 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>

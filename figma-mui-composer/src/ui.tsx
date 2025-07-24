@@ -74,6 +74,7 @@ const patternDescriptions: Record<string, string> = {
 };
 
 function App() {
+  console.log('App component rendering');
   const [selectedTab, setSelectedTab] = useState(0);
   const [muiComponents, setMuiComponents] = useState<any>(null);
   const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null);
@@ -85,15 +86,22 @@ function App() {
   const [projectPatterns, setProjectPatterns] = useState<any[]>([]);
 
   useEffect(() => {
-    // Load pattern definitions
-    const patternDefs = getAllPatternDefinitions();
-    const formattedPatterns: Pattern[] = patternDefs.map(def => ({
-      name: def.name,
-      category: getCategoryFromPattern(def.name),
-      description: patternDescriptions[def.name] || `${def.name} component`,
-      definition: def
-    }));
-    setPatterns(formattedPatterns);
+    console.log('Loading pattern definitions...');
+    try {
+      // Load pattern definitions
+      const patternDefs = getAllPatternDefinitions();
+      console.log('Pattern definitions loaded:', patternDefs);
+      const formattedPatterns: Pattern[] = patternDefs.map(def => ({
+        name: def.name,
+        category: getCategoryFromPattern(def.name),
+        description: patternDescriptions[def.name] || `${def.name} component`,
+        definition: def
+      }));
+      setPatterns(formattedPatterns);
+    } catch (error) {
+      console.error('Error loading patterns:', error);
+      setMessage({ type: 'error', text: 'Failed to load patterns' });
+    }
 
     // Listen for messages from the plugin
     window.onmessage = (event) => {
@@ -192,9 +200,13 @@ function App() {
 
   const componentCount = muiComponents ? Object.keys(muiComponents).length : 0;
 
+  console.log('Rendering App component, patterns:', patterns.length);
+  
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ width: '100%', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ width: '100%', height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.paper' }}>
+        <Typography variant="h6" sx={{ p: 2 }}>MUI Pattern Composer</Typography>
+        <Divider />
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={selectedTab} onChange={(_, val) => setSelectedTab(val)}>
             <Tab label="Patterns" />
@@ -348,5 +360,22 @@ function App() {
   );
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root')!);
-root.render(<App />);
+// Ensure React is properly initialized
+if (typeof window !== 'undefined') {
+  window.addEventListener('DOMContentLoaded', () => {
+    console.log('Starting React app...');
+    const rootElement = document.getElementById('root');
+    console.log('Root element:', rootElement);
+
+    if (rootElement) {
+      const root = ReactDOM.createRoot(rootElement);
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      );
+    } else {
+      console.error('Could not find root element');
+    }
+  });
+}

@@ -1,27 +1,31 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
-interface ComponentInfo {
+export interface PatternInfo {
   name: string;
+  status: 'pending' | 'accepted';
+  category: string;
+  instanceId: string;
   props: Record<string, any>;
-  variant?: string;
-  size?: string;
-  color?: string;
   element: HTMLElement;
   rect: DOMRect;
-  reference?: string;
-  displayReference?: string;
-  gridPosition?: string | null;
+  hasConfig?: boolean;
+  configPath?: string;
 }
 
 interface AIDesignModeContextType {
   isEnabled: boolean;
   toggleEnabled: () => void;
-  hoveredComponent: ComponentInfo | null;
-  setHoveredComponent: (info: ComponentInfo | null) => void;
-  selectedComponent: ComponentInfo | null;
-  setSelectedComponent: (info: ComponentInfo | null) => void;
-  showOverlay: boolean;
-  setShowOverlay: (show: boolean) => void;
+  hoveredPattern: PatternInfo | null;
+  setHoveredPattern: (info: PatternInfo | null) => void;
+  selectedPattern: PatternInfo | null;
+  setSelectedPattern: (info: PatternInfo | null) => void;
+  drawerOpen: boolean;
+  setDrawerOpen: (open: boolean) => void;
+  drawerWidth: number;
+  setDrawerWidth: (width: number) => void;
+  patternInstances: Map<string, PatternInfo[]>;
+  registerPatternInstance: (pattern: PatternInfo) => void;
+  unregisterPatternInstance: (instanceId: string) => void;
 }
 
 const AIDesignModeContext = createContext<AIDesignModeContextType | undefined>(undefined);
@@ -40,28 +44,67 @@ interface AIDesignModeProviderProps {
 
 export const AIDesignModeProvider: React.FC<AIDesignModeProviderProps> = ({ children }) => {
   const [isEnabled, setIsEnabled] = useState(false);
-  const [hoveredComponent, setHoveredComponent] = useState<ComponentInfo | null>(null);
-  const [selectedComponent, setSelectedComponent] = useState<ComponentInfo | null>(null);
-  const [showOverlay, setShowOverlay] = useState(true);
+  const [hoveredPattern, setHoveredPattern] = useState<PatternInfo | null>(null);
+  const [selectedPattern, setSelectedPattern] = useState<PatternInfo | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerWidth, setDrawerWidth] = useState(400);
+  const [patternInstances] = useState<Map<string, PatternInfo[]>>(new Map());
 
   const toggleEnabled = useCallback(() => {
     setIsEnabled(prev => !prev);
     if (!isEnabled) {
       // Clear states when disabling
-      setHoveredComponent(null);
-      setSelectedComponent(null);
+      setHoveredPattern(null);
+      setSelectedPattern(null);
+      setDrawerOpen(false);
     }
   }, [isEnabled]);
+
+  const registerPatternInstance = useCallback((pattern: PatternInfo) => {
+    const instances = patternInstances.get(pattern.name) || [];
+    instances.push(pattern);
+    patternInstances.set(pattern.name, instances);
+  }, [patternInstances]);
+
+  const unregisterPatternInstance = useCallback((instanceId: string) => {
+    patternInstances.forEach((instances, patternName) => {
+      const filtered = instances.filter(p => p.instanceId !== instanceId);
+      if (filtered.length === 0) {
+        patternInstances.delete(patternName);
+      } else {
+        patternInstances.set(patternName, filtered);
+      }
+    });
+  }, [patternInstances]);
+
+  // Load drawer width from localStorage
+  React.useEffect(() => {
+    const savedWidth = localStorage.getItem('ai-design-drawer-width');
+    if (savedWidth) {
+      setDrawerWidth(parseInt(savedWidth, 10));
+    }
+  }, []);
+
+  // Save drawer width to localStorage
+  const handleSetDrawerWidth = useCallback((width: number) => {
+    setDrawerWidth(width);
+    localStorage.setItem('ai-design-drawer-width', width.toString());
+  }, []);
 
   const value = {
     isEnabled,
     toggleEnabled,
-    hoveredComponent,
-    setHoveredComponent,
-    selectedComponent,
-    setSelectedComponent,
-    showOverlay,
-    setShowOverlay,
+    hoveredPattern,
+    setHoveredPattern,
+    selectedPattern,
+    setSelectedPattern,
+    drawerOpen,
+    setDrawerOpen,
+    drawerWidth,
+    setDrawerWidth: handleSetDrawerWidth,
+    patternInstances,
+    registerPatternInstance,
+    unregisterPatternInstance,
   };
 
   return (
