@@ -213,29 +213,13 @@ Requirements:
               <Chip 
                 label={selectedPattern.category} 
                 size="small" 
-                variant="filled"
-                sx={(theme) => ({
-                  bgcolor: theme.palette.mode === 'dark' 
-                    ? theme.palette.primary.dark 
-                    : theme.palette.primary.light,
-                  color: theme.palette.mode === 'dark'
-                    ? theme.palette.primary.contrastText
-                    : theme.palette.primary.dark,
-                })}
+                color="primary"
               />
               {selectedPattern.hasConfig !== false && (
                 <Chip 
                   label="Interactive" 
                   size="small" 
                   variant="outlined"
-                  sx={(theme) => ({
-                    borderColor: theme.palette.mode === 'dark'
-                      ? theme.palette.grey[600]
-                      : theme.palette.grey[400],
-                    color: theme.palette.mode === 'dark'
-                      ? theme.palette.grey[300]
-                      : theme.palette.grey[700],
-                  })}
                 />
               )}
               {patternInstances.length > 1 && (
@@ -243,18 +227,7 @@ Requirements:
                   icon={<LayersIcon />} 
                   label={`${patternInstances.length} instances`} 
                   size="small" 
-                  variant="filled"
-                  sx={(theme) => ({
-                    bgcolor: theme.palette.mode === 'dark' 
-                      ? theme.palette.secondary.dark 
-                      : theme.palette.secondary.light,
-                    color: theme.palette.mode === 'dark'
-                      ? theme.palette.secondary.contrastText
-                      : theme.palette.secondary.dark,
-                    '& .MuiChip-icon': {
-                      color: 'inherit',
-                    },
-                  })}
+                  color="secondary"
                 />
               )}
             </Stack>
@@ -302,37 +275,8 @@ Requirements:
                               PatternInstanceManager.scrollToInstance(instance.id);
                             }}
                             data-ai-ignore="true"
-                            sx={(theme) => ({
-                              bgcolor: isSelected
-                                ? theme.palette.mode === 'dark' 
-                                  ? 'primary.dark' 
-                                  : 'primary.light' 
-                                : theme.palette.mode === 'dark'
-                                  ? 'grey.800'
-                                  : 'grey.200',
-                              color: isSelected
-                                ? theme.palette.mode === 'dark'
-                                  ? 'primary.contrastText'
-                                  : 'primary.main'
-                                : 'text.secondary',
-                              fontWeight: isSelected ? 600 : 400,
-                              border: isSelected
-                                ? `1px solid ${theme.palette.primary.main}` 
-                                : '1px solid transparent',
-                              '& .MuiChip-icon': {
-                                color: 'inherit',
-                                fontSize: '1rem',
-                              },
-                              '&:hover': {
-                                bgcolor: isSelected
-                                  ? theme.palette.mode === 'dark'
-                                    ? 'primary.dark' 
-                                    : 'primary.light'
-                                  : theme.palette.mode === 'dark'
-                                    ? 'grey.700'
-                                    : 'grey.300',
-                              },
-                            })}
+                            color={isSelected ? "primary" : "default"}
+                            variant={isSelected ? "filled" : "outlined"}
                           />
                         );
                       })}
