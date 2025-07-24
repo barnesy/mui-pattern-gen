@@ -43,6 +43,7 @@ export interface PageHeaderProps {
     icon?: React.ReactNode;
     onClick?: () => void;
   }>;
+  width?: string;
   padding?: SpacingConfig;
   margin?: SpacingConfig;
   titleVariant?: TypographyVariant;
@@ -79,6 +80,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     { label: 'Share', icon: <ShareIcon />, onClick: () => {} },
     { label: 'Export', icon: <DownloadIcon />, onClick: () => {} },
   ],
+  width,
   padding,
   margin,
   titleVariant = 'h4',
@@ -264,6 +266,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   return (
     <Box
       sx={{
+        width: width || '100%',
         padding: getSpacingValue(effectivePadding),
         margin: margin ? getSpacingValue(margin) : undefined,
         backgroundColor: isTransparent

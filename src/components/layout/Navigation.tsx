@@ -15,6 +15,7 @@ import {
   Palette as PaletteIcon,
   ViewModule as ViewModuleIcon,
   AddBox as AddBoxIcon,
+  Analytics as AnalyticsIcon,
 } from '@mui/icons-material';
 
 interface NavigationItem {
@@ -33,6 +34,7 @@ const navigationItems: NavigationItem[] = [
   { text: 'Components', path: '/components', icon: <DashboardIcon /> },
   { text: 'Pattern Generator', path: '/pattern-generator', icon: <AddBoxIcon /> },
   { text: 'Pattern Library', path: '/patterns', icon: <ViewModuleIcon /> },
+  { text: 'Dashboard Example', path: '/dashboard-example', icon: <AnalyticsIcon /> },
 ];
 
 export const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {

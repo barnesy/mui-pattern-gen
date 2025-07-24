@@ -95,6 +95,14 @@ export const pageHeaderControls: PropControl[] = [
 
   // Spacing controls (at the top of settings)
   {
+    name: 'width',
+    type: 'text',
+    label: 'Width',
+    defaultValue: '100%',
+    helperText: 'Width of the header container (e.g., 100%, 1200px, auto)',
+    group: 'Layout',
+  },
+  {
     name: 'padding',
     type: 'padding',
     label: 'Padding',

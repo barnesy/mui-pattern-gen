@@ -93,7 +93,7 @@ main {
   background-color: rgba(25, 118, 210, 0.2);
 }
 
-/* Pattern wrapper should not affect layout */
+/* Pattern wrapper maintains block display for proper outline rendering */
 [data-pattern-name] {
-  display: contents;
+  display: block;
 }

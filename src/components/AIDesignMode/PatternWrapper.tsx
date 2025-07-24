@@ -146,9 +146,10 @@ export const PatternWrapper: React.FC<PatternWrapperProps> = ({
         data-pattern-props={JSON.stringify(currentProps)}
         sx={{ 
           position: 'relative',
-          display: 'inline-block',
-          width: 'fit-content',
-          height: 'fit-content',
+          // Use block display to ensure outline works properly
+          display: 'block',
+          // Let the child component determine its own width
+          width: '100%',
         }}
       >
         {showDebug && (
