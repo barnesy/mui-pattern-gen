@@ -223,7 +223,7 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
     return total;
   }
 
-  private findInstanceById(instanceId: string): PatternInstance | null {
+  findInstanceById(instanceId: string): PatternInstance | null {
     for (const instances of this.registry.values()) {
       const instance = Array.from(instances).find(inst => inst.id === instanceId);
       if (instance) return instance;

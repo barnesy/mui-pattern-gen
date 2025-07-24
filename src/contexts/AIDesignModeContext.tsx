@@ -37,6 +37,7 @@ interface AIDesignModeContextType {
   updateAllPatternInstances: (patternName: string, props: Record<string, unknown>) => void;
   getPatternInstances: (patternName: string) => PatternInstance[];
   getPatternInstanceCount: (patternName: string) => number;
+  findPatternInstanceById: (instanceId: string) => PatternInstance | null;
 }
 
 export const AIDesignModeContext = createContext<AIDesignModeContextType | undefined>(undefined);
@@ -146,6 +147,10 @@ export const AIDesignModeProvider: React.FC<AIDesignModeProviderProps> = ({ chil
     return PatternInstanceManager.getInstanceCount(patternName);
   }, []);
 
+  const findPatternInstanceById = useCallback((instanceId: string) => {
+    return PatternInstanceManager.findInstanceById(instanceId);
+  }, []);
+
   // Load drawer width from localStorage
   React.useEffect(() => {
     const savedWidth = localStorage.getItem('ai-design-drawer-width');
@@ -180,6 +185,7 @@ export const AIDesignModeProvider: React.FC<AIDesignModeProviderProps> = ({ chil
     updateAllPatternInstances,
     getPatternInstances,
     getPatternInstanceCount,
+    findPatternInstanceById,
   };
 
   return (

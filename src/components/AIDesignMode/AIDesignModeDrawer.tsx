@@ -38,6 +38,7 @@ export const AIDesignModeDrawer: React.FC = () => {
     updatePatternInstance,
     updateAllPatternInstances,
     getPatternInstances,
+    findPatternInstanceById,
   } = useAIDesignMode();
 
   const [patternConfig, setPatternConfig] = useState<PropControl[]>([]);
@@ -211,8 +212,7 @@ Requirements:
                           // Find parent pattern element and select it
                           const parentInstanceId = selectedPattern.parentInstanceId;
                           if (parentInstanceId) {
-                            const instances = getPatternInstances();
-                            const parentInstance = instances.find(inst => inst.id === parentInstanceId);
+                            const parentInstance = findPatternInstanceById(parentInstanceId);
                             if (parentInstance && parentInstance.element) {
                               const patternName = parentInstance.element.getAttribute('data-pattern-name');
                               const status = parentInstance.element.getAttribute('data-pattern-status') as 'pending' | 'accepted';
@@ -240,7 +240,11 @@ Requirements:
                           }
                         }}
                       >
-                        Parent Component
+                        {(() => {
+                          const parentInstance = findPatternInstanceById(selectedPattern.parentInstanceId || '');
+                          const parentName = parentInstance?.element.getAttribute('data-pattern-name');
+                          return parentName || 'Parent Component';
+                        })()}
                       </Link>
                       <Typography color="text.primary">{selectedPattern.name}</Typography>
                     </Breadcrumbs>
