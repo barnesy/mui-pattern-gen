@@ -26,7 +26,7 @@ import {
 import { useAIDesignMode } from '../../contexts/AIDesignModeContext';
 import { PatternInstance, PatternInstanceManager } from '../../services/PatternInstanceManager';
 import { SettingsPanel } from '../patterns/SettingsPanel';
-import { PropControl } from '../patterns/PatternPropsPanel';
+import { PatternPropsPanel, PropControl } from '../patterns/PatternPropsPanel';
 import { getSubComponentConfig } from './subComponentConfigs';
 
 export const AIDesignModeDrawer: React.FC = () => {
@@ -437,35 +437,46 @@ Requirements:
           </Stack>
         ) : patternConfig.length > 0 ? (
           <Stack spacing={3}>
-            <SettingsPanel
-              controls={patternConfig}
-              values={componentProps}
-              onChange={handlePropChange}
-            />
+            {/* Use PatternPropsPanel for sub-components, SettingsPanel for regular patterns */}
+            {selectedPattern.isSubComponent ? (
+              <PatternPropsPanel
+                controls={patternConfig}
+                values={componentProps}
+                onChange={handlePropChange}
+                onReset={handleReset}
+              />
+            ) : (
+              <SettingsPanel
+                controls={patternConfig}
+                values={componentProps}
+                onChange={handlePropChange}
+              />
+            )}
             
-            {/* Action Buttons */}
-            <Stack direction="row" spacing={1} sx={{ p: '20px' }}>
-              <Button
-                fullWidth
-                size="small"
-                variant="contained"
-                startIcon={copiedConfig ? <CheckIcon /> : <CopyIcon />}
-                onClick={handleCopyConfig}
-                color={copiedConfig ? 'success' : 'primary'}
-              >
-                {copiedConfig ? 'Copied!' : 'Copy'}
-              </Button>
-              <Button
-                fullWidth
-                size="small"
-                variant="outlined"
-                startIcon={<RefreshIcon />}
-                onClick={handleReset}
-              >
-                Reset
-              </Button>
-            </Stack>
-          </Stack>
+            {/* Action Buttons - only show for regular patterns */}
+            {!selectedPattern.isSubComponent && (
+              <Stack direction="row" spacing={1} sx={{ p: '20px' }}>
+                <Button
+                  fullWidth
+                  size="small"
+                  variant="contained"
+                  startIcon={copiedConfig ? <CheckIcon /> : <CopyIcon />}
+                  onClick={handleCopyConfig}
+                  color={copiedConfig ? 'success' : 'primary'}
+                >
+                  {copiedConfig ? 'Copied!' : 'Copy'}
+                </Button>
+                <Button
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  startIcon={<RefreshIcon />}
+                  onClick={handleReset}
+                >
+                  Reset
+                </Button>
+              </Stack>
+            )}
         ) : (
           <Alert severity="info">
             <Typography variant="body2">
