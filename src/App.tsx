@@ -13,6 +13,7 @@ import { PatternGenerator } from './pages/PatternGenerator';
 import { PatternViewer } from './pages/PatternViewer';
 import { DashboardExample } from './pages/DashboardExample';
 import { SubComponentDebug } from './pages/SubComponentDebug';
+import { SimpleSubComponentTest } from './pages/SimpleSubComponentTest';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { theme as baseTheme } from './theme/theme';
 import { darkPalette } from './theme';
@@ -128,6 +129,7 @@ function AppWithDensity() {
             <Route path="pattern-studio" element={<PatternGenerator />} />
             <Route path="dashboard-example" element={<DashboardExample />} />
             <Route path="debug/subcomponents" element={<SubComponentDebug />} />
+            <Route path="debug/simple" element={<SimpleSubComponentTest />} />
           </Route>
         </Routes>
       </BrowserRouter>
