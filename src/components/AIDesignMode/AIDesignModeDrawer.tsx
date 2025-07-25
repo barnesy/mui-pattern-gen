@@ -27,6 +27,7 @@ import { useAIDesignMode } from '../../contexts/AIDesignModeContext';
 import { PatternInstance, PatternInstanceManager } from '../../services/PatternInstanceManager';
 import { SettingsPanel } from '../patterns/SettingsPanel';
 import { PropControl } from '../patterns/PatternPropsPanel';
+import { getSubComponentConfig } from './subComponentConfigs';
 
 export const AIDesignModeDrawer: React.FC = () => {
   const {
@@ -58,11 +59,28 @@ export const AIDesignModeDrawer: React.FC = () => {
     }
 
     const loadConfig = async () => {
-      // Skip loading config for sub-components
+      // Handle sub-components
       if (selectedPattern.isSubComponent) {
         setConfigLoading(false);
-        setPatternConfig([]);
-        setComponentProps(selectedPattern.props || {});
+        
+        // Try to get sub-component config
+        const subConfig = getSubComponentConfig(selectedPattern.category);
+        if (subConfig) {
+          setPatternConfig(subConfig);
+          
+          // Initialize props with defaults and merge with current props
+          const defaults: Record<string, unknown> = {};
+          subConfig.forEach((control) => {
+            if (control.defaultValue !== undefined) {
+              defaults[control.name] = control.defaultValue;
+            }
+          });
+          setComponentProps({ ...defaults, ...selectedPattern.props });
+        } else {
+          setPatternConfig([]);
+          setComponentProps(selectedPattern.props || {});
+        }
+        
         return;
       }
       
@@ -135,10 +153,17 @@ export const AIDesignModeDrawer: React.FC = () => {
     
     // Update pattern instances
     if (selectedPattern) {
-      if (updateAllInstances) {
-        updateAllPatternInstances(selectedPattern.name, newProps);
-      } else if (selectedInstanceId) {
-        updatePatternInstance(selectedInstanceId, newProps);
+      if (selectedPattern.isSubComponent) {
+        // For sub-components, we need to update the parent pattern
+        // This is a temporary solution - ideally we'd update just the sub-component
+        console.warn('Sub-component prop updates not yet implemented');
+        // TODO: Implement sub-component prop updates through parent
+      } else {
+        if (updateAllInstances) {
+          updateAllPatternInstances(selectedPattern.name, newProps);
+        } else if (selectedInstanceId) {
+          updatePatternInstance(selectedInstanceId, newProps);
+        }
       }
     }
   }, [componentProps, selectedPattern, selectedInstanceId, updateAllInstances, updatePatternInstance, updateAllPatternInstances]);
@@ -383,7 +408,7 @@ Requirements:
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 2, py: 4 }}>
             <CircularProgress />
           </Box>
-        ) : selectedPattern.isSubComponent ? (
+        ) : selectedPattern.isSubComponent && patternConfig.length === 0 ? (
           <Stack spacing={2} sx={{ p: 2 }}>
             <Alert severity="info">
               <Typography variant="body2">
@@ -407,7 +432,7 @@ Requirements:
             </Box>
             
             <Typography variant="caption" color="text.secondary">
-              Sub-component editing is coming soon. For now, edit the parent component to modify these properties.
+              No configuration available for this sub-component type.
             </Typography>
           </Stack>
         ) : patternConfig.length > 0 ? (
