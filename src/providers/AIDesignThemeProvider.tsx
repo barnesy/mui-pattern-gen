@@ -26,6 +26,7 @@ const AIDesignModeInjector: React.FC<{ children: ReactNode }> = ({ children }) =
   useEffect(() => {
     if (!isEnabled) {
       // Clean up data attributes when disabled
+      document.body.removeAttribute('data-ai-mode');
       document.querySelectorAll('[data-ai-mode]').forEach(el => {
         el.removeAttribute('data-ai-mode');
         el.removeAttribute('data-ai-selected');
@@ -33,6 +34,9 @@ const AIDesignModeInjector: React.FC<{ children: ReactNode }> = ({ children }) =
       });
       return;
     }
+
+    // Set AI mode on body for CSS selectors
+    document.body.setAttribute('data-ai-mode', 'true');
 
     // Add data-ai-mode to pattern components only
     const updateDataAttributes = () => {

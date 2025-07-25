@@ -97,3 +97,32 @@ main {
 [data-pattern-name] {
   display: block;
 }
+
+/* Sub-component styles */
+[data-subcomponent-id] {
+  position: relative;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+/* Sub-component hover state - subtle dashed outline */
+body[data-ai-mode="true"] [data-subcomponent-id]:hover {
+  outline: 2px dashed rgba(156, 39, 176, 0.4);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Selected sub-component gets solid outline */
+[data-subcomponent-id][data-ai-selected="true"] {
+  outline: 2px solid rgba(156, 39, 176, 0.6) !important;
+  outline-offset: 2px !important;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(156, 39, 176, 0.2);
+  z-index: 1000;
+}
+
+/* When a sub-component is selected, hide the parent pattern outline */
+[data-pattern-name]:has([data-ai-selected="true"]) {
+  outline: none !important;
+  box-shadow: none !important;
+}

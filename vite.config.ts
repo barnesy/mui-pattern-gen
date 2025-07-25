@@ -6,6 +6,10 @@ import { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    host: true, // Expose to all network interfaces
+    port: 5173, // Explicitly set the port
+  },
   build: {
     rollupOptions: {
       input: {
