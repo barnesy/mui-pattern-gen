@@ -90,8 +90,28 @@ export const SubComponentWrapper: React.FC<SubComponentWrapperProps> = ({
     }
   }, [componentProps]);
 
+  // Debug logging
+  if (import.meta.env.DEV && window.location.search.includes('debug=true')) {
+    console.log('SubComponentWrapper render:', {
+      componentName,
+      parentInstanceId,
+      isInMainApp,
+      isEnabled,
+      isSelected,
+      subInstanceId
+    });
+  }
+
   // Only show sub-component indicators in AI Design Mode
   if (!isInMainApp || !isEnabled) {
+    if (import.meta.env.DEV) {
+      console.log('SubComponentWrapper bypassed:', {
+        componentName,
+        isInMainApp,
+        isEnabled,
+        reason: !isInMainApp ? 'Not in main app' : 'AI Design Mode disabled'
+      });
+    }
     return <>{children}</>;
   }
 
