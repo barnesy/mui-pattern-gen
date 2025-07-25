@@ -99,30 +99,35 @@ main {
 }
 
 /* Sub-component styles */
-[data-subcomponent-id] {
+body[data-ai-mode="true"] [data-subcomponent-id] {
   position: relative;
-  transition: all 0.2s ease-in-out;
+  transition: outline 0.2s ease-in-out;
   cursor: pointer;
 }
 
 /* Sub-component hover state - subtle dashed outline */
 body[data-ai-mode="true"] [data-subcomponent-id]:hover {
-  outline: 2px dashed rgba(156, 39, 176, 0.4);
+  outline: 2px dashed rgba(156, 39, 176, 0.5) !important;
   outline-offset: 2px;
   border-radius: 4px;
 }
 
 /* Selected sub-component gets solid outline */
-[data-subcomponent-id][data-ai-selected="true"] {
-  outline: 2px solid rgba(156, 39, 176, 0.6) !important;
+body[data-ai-mode="true"] [data-subcomponent-id][data-ai-selected="true"] {
+  outline: 2px solid rgba(156, 39, 176, 0.8) !important;
   outline-offset: 2px !important;
   border-radius: 4px;
-  box-shadow: 0 0 8px rgba(156, 39, 176, 0.2);
+  box-shadow: 0 0 8px rgba(156, 39, 176, 0.3);
   z-index: 1000;
 }
 
 /* When a sub-component is selected, hide the parent pattern outline */
-[data-pattern-name]:has([data-ai-selected="true"]) {
+body[data-ai-mode="true"] [data-pattern-name]:has([data-ai-selected="true"]) {
   outline: none !important;
   box-shadow: none !important;
+}
+
+/* Debug: Add border to verify sub-components are rendered */
+body[data-ai-mode="true"] [data-subcomponent-id] {
+  /* border: 1px dotted red; - uncomment to debug */
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
 import { Box } from '@mui/material';
-import { AIDesignModeContext } from '../../contexts/AIDesignModeContext';
+import { AIDesignModeContext, useAIDesignMode } from '../../contexts/AIDesignModeContext';
 import { PatternPropsContext } from '../../contexts/PatternPropsContext';
 import { PatternInstanceManager } from '../../services/PatternInstanceManager';
 
@@ -25,7 +25,6 @@ export const SubComponentWrapper: React.FC<SubComponentWrapperProps> = ({
 }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const patternContext = useContext(PatternPropsContext);
-  const aiDesignContext = useContext(AIDesignModeContext);
   
   // Get parent pattern instance ID from context
   const parentInstanceId = patternContext?.instanceId;
@@ -33,9 +32,19 @@ export const SubComponentWrapper: React.FC<SubComponentWrapperProps> = ({
     `${parentInstanceId}-${componentName}-${index || 0}-${Date.now()}`
   );
 
-  // Check if AI Design Mode context is available
-  const isInMainApp = !!aiDesignContext;
-  const { isAIDesignMode, selectedPattern } = aiDesignContext || {};
+  // Try to use AI Design Mode hook (will throw if not in context)
+  let isEnabled = false;
+  let selectedPattern: any = null;
+  let isInMainApp = false;
+  
+  try {
+    const aiDesignMode = useAIDesignMode();
+    isEnabled = aiDesignMode.isEnabled;
+    selectedPattern = aiDesignMode.selectedPattern;
+    isInMainApp = true;
+  } catch (e) {
+    // Not in AI Design Mode context (e.g., in preview iframe)
+  }
 
   // Determine if this sub-component is selected
   const isSelected = selectedPattern?.instanceId === subInstanceId;
@@ -82,29 +91,19 @@ export const SubComponentWrapper: React.FC<SubComponentWrapperProps> = ({
   }, [componentProps]);
 
   // Only show sub-component indicators in AI Design Mode
-  if (!isInMainApp || !isAIDesignMode) {
+  if (!isInMainApp || !isEnabled) {
     return <>{children}</>;
   }
 
   return (
     <Box
       ref={wrapperRef}
-      data-ai-subcomponent="true"
-      data-ai-selected={isSelected}
+      data-subcomponent-id={subInstanceId}
+      data-ai-selected={isSelected ? 'true' : undefined}
       sx={{
         position: 'relative',
         display: 'inline-block',
-        // Add subtle outline on hover in AI Design Mode
-        '&:hover': {
-          outline: '1px dashed rgba(156, 39, 176, 0.3)',
-          outlineOffset: '2px',
-          cursor: 'pointer',
-        },
-        // Stronger outline when selected
-        '&[data-ai-selected="true"]': {
-          outline: '2px solid rgba(156, 39, 176, 0.6)',
-          outlineOffset: '2px',
-        },
+        width: '100%', // Take full width of parent
       }}
     >
       {children}
