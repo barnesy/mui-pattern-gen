@@ -70,6 +70,7 @@ export const SubComponentWrapper: React.FC<SubComponentWrapperProps> = ({
     element.setAttribute('data-subcomponent-name', componentName);
     element.setAttribute('data-subcomponent-type', componentType);
     element.setAttribute('data-parent-instance', parentInstanceId);
+    element.setAttribute('data-subcomponent-props', JSON.stringify(componentProps));
     if (index !== undefined) {
       element.setAttribute('data-subcomponent-index', index.toString());
     }
