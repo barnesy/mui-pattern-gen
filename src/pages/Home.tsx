@@ -32,14 +32,16 @@ export const Home: React.FC = () => {
   const features: Feature[] = [
     {
       title: 'Component Showcase',
-      description: 'Explore all MUI components organized by category with live examples and variants.',
+      description:
+        'Explore all MUI components organized by category with live examples and variants.',
       icon: <DashboardIcon fontSize="large" />,
       action: () => navigate('/components'),
       color: 'primary.main',
     },
     {
       title: 'Theme Viewer',
-      description: 'View and copy all theme values including colors, typography, spacing, and more.',
+      description:
+        'View and copy all theme values including colors, typography, spacing, and more.',
       icon: <PaletteIcon fontSize="large" />,
       action: () => navigate('/theme'),
       color: 'secondary.main',
@@ -56,20 +58,10 @@ export const Home: React.FC = () => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ py: 4 }}>
-        <Typography 
-          variant="h1" 
-          component="h1" 
-          gutterBottom 
-          align="center"
-        >
+        <Typography variant="h1" component="h1" gutterBottom align="center">
           MUI Pattern Generator
         </Typography>
-        <Typography 
-          variant="body1" 
-          color="text.secondary" 
-          align="center" 
-          paragraph
-        >
+        <Typography variant="body1" color="text.secondary" align="center" paragraph>
           A comprehensive toolkit for Material-UI theme development and component exploration
         </Typography>
 
@@ -83,17 +75,17 @@ export const Home: React.FC = () => {
                   flexDirection: 'column',
                   transition: 'transform 0.2s',
                   cursor: feature.disabled ? 'default' : 'pointer',
-                  '&:hover': feature.disabled ? {} : {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 4,
-                  },
+                  '&:hover': feature.disabled
+                    ? {}
+                    : {
+                        transform: 'translateY(-4px)',
+                        boxShadow: 4,
+                      },
                 }}
                 onClick={feature.disabled ? undefined : feature.action}
               >
                 <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
-                  <Box sx={{ color: feature.color, mb: 2 }}>
-                    {feature.icon}
-                  </Box>
+                  <Box sx={{ color: feature.color, mb: 2 }}>{feature.icon}</Box>
                   <Typography variant="h5" component="h2" gutterBottom>
                     {feature.title}
                   </Typography>
@@ -123,8 +115,8 @@ export const Home: React.FC = () => {
             Getting Started
           </Typography>
           <Typography variant="body1" paragraph>
-            This application showcases Material-UI (MUI) components with a custom theme implementation.
-            Use the navigation menu to explore different sections:
+            This application showcases Material-UI (MUI) components with a custom theme
+            implementation. Use the navigation menu to explore different sections:
           </Typography>
           <Box component="ul" sx={{ pl: 3 }}>
             <Typography component="li" variant="body1" paragraph>
@@ -136,13 +128,14 @@ export const Home: React.FC = () => {
               typography settings, spacing units, shadows, and breakpoints
             </Typography>
             <Typography component="li" variant="body1" paragraph>
-              <strong>Pattern Generator:</strong> Create reusable component patterns using MUI components.
-              Tell Claude to generate patterns via the terminal and manage them through the UI
+              <strong>Pattern Generator:</strong> Create reusable component patterns using MUI
+              components. Tell Claude to generate patterns via the terminal and manage them through
+              the UI
             </Typography>
           </Box>
           <Typography variant="body1">
-            The theme supports both light and dark modes. Use the toggle button in the app bar
-            to switch between them.
+            The theme supports both light and dark modes. Use the toggle button in the app bar to
+            switch between them.
           </Typography>
         </Paper>
       </Box>

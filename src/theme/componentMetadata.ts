@@ -155,7 +155,8 @@ export const componentMetadata: Record<string, ComponentMetadata> = {
   },
   Alert: {
     name: 'Alert',
-    description: 'An alert displays a short, important message in a way that attracts the user\'s attention without interrupting the user\'s task.',
+    description:
+      "An alert displays a short, important message in a way that attracts the user's attention without interrupting the user's task.",
     props: {
       severity: {
         type: 'string',
@@ -177,7 +178,8 @@ export const componentMetadata: Record<string, ComponentMetadata> = {
   },
   Avatar: {
     name: 'Avatar',
-    description: 'Avatars are found throughout material design with uses in everything from tables to dialog menus.',
+    description:
+      'Avatars are found throughout material design with uses in everything from tables to dialog menus.',
     props: {
       variant: {
         type: 'string',
@@ -201,19 +203,42 @@ export const componentMetadata: Record<string, ComponentMetadata> = {
   },
   Typography: {
     name: 'Typography',
-    description: 'Use typography to present your design and content as clearly and efficiently as possible.',
+    description:
+      'Use typography to present your design and content as clearly and efficiently as possible.',
     props: {
       variant: {
         type: 'string',
         description: 'Applies the theme typography styles',
         default: 'body1',
-        options: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle1', 'subtitle2', 'body1', 'body2', 'button', 'caption', 'overline'],
+        options: [
+          'h1',
+          'h2',
+          'h3',
+          'h4',
+          'h5',
+          'h6',
+          'subtitle1',
+          'subtitle2',
+          'body1',
+          'body2',
+          'button',
+          'caption',
+          'overline',
+        ],
       },
       color: {
         type: 'string',
         description: 'The color of the component',
         default: 'initial',
-        options: ['initial', 'inherit', 'primary', 'secondary', 'textPrimary', 'textSecondary', 'error'],
+        options: [
+          'initial',
+          'inherit',
+          'primary',
+          'secondary',
+          'textPrimary',
+          'textSecondary',
+          'error',
+        ],
       },
       align: {
         type: 'string',
@@ -235,7 +260,8 @@ export const componentMetadata: Record<string, ComponentMetadata> = {
   },
   Paper: {
     name: 'Paper',
-    description: 'In Material Design, the physical properties of paper are translated to the screen.',
+    description:
+      'In Material Design, the physical properties of paper are translated to the screen.',
     props: {
       elevation: {
         type: 'number',

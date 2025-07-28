@@ -48,7 +48,11 @@ export const ThemeEditor: React.FC = () => {
   const [expanded, setExpanded] = useState<string | false>('colors');
   const [codeDialogOpen, setCodeDialogOpen] = useState(false);
   const [currentTab, setCurrentTab] = useState(0);
-  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error';
+  }>({
     open: false,
     message: '',
     severity: 'success',
@@ -62,16 +66,22 @@ export const ThemeEditor: React.FC = () => {
     borderRadius: 4,
   });
 
-  const handleAccordionChange = (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
-    setExpanded(isExpanded ? panel : false);
-  };
+  const handleAccordionChange =
+    (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : false);
+    };
 
-  const handleColorChange = (section: string, color: string, value: string, isDark: boolean = false) => {
+  const handleColorChange = (
+    section: string,
+    color: string,
+    value: string,
+    isDark: boolean = false
+  ) => {
     const paletteKey = isDark ? 'darkPalette' : 'palette';
-    
+
     // Handle special case for divider which is a direct property
     if (section === 'divider') {
-      setThemeState(prev => ({
+      setThemeState((prev) => ({
         ...prev,
         [paletteKey]: {
           ...prev[paletteKey],
@@ -79,7 +89,7 @@ export const ThemeEditor: React.FC = () => {
         },
       }));
     } else {
-      setThemeState(prev => ({
+      setThemeState((prev) => ({
         ...prev,
         [paletteKey]: {
           ...prev[paletteKey],
@@ -93,7 +103,7 @@ export const ThemeEditor: React.FC = () => {
   };
 
   const handleTypographyChange = (variant: string, property: string, value: string | number) => {
-    setThemeState(prev => ({
+    setThemeState((prev) => ({
       ...prev,
       typography: {
         ...prev.typography,
@@ -106,11 +116,11 @@ export const ThemeEditor: React.FC = () => {
   };
 
   const handleSpacingChange = (value: number) => {
-    setThemeState(prev => ({ ...prev, spacing: value }));
+    setThemeState((prev) => ({ ...prev, spacing: value }));
   };
 
   const handleBorderRadiusChange = (value: number) => {
-    setThemeState(prev => ({ ...prev, borderRadius: value }));
+    setThemeState((prev) => ({ ...prev, borderRadius: value }));
   };
 
   const handleReset = () => {
@@ -127,7 +137,7 @@ export const ThemeEditor: React.FC = () => {
   const handleSave = async () => {
     try {
       const files = generateThemeFiles(themeState);
-      
+
       // Send the files to our development API
       const response = await fetch('/api/update-theme', {
         method: 'POST',
@@ -136,16 +146,16 @@ export const ThemeEditor: React.FC = () => {
         },
         body: JSON.stringify(files),
       });
-      
+
       const result = await response.json();
-      
+
       if (result.success) {
         setSnackbar({
           open: true,
           message: 'Theme files saved successfully! The page will reload to apply changes.',
           severity: 'success',
         });
-        
+
         // Reload after a short delay to show the message
         setTimeout(() => {
           window.location.reload();
@@ -158,10 +168,10 @@ export const ThemeEditor: React.FC = () => {
       if (import.meta.env.DEV) {
         console.error('Save error:', error);
       }
-      
+
       // Fallback: show the files in dialog for manual copying
       setCodeDialogOpen(true);
-      
+
       setSnackbar({
         open: true,
         message: 'Failed to save automatically. Please copy the files manually from the dialog.',
@@ -179,25 +189,31 @@ export const ThemeEditor: React.FC = () => {
     });
   };
 
-  const typographyVariants = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle1', 'subtitle2', 'body1', 'body2', 'button', 'caption', 'overline'];
+  const typographyVariants = [
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'subtitle1',
+    'subtitle2',
+    'body1',
+    'body2',
+    'button',
+    'caption',
+    'overline',
+  ];
 
   return (
     <Box>
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h1">Theme Editor</Typography>
         <Stack direction="row" spacing={2}>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={handleReset}
-          >
+          <Button variant="outlined" startIcon={<RefreshIcon />} onClick={handleReset}>
             Reset
           </Button>
-          <Button
-            variant="contained"
-            startIcon={<SaveIcon />}
-            onClick={handleSave}
-          >
+          <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSave}>
             Save Theme
           </Button>
         </Stack>
@@ -214,7 +230,9 @@ export const ThemeEditor: React.FC = () => {
               </AccordionSummary>
               <AccordionDetails>
                 <Box>
-                  <Typography variant="subtitle1" gutterBottom>Light Mode</Typography>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Light Mode
+                  </Typography>
                   <ColorPaletteEditor
                     palette={themeState.palette}
                     isDarkMode={false}
@@ -223,7 +241,9 @@ export const ThemeEditor: React.FC = () => {
 
                   <Divider sx={{ my: 3 }} />
 
-                  <Typography variant="subtitle1" gutterBottom>Dark Mode</Typography>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Dark Mode
+                  </Typography>
                   <ColorPaletteEditor
                     palette={themeState.darkPalette}
                     isDarkMode={true}
@@ -234,7 +254,10 @@ export const ThemeEditor: React.FC = () => {
             </Accordion>
 
             {/* Typography Section */}
-            <Accordion expanded={expanded === 'typography'} onChange={handleAccordionChange('typography')}>
+            <Accordion
+              expanded={expanded === 'typography'}
+              onChange={handleAccordionChange('typography')}
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h6">Typography</Typography>
               </AccordionSummary>
@@ -242,15 +265,24 @@ export const ThemeEditor: React.FC = () => {
                 <Stack spacing={3}>
                   {typographyVariants.map((variant) => (
                     <Paper key={variant} variant="outlined" sx={{ p: 2 }}>
-                      <Typography variant="subtitle2" gutterBottom sx={{ textTransform: 'capitalize' }}>
+                      <Typography
+                        variant="subtitle2"
+                        gutterBottom
+                        sx={{ textTransform: 'capitalize' }}
+                      >
                         {variant}
                       </Typography>
                       <Grid container spacing={2}>
                         <Grid item xs={6} sm={3}>
                           <TextField
                             label="Font Size"
-                            value={(themeState.typography as Record<string, any>)[variant]?.fontSize || ''}
-                            onChange={(e) => handleTypographyChange(variant, 'fontSize', e.target.value)}
+                            value={
+                              (themeState.typography as Record<string, any>)[variant]?.fontSize ||
+                              ''
+                            }
+                            onChange={(e) =>
+                              handleTypographyChange(variant, 'fontSize', e.target.value)
+                            }
                             fullWidth
                             size="small"
                           />
@@ -258,8 +290,13 @@ export const ThemeEditor: React.FC = () => {
                         <Grid item xs={6} sm={3}>
                           <TextField
                             label="Font Weight"
-                            value={(themeState.typography as Record<string, any>)[variant]?.fontWeight || ''}
-                            onChange={(e) => handleTypographyChange(variant, 'fontWeight', e.target.value)}
+                            value={
+                              (themeState.typography as Record<string, any>)[variant]?.fontWeight ||
+                              ''
+                            }
+                            onChange={(e) =>
+                              handleTypographyChange(variant, 'fontWeight', e.target.value)
+                            }
                             fullWidth
                             size="small"
                           />
@@ -267,8 +304,13 @@ export const ThemeEditor: React.FC = () => {
                         <Grid item xs={6} sm={3}>
                           <TextField
                             label="Line Height"
-                            value={(themeState.typography as Record<string, any>)[variant]?.lineHeight || ''}
-                            onChange={(e) => handleTypographyChange(variant, 'lineHeight', e.target.value)}
+                            value={
+                              (themeState.typography as Record<string, any>)[variant]?.lineHeight ||
+                              ''
+                            }
+                            onChange={(e) =>
+                              handleTypographyChange(variant, 'lineHeight', e.target.value)
+                            }
                             fullWidth
                             size="small"
                           />
@@ -276,8 +318,13 @@ export const ThemeEditor: React.FC = () => {
                         <Grid item xs={6} sm={3}>
                           <TextField
                             label="Letter Spacing"
-                            value={(themeState.typography as Record<string, any>)[variant]?.letterSpacing || ''}
-                            onChange={(e) => handleTypographyChange(variant, 'letterSpacing', e.target.value)}
+                            value={
+                              (themeState.typography as Record<string, any>)[variant]
+                                ?.letterSpacing || ''
+                            }
+                            onChange={(e) =>
+                              handleTypographyChange(variant, 'letterSpacing', e.target.value)
+                            }
                             fullWidth
                             size="small"
                           />
@@ -290,7 +337,10 @@ export const ThemeEditor: React.FC = () => {
             </Accordion>
 
             {/* Spacing & Shape Section */}
-            <Accordion expanded={expanded === 'spacing'} onChange={handleAccordionChange('spacing')}>
+            <Accordion
+              expanded={expanded === 'spacing'}
+              onChange={handleAccordionChange('spacing')}
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h6">Spacing & Shape</Typography>
               </AccordionSummary>
@@ -322,7 +372,9 @@ export const ThemeEditor: React.FC = () => {
         <Grid item xs={12} lg={5}>
           <Box sx={{ position: 'sticky', top: 80 }}>
             <Paper sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>Live Preview</Typography>
+              <Typography variant="h6" gutterBottom>
+                Live Preview
+              </Typography>
               <ThemePreview themeState={themeState} />
             </Paper>
           </Box>
@@ -334,7 +386,10 @@ export const ThemeEditor: React.FC = () => {
         autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
       >
-        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
@@ -346,9 +401,7 @@ export const ThemeEditor: React.FC = () => {
         maxWidth="lg"
         fullWidth
       >
-        <DialogTitle>
-          Generated Theme Files
-        </DialogTitle>
+        <DialogTitle>Generated Theme Files</DialogTitle>
         <DialogContent>
           <Tabs value={currentTab} onChange={(_, v) => setCurrentTab(v)} sx={{ mb: 2 }}>
             <Tab label="palette.ts" />
@@ -361,11 +414,18 @@ export const ThemeEditor: React.FC = () => {
             <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="caption">src/theme/palette.ts</Typography>
-                <IconButton size="small" onClick={() => copyToClipboard(generateThemeFiles(themeState).palette)}>
+                <IconButton
+                  size="small"
+                  onClick={() => copyToClipboard(generateThemeFiles(themeState).palette)}
+                >
                   <CopyIcon fontSize="small" />
                 </IconButton>
               </Box>
-              <Typography component="pre" variant="body2" sx={{ overflow: 'auto', m: 0, fontFamily: 'monospace' }}>
+              <Typography
+                component="pre"
+                variant="body2"
+                sx={{ overflow: 'auto', m: 0, fontFamily: 'monospace' }}
+              >
                 {generateThemeFiles(themeState).palette}
               </Typography>
             </Paper>
@@ -375,11 +435,18 @@ export const ThemeEditor: React.FC = () => {
             <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="caption">src/theme/darkPalette.ts</Typography>
-                <IconButton size="small" onClick={() => copyToClipboard(generateThemeFiles(themeState).darkPalette)}>
+                <IconButton
+                  size="small"
+                  onClick={() => copyToClipboard(generateThemeFiles(themeState).darkPalette)}
+                >
                   <CopyIcon fontSize="small" />
                 </IconButton>
               </Box>
-              <Typography component="pre" variant="body2" sx={{ overflow: 'auto', m: 0, fontFamily: 'monospace' }}>
+              <Typography
+                component="pre"
+                variant="body2"
+                sx={{ overflow: 'auto', m: 0, fontFamily: 'monospace' }}
+              >
                 {generateThemeFiles(themeState).darkPalette}
               </Typography>
             </Paper>
@@ -389,11 +456,18 @@ export const ThemeEditor: React.FC = () => {
             <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="caption">src/theme/typography.ts</Typography>
-                <IconButton size="small" onClick={() => copyToClipboard(generateThemeFiles(themeState).typography)}>
+                <IconButton
+                  size="small"
+                  onClick={() => copyToClipboard(generateThemeFiles(themeState).typography)}
+                >
                   <CopyIcon fontSize="small" />
                 </IconButton>
               </Box>
-              <Typography component="pre" variant="body2" sx={{ overflow: 'auto', m: 0, fontFamily: 'monospace' }}>
+              <Typography
+                component="pre"
+                variant="body2"
+                sx={{ overflow: 'auto', m: 0, fontFamily: 'monospace' }}
+              >
                 {generateThemeFiles(themeState).typography}
               </Typography>
             </Paper>
@@ -403,11 +477,18 @@ export const ThemeEditor: React.FC = () => {
             <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="caption">src/theme/theme.ts</Typography>
-                <IconButton size="small" onClick={() => copyToClipboard(generateThemeFiles(themeState).theme)}>
+                <IconButton
+                  size="small"
+                  onClick={() => copyToClipboard(generateThemeFiles(themeState).theme)}
+                >
                   <CopyIcon fontSize="small" />
                 </IconButton>
               </Box>
-              <Typography component="pre" variant="body2" sx={{ overflow: 'auto', m: 0, fontFamily: 'monospace' }}>
+              <Typography
+                component="pre"
+                variant="body2"
+                sx={{ overflow: 'auto', m: 0, fontFamily: 'monospace' }}
+              >
                 {generateThemeFiles(themeState).theme}
               </Typography>
             </Paper>

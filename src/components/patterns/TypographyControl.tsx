@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Stack,
-  Chip,
-} from '@mui/material';
+import { Box, Typography, Stack, Chip } from '@mui/material';
 
 interface TypographyControlProps {
   label: string;
@@ -29,61 +24,61 @@ const defaultTypographyOptions = [
   { label: 'Overline', value: 'overline' },
 ];
 
-export const TypographyControl: React.FC<TypographyControlProps> = React.memo(({
-  label,
-  value,
-  onChange,
-  helperText,
-  options = defaultTypographyOptions,
-}) => {
-  return (
-    <Box>
-      <Typography variant="body2" color="text.secondary" gutterBottom>
-        {label}
-      </Typography>
-      <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
-        {options.map((option) => (
-          <Chip
-            key={option.value}
-            label={option.label}
-            size="small"
-            onClick={() => onChange(option.value)}
-            data-ai-ignore="true"
-            sx={(theme) => ({
-              bgcolor: value === option.value 
-                ? theme.palette.mode === 'dark' 
-                  ? 'primary.dark' 
-                  : 'primary.light' 
-                : theme.palette.mode === 'dark'
-                  ? 'grey.800'
-                  : 'grey.200',
-              color: value === option.value 
-                ? theme.palette.mode === 'dark'
-                  ? 'primary.contrastText'
-                  : 'primary.main'
-                : 'text.secondary',
-              fontWeight: value === option.value ? 600 : 400,
-              border: value === option.value 
-                ? `1px solid ${theme.palette.primary.main}` 
-                : '1px solid transparent',
-              '&:hover': {
-                bgcolor: value === option.value 
-                  ? theme.palette.mode === 'dark'
-                    ? 'primary.dark' 
-                    : 'primary.light'
-                  : theme.palette.mode === 'dark'
-                    ? 'grey.700'
-                    : 'grey.300',
-              },
-            })}
-          />
-        ))}
-      </Stack>
-      {helperText && (
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-          {helperText}
+export const TypographyControl: React.FC<TypographyControlProps> = React.memo(
+  ({ label, value, onChange, helperText, options = defaultTypographyOptions }) => {
+    return (
+      <Box>
+        <Typography variant="body2" color="text.secondary" gutterBottom>
+          {label}
         </Typography>
-      )}
-    </Box>
-  );
-});
+        <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+          {options.map((option) => (
+            <Chip
+              key={option.value}
+              label={option.label}
+              size="small"
+              onClick={() => onChange(option.value)}
+              data-ai-ignore="true"
+              sx={(theme) => ({
+                bgcolor:
+                  value === option.value
+                    ? theme.palette.mode === 'dark'
+                      ? 'primary.dark'
+                      : 'primary.light'
+                    : theme.palette.mode === 'dark'
+                      ? 'grey.800'
+                      : 'grey.200',
+                color:
+                  value === option.value
+                    ? theme.palette.mode === 'dark'
+                      ? 'primary.contrastText'
+                      : 'primary.main'
+                    : 'text.secondary',
+                fontWeight: value === option.value ? 600 : 400,
+                border:
+                  value === option.value
+                    ? `1px solid ${theme.palette.primary.main}`
+                    : '1px solid transparent',
+                '&:hover': {
+                  bgcolor:
+                    value === option.value
+                      ? theme.palette.mode === 'dark'
+                        ? 'primary.dark'
+                        : 'primary.light'
+                      : theme.palette.mode === 'dark'
+                        ? 'grey.700'
+                        : 'grey.300',
+                },
+              })}
+            />
+          ))}
+        </Stack>
+        {helperText && (
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+            {helperText}
+          </Typography>
+        )}
+      </Box>
+    );
+  }
+);

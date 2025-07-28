@@ -98,9 +98,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       {/* Breadcrumbs */}
       {showBreadcrumbs && !isMinimal && breadcrumbs.length > 0 && (
         <Box sx={{ mb: 2 }}>
-          <Breadcrumbs
-            separator={<ChevronRightIcon fontSize="small" />}
-          >
+          <Breadcrumbs separator={<ChevronRightIcon fontSize="small" />}>
             <Link
               underline="hover"
               color="inherit"
@@ -113,11 +111,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             {breadcrumbs.map((crumb, index) => {
               const isLast = index === breadcrumbs.length - 1;
               return isLast ? (
-                <Typography
-                  key={index}
-                  variant="body2"
-                  color="text.primary"
-                >
+                <Typography key={index} variant="body2" color="text.primary">
                   {crumb.label}
                 </Typography>
               ) : (
@@ -158,12 +152,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
               {title}
             </Typography>
             {status && showStatus && (
-              <Chip
-                label={status}
-                color={statusColor}
-                size="small"
-                sx={{ flexShrink: 0 }}
-              />
+              <Chip label={status} color={statusColor} size="small" sx={{ flexShrink: 0 }} />
             )}
           </Stack>
 
@@ -171,7 +160,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             <Typography
               variant={subtitleVariant}
               color="text.secondary"
-              sx={{ 
+              sx={{
                 mb: 2,
               }}
             >
@@ -181,26 +170,13 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
           {/* Metadata */}
           {metadata.length > 0 && showMetadata && !isMinimal && (
-            <Stack
-              direction="row"
-              spacing={3}
-              flexWrap="wrap"
-              sx={{ gap: 1 }}
-            >
+            <Stack direction="row" spacing={3} flexWrap="wrap" sx={{ gap: 1 }}>
               {metadata.map((item, index) => (
                 <Box key={index}>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    component="span"
-                  >
+                  <Typography variant="caption" color="text.secondary" component="span">
                     {item.label}:{' '}
                   </Typography>
-                  <Typography
-                    variant="caption"
-                    component="span"
-                    fontWeight={500}
-                  >
+                  <Typography variant="caption" component="span" fontWeight={500}>
                     {item.value}
                   </Typography>
                 </Box>
@@ -211,45 +187,45 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
         {/* Actions Section */}
         {showActions && (
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={1}
-          sx={{
-            flexShrink: 0,
-            width: { xs: '100%', sm: 'auto' },
-            mt: { xs: 2, md: 0 },
-          }}
-        >
-          {/* Secondary Actions */}
-          {secondaryActions.length > 0 && !isMobile && (
-            <>
-              {secondaryActions.map((action, index) => (
-                <Button
-                  key={index}
-                  variant="outlined"
-                  startIcon={action.icon}
-                  onClick={action.onClick}
-                  size={isTablet ? 'small' : 'medium'}
-                >
-                  {action.label}
-                </Button>
-              ))}
-            </>
-          )}
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={1}
+            sx={{
+              flexShrink: 0,
+              width: { xs: '100%', sm: 'auto' },
+              mt: { xs: 2, md: 0 },
+            }}
+          >
+            {/* Secondary Actions */}
+            {secondaryActions.length > 0 && !isMobile && (
+              <>
+                {secondaryActions.map((action, index) => (
+                  <Button
+                    key={index}
+                    variant="outlined"
+                    startIcon={action.icon}
+                    onClick={action.onClick}
+                    size={isTablet ? 'small' : 'medium'}
+                  >
+                    {action.label}
+                  </Button>
+                ))}
+              </>
+            )}
 
-          {/* Primary Action */}
-          {primaryAction && (
-            <Button
-              variant="contained"
-              startIcon={primaryAction.icon}
-              onClick={primaryAction.onClick}
-              size={isTablet ? 'small' : 'medium'}
-              fullWidth={isMobile}
-            >
-              {primaryAction.label}
-            </Button>
-          )}
-        </Stack>
+            {/* Primary Action */}
+            {primaryAction && (
+              <Button
+                variant="contained"
+                startIcon={primaryAction.icon}
+                onClick={primaryAction.onClick}
+                size={isTablet ? 'small' : 'medium'}
+                fullWidth={isMobile}
+              >
+                {primaryAction.label}
+              </Button>
+            )}
+          </Stack>
         )}
       </Stack>
     </>
@@ -269,12 +245,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         width: width || '100%',
         padding: getSpacingValue(effectivePadding),
         margin: margin ? getSpacingValue(margin) : undefined,
-        backgroundColor: isTransparent
-          ? 'transparent'
-          : theme.palette.background.default,
-        borderBottom: isTransparent
-          ? 'none'
-          : `1px solid ${theme.palette.divider}`,
+        backgroundColor: isTransparent ? 'transparent' : theme.palette.background.default,
+        borderBottom: isTransparent ? 'none' : `1px solid ${theme.palette.divider}`,
       }}
     >
       {headerContent}

@@ -212,19 +212,43 @@ export const getDemoData = (type: string) => {
     case 'revenue':
       return {
         stats: [
-          { label: 'Total Revenue', value: '$125,430', trend: 'up', trendValue: '+12.5%', color: 'primary' },
-          { label: 'New Customers', value: '1,234', trend: 'up', trendValue: '+8.3%', color: 'success' },
-          { label: 'Avg Order Value', value: '$89.50', trend: 'down', trendValue: '-2.1%', color: 'warning' },
+          {
+            label: 'Total Revenue',
+            value: '$125,430',
+            trend: 'up',
+            trendValue: '+12.5%',
+            color: 'primary',
+          },
+          {
+            label: 'New Customers',
+            value: '1,234',
+            trend: 'up',
+            trendValue: '+8.3%',
+            color: 'success',
+          },
+          {
+            label: 'Avg Order Value',
+            value: '$89.50',
+            trend: 'down',
+            trendValue: '-2.1%',
+            color: 'warning',
+          },
           { label: 'Conversion Rate', value: '3.45%', trend: 'neutral', color: 'info' },
         ],
         labelValuePairs: [
           { label: 'Region', value: 'North America', variant: 'inline' },
           { label: 'Currency', value: 'USD', variant: 'inline' },
           { label: 'Period', value: 'Q4 2024', variant: 'inline', chip: true },
-          { label: 'Growth Rate', value: '+15.2%', variant: 'default', valueColor: 'success', trend: 'up' },
+          {
+            label: 'Growth Rate',
+            value: '+15.2%',
+            variant: 'default',
+            valueColor: 'success',
+            trend: 'up',
+          },
         ],
       };
-    
+
     case 'users':
       return {
         listItems: [
@@ -258,7 +282,7 @@ export const getDemoData = (type: string) => {
           },
         ],
       };
-    
+
     case 'tasks':
       return {
         listItems: [
@@ -283,7 +307,7 @@ export const getDemoData = (type: string) => {
           },
         ],
       };
-    
+
     case 'sales':
       return {
         tableColumns: ['Product', 'Units Sold', 'Revenue', 'Growth'],
@@ -294,7 +318,7 @@ export const getDemoData = (type: string) => {
           { Product: 'Product D', 'Units Sold': '543', Revenue: '$5,430', Growth: '+22%' },
         ],
       };
-    
+
     case 'workflow':
       return {
         workflowSteps: [
@@ -333,7 +357,7 @@ export const getDemoData = (type: string) => {
           },
         ],
       };
-    
+
     case 'dashboard':
       return {
         stats: [
@@ -341,10 +365,21 @@ export const getDemoData = (type: string) => {
           { label: 'Revenue', value: '$45,678', trend: 'up', trendValue: '+12.3%' },
         ],
         labelValuePairs: [
-          { label: 'Server Status', value: 'Operational', variant: 'inline', valueColor: 'success', chip: true },
+          {
+            label: 'Server Status',
+            value: 'Operational',
+            variant: 'inline',
+            valueColor: 'success',
+            chip: true,
+          },
           { label: 'API Latency', value: '142ms', variant: 'inline' },
           { label: 'Database', value: 'PostgreSQL 14.5', variant: 'minimal' },
-          { label: 'Last Backup', value: '2 hours ago', variant: 'inline', helpText: 'Automated backup successful' },
+          {
+            label: 'Last Backup',
+            value: '2 hours ago',
+            variant: 'inline',
+            helpText: 'Automated backup successful',
+          },
         ],
         listItems: [
           {
@@ -361,7 +396,7 @@ export const getDemoData = (type: string) => {
           },
         ],
       };
-    
+
     default:
       return {};
   }

@@ -36,17 +36,18 @@ interface ResponsiveLayoutProps {
 
 const LEFT_DRAWER_WIDTH = 240;
 const RIGHT_DRAWER_WIDTH = 320;
+const MOBILE_RIGHT_DRAWER_WIDTH = '100%';
 
-export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ 
-  toggleColorMode, 
+export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
+  toggleColorMode,
   isDarkMode,
   toggleDensity,
-  density 
+  density,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { isEnabled: isAIMode } = useAIDesignMode();
-  
+
   // Drawer states
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(true);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
@@ -55,7 +56,7 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
   useEffect(() => {
     const savedLeftOpen = localStorage.getItem('left-drawer-open');
     const savedRightOpen = localStorage.getItem('right-drawer-open');
-    
+
     if (savedLeftOpen !== null) {
       setLeftDrawerOpen(savedLeftOpen === 'true');
     }
@@ -108,9 +109,21 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            MUI Pattern Generator
+            MPG
           </Typography>
           <AIDesignModeToggle variant="icon" />
+          {isAIMode && (
+            <Tooltip title="Toggle Pattern Inspector">
+              <IconButton
+                color="inherit"
+                onClick={toggleRightDrawer}
+                aria-label="toggle pattern inspector"
+                sx={{ ml: 1 }}
+              >
+                <SidebarIcon sx={{ transform: 'scaleX(-1)' }} />
+              </IconButton>
+            </Tooltip>
+          )}
           <Tooltip title={`Density: ${density}`}>
             <IconButton
               color="inherit"
@@ -127,30 +140,22 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
               )}
             </IconButton>
           </Tooltip>
-          <IconButton
-            color="inherit"
-            onClick={toggleColorMode}
-            aria-label="toggle dark mode"
-          >
+          <IconButton color="inherit" onClick={toggleColorMode} aria-label="toggle dark mode">
             {isDarkMode ? <LightModeIcon /> : <DarkModeIcon />}
           </IconButton>
         </Toolbar>
       </AppBar>
       {/* Left Drawer - Navigation */}
       <Drawer
-        variant="permanent"
+        variant={isMobile ? 'temporary' : 'persistent'}
         open={leftDrawerOpen}
+        onClose={isMobile ? toggleLeftDrawer : undefined}
         sx={{
-          width: leftDrawerOpen ? LEFT_DRAWER_WIDTH : 0,
+          width: LEFT_DRAWER_WIDTH,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-            width: leftDrawerOpen ? LEFT_DRAWER_WIDTH : 0,
+            width: LEFT_DRAWER_WIDTH,
             boxSizing: 'border-box',
-            overflow: 'hidden',
-            transition: theme.transitions.create('width', {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.leavingScreen,
-            }),
           },
         }}
       >
@@ -166,6 +171,11 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
           bgcolor: 'background.default',
           color: 'text.primary',
           overflow: 'auto',
+          marginLeft: !isMobile && leftDrawerOpen ? `${LEFT_DRAWER_WIDTH}px` : 0,
+          transition: theme.transitions.create('margin', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
         }}
       >
         <Toolbar />
@@ -174,25 +184,40 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
 
       {/* Right Drawer - AI Design Mode */}
       <Drawer
-        variant="permanent"
+        variant={isMobile ? 'temporary' : 'permanent'}
         anchor="right"
         open={rightDrawerOpen && isAIMode}
+        onClose={isMobile ? toggleRightDrawer : undefined}
         sx={{
-          width: rightDrawerOpen && isAIMode ? RIGHT_DRAWER_WIDTH : 0,
+          width:
+            rightDrawerOpen && isAIMode
+              ? isMobile
+                ? MOBILE_RIGHT_DRAWER_WIDTH
+                : RIGHT_DRAWER_WIDTH
+              : 0,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-            width: rightDrawerOpen && isAIMode ? RIGHT_DRAWER_WIDTH : 0,
+            width:
+              rightDrawerOpen && isAIMode
+                ? isMobile
+                  ? MOBILE_RIGHT_DRAWER_WIDTH
+                  : RIGHT_DRAWER_WIDTH
+                : 0,
             boxSizing: 'border-box',
             overflow: 'hidden',
             transition: theme.transitions.create('width', {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,
             }),
+            backgroundColor:
+              theme.palette.mode === 'dark' ? 'rgba(18, 18, 18, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)', // Safari support
           },
         }}
       >
         <Box sx={{ height: '100%' }}>
-          <AIDesignModeDrawer />
+          <AIDesignModeDrawer onClose={isMobile ? toggleRightDrawer : undefined} />
         </Box>
       </Drawer>
     </Box>

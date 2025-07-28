@@ -15,7 +15,7 @@ export const emptyStateCardControls: PropControl[] = [
     ],
     group: 'General',
   },
-  
+
   // Text props
   {
     name: 'title',
@@ -41,7 +41,7 @@ export const emptyStateCardControls: PropControl[] = [
     helperText: 'Leave empty to use default label for variant',
     group: 'General',
   },
-  
+
   // Component toggles
   {
     name: 'showIcon',
@@ -63,7 +63,7 @@ export const emptyStateCardControls: PropControl[] = [
     helperText: 'Display action button',
     group: 'Components',
   },
-  
+
   // Appearance
   {
     name: 'elevation',
@@ -88,7 +88,7 @@ export const emptyStateCardControls: PropControl[] = [
     ],
     group: 'Appearance',
   },
-  
+
   // Typography controls
   {
     name: 'titleVariant',
@@ -118,7 +118,7 @@ export const emptyStateCardControls: PropControl[] = [
     helperText: 'Select description typography style',
     group: 'Typography',
   },
-  
+
   // REQUIRED: Spacing controls
   {
     name: 'padding',

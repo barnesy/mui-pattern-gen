@@ -12,16 +12,18 @@ export interface WithPatternWrapperOptions {
  * Component that uses pattern props from context
  * This ensures props are properly injected without cloning issues
  */
-const PatternPropsInjector = React.forwardRef<any, {
-  Component: React.ComponentType<any>;
-  fallbackProps: any;
-}>(({ Component, fallbackProps }, ref) => {
+const PatternPropsInjector = React.forwardRef<
+  any,
+  {
+    Component: React.ComponentType<any>;
+    fallbackProps: any;
+  }
+>(({ Component, fallbackProps }, ref) => {
   const patternContext = usePatternProps();
-  
+
   // Use context props if available, otherwise use fallback
   const props = patternContext ? patternContext.props : fallbackProps;
-  
-  
+
   return <Component {...props} ref={ref} />;
 });
 

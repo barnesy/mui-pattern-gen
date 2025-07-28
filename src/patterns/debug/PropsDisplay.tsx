@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Card,
-  CardContent,
-  Typography,
-  Divider,
-} from '@mui/material';
+import { Card, CardContent, Typography, Divider } from '@mui/material';
 import { usePatternProps } from '../../contexts/PatternPropsContext';
 
 export interface PropsDisplayProps {
@@ -15,15 +10,18 @@ export interface PropsDisplayProps {
 
 export const PropsDisplay: React.FC<PropsDisplayProps> = (props) => {
   const contextProps = usePatternProps();
-  
+
   const getVariantColor = () => {
     switch (props.variant || 'debug') {
-      case 'info': return 'primary.main';
-      case 'warning': return 'warning.main';
-      default: return 'text.secondary';
+      case 'info':
+        return 'primary.main';
+      case 'warning':
+        return 'warning.main';
+      default:
+        return 'text.secondary';
     }
   };
-  
+
   return (
     <Card variant="outlined" sx={{ borderColor: getVariantColor() }}>
       <CardContent>

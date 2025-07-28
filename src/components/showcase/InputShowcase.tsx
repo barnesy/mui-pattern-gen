@@ -73,9 +73,15 @@ export const InputShowcase: React.FC = () => {
                 <Button variant="outlined">Outlined</Button>
               </Box>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                <Button variant="contained" color="primary">Primary</Button>
-                <Button variant="contained" color="secondary">Secondary</Button>
-                <Button variant="contained" color="error">Error</Button>
+                <Button variant="contained" color="primary">
+                  Primary
+                </Button>
+                <Button variant="contained" color="secondary">
+                  Secondary
+                </Button>
+                <Button variant="contained" color="error">
+                  Error
+                </Button>
               </Box>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                 <Button size="small">Small</Button>
@@ -107,7 +113,7 @@ export const InputShowcase: React.FC = () => {
                 <FormControlLabel control={<Checkbox />} label="Unchecked" />
                 <FormControlLabel control={<Checkbox disabled />} label="Disabled" />
               </Box>
-              
+
               <FormControl>
                 <FormLabel>Radio Group</FormLabel>
                 <RadioGroup value={radioValue} onChange={(e) => setRadioValue(e.target.value)}>
@@ -169,10 +175,7 @@ export const InputShowcase: React.FC = () => {
 
               <Box>
                 <Typography gutterBottom>Rating</Typography>
-                <Rating
-                  value={ratingValue}
-                  onChange={(_, value) => setRatingValue(value || 0)}
-                />
+                <Rating value={ratingValue} onChange={(_, value) => setRatingValue(value || 0)} />
               </Box>
             </Box>
           </Paper>

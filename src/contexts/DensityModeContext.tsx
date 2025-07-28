@@ -40,11 +40,7 @@ export const DensityModeProvider: React.FC<{ children: ReactNode }> = ({ childre
     spacing: densitySpacingMap[density],
   };
 
-  return (
-    <DensityModeContext.Provider value={value}>
-      {children}
-    </DensityModeContext.Provider>
-  );
+  return <DensityModeContext.Provider value={value}>{children}</DensityModeContext.Provider>;
 };
 
 export const useDensityMode = () => {
@@ -58,7 +54,7 @@ export const useDensityMode = () => {
 // Helper hook to get component size based on density
 export const useComponentSize = () => {
   const { density } = useDensityMode();
-  
+
   return {
     buttonSize: density === 'compact' ? 'small' : density === 'spacious' ? 'large' : 'medium',
     textFieldSize: density === 'compact' ? 'small' : 'medium',
@@ -71,7 +67,7 @@ export const useComponentSize = () => {
 // Helper hook to get spacing values
 export const useDensitySpacing = () => {
   const { density, spacing } = useDensityMode();
-  
+
   return {
     spacing,
     paddingDense: density === 'compact' ? 1 : density === 'spacious' ? 3 : 2,

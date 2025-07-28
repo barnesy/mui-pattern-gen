@@ -8,12 +8,12 @@ import { useAIDesignMode } from '../contexts/AIDesignModeContext';
 const AIDataDisplayCard = withPatternWrapper(DataDisplayCard, {
   patternName: 'DataDisplayCard',
   status: 'pending',
-  category: 'pending'
+  category: 'pending',
 });
 
 export const SubComponentDebug: React.FC = () => {
   const { isEnabled } = useAIDesignMode();
-  
+
   // Simple test sub-component
   const TestSubComponent = () => (
     <SubComponentWrapper
@@ -28,22 +28,22 @@ export const SubComponentDebug: React.FC = () => {
       </Paper>
     </SubComponentWrapper>
   );
-  
+
   return (
     <Box sx={{ p: 4 }}>
       <Typography variant="h4" gutterBottom>
         Sub-Component Debug Page
       </Typography>
-      
+
       <Alert severity="info" sx={{ mb: 2 }}>
         AI Design Mode is: {isEnabled ? 'ENABLED' : 'DISABLED'}
       </Alert>
-      
+
       <Typography variant="h6" gutterBottom>
         1. Simple Sub-Component Test
       </Typography>
       <TestSubComponent />
-      
+
       <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
         2. DataDisplayCard with Sub-Components
       </Typography>
@@ -52,10 +52,10 @@ export const SubComponentDebug: React.FC = () => {
         title="Debug Card"
         stats={[
           { label: 'Test Stat 1', value: '100', change: '+10%' },
-          { label: 'Test Stat 2', value: '200', change: '-5%' }
+          { label: 'Test Stat 2', value: '200', change: '-5%' },
         ]}
       />
-      
+
       <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
         3. DataDisplayCard with Label-Value Pairs
       </Typography>
@@ -65,10 +65,10 @@ export const SubComponentDebug: React.FC = () => {
         labelValuePairs={[
           { label: 'Name', value: 'John Doe' },
           { label: 'Email', value: 'john@example.com' },
-          { label: 'Status', value: 'Active' }
+          { label: 'Status', value: 'Active' },
         ]}
       />
-      
+
       <Box sx={{ mt: 4 }}>
         <Typography variant="body2" color="text.secondary">
           Debug Info:

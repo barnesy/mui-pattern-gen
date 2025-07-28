@@ -35,12 +35,5 @@ export const TextFieldWithDebounce: React.FC<TextFieldWithDebounceProps> = ({
     setLocalValue(newValue);
   };
 
-  return (
-    <TextField
-      {...props}
-      type={type}
-      value={localValue}
-      onChange={handleChange}
-    />
-  );
+  return <TextField {...props} type={type} value={localValue} onChange={handleChange} />;
 };

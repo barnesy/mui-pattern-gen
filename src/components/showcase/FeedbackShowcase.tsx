@@ -41,19 +41,19 @@ export const FeedbackShowcase: React.FC = () => {
               <Alert severity="warning">This is a warning alert!</Alert>
               <Alert severity="info">This is an info alert!</Alert>
               <Alert severity="success">This is a success alert!</Alert>
-              
+
               <Alert severity="error" variant="outlined">
                 This is an outlined error alert!
               </Alert>
-              
+
               <Alert severity="info" variant="filled">
                 This is a filled info alert!
               </Alert>
-              
+
               <Alert severity="warning" onClose={() => {}}>
                 This alert can be closed!
               </Alert>
-              
+
               <Alert severity="success">
                 <AlertTitle>Success</AlertTitle>
                 This is a success alert with a title!
@@ -79,7 +79,7 @@ export const FeedbackShowcase: React.FC = () => {
                   <CircularProgress variant="determinate" value={75} />
                 </Box>
               </Box>
-              
+
               <Box>
                 <Typography variant="body2" gutterBottom>
                   Linear Progress
@@ -146,10 +146,7 @@ export const FeedbackShowcase: React.FC = () => {
             <Button variant="contained" onClick={() => setOpenDialog(true)}>
               Open Dialog
             </Button>
-            <Dialog
-              open={openDialog}
-              onClose={() => setOpenDialog(false)}
-            >
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
               <DialogTitle>Dialog Title</DialogTitle>
               <DialogContent>
                 <DialogContentText>
@@ -175,7 +172,10 @@ export const FeedbackShowcase: React.FC = () => {
               Open Backdrop
             </Button>
             <Backdrop
-              sx={{ color: (theme) => theme.palette.common.white, zIndex: (theme) => theme.zIndex.drawer + 1 }}
+              sx={{
+                color: (theme) => theme.palette.common.white,
+                zIndex: (theme) => theme.zIndex.drawer + 1,
+              }}
               open={openBackdrop}
               onClick={() => setOpenBackdrop(false)}
             >

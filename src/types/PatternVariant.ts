@@ -34,7 +34,7 @@ export interface VariantConfig<V extends string = PatternVariant> {
  * Base props that all variant-aware patterns should include
  */
 export interface VariantAwareProps {
-  variant?: PatternVariant | string;
+  variant?: PatternVariant  ;
   padding?: SpacingConfig;
   margin?: SpacingConfig;
 }
@@ -43,7 +43,7 @@ export interface VariantAwareProps {
  * Helper to get spacing CSS values
  */
 export const getSpacingValue = (spacing?: SpacingConfig): string | undefined => {
-  if (!spacing) return undefined;
+  if (!spacing) {return undefined;}
   return `${spacing.top}px ${spacing.right}px ${spacing.bottom}px ${spacing.left}px`;
 };
 
@@ -53,15 +53,15 @@ export const getSpacingValue = (spacing?: SpacingConfig): string | undefined => 
  */
 export const exampleVariantSpacing: Record<string, { padding: SpacingConfig }> = {
   default: {
-    padding: { top: 16, right: 16, bottom: 16, left: 16 }
+    padding: { top: 16, right: 16, bottom: 16, left: 16 },
   },
   compact: {
-    padding: { top: 8, right: 8, bottom: 8, left: 8 }
+    padding: { top: 8, right: 8, bottom: 8, left: 8 },
   },
   minimal: {
-    padding: { top: 0, right: 0, bottom: 0, left: 0 }
+    padding: { top: 0, right: 0, bottom: 0, left: 0 },
   },
   detailed: {
-    padding: { top: 24, right: 24, bottom: 24, left: 24 }
-  }
+    padding: { top: 24, right: 24, bottom: 24, left: 24 },
+  },
 };

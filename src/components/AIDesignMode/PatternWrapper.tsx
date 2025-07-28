@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import { AIDesignModeContext } from '../../contexts/AIDesignModeContext';
 import { PatternPropsProvider } from '../../contexts/PatternPropsContext';
 import { PatternInstanceManager } from '../../services/PatternInstanceManager';
+import { usePropsStore, useComponentProps } from '../../contexts/PropsStoreContext';
 
 export interface PatternWrapperProps {
   patternName: string;
@@ -24,42 +25,67 @@ export const PatternWrapper: React.FC<PatternWrapperProps> = ({
   patternProps: initialProps = {},
 }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const [instanceId] = useState(() => 
-    `${patternName}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  const [instanceId] = useState(
+    () => `${patternName}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   );
-  const [currentProps, setCurrentProps] = useState(initialProps);
-  
+
+  // Use PropsStore for centralized props management
+  const propsStore = usePropsStore();
+  const storedProps = useComponentProps(instanceId);
+  const currentProps = storedProps || initialProps;
+
   // Check if AI Design Mode context is available (not in iframe)
   const aiDesignContext = useContext(AIDesignModeContext);
   const isInMainApp = !!aiDesignContext;
   const { registerPatternInstance, unregisterPatternInstance } = aiDesignContext || {};
 
   // Update specific prop
-  const updateProp = useCallback((name: string, value: unknown) => {
-    setCurrentProps(prev => ({ ...prev, [name]: value }));
-  }, []);
+  const updateProp = useCallback(
+    (name: string, value: unknown) => {
+      propsStore.updateProps(instanceId, { [name]: value });
+    },
+    [instanceId, propsStore]
+  );
 
   // Update all props
-  const updateAllProps = useCallback((newProps: Record<string, unknown>) => {
-    setCurrentProps(newProps);
-  }, [patternName, instanceId]);
+  const updateAllProps = useCallback(
+    (newProps: Record<string, unknown>) => {
+      propsStore.updateProps(instanceId, newProps);
+    },
+    [instanceId, propsStore]
+  );
 
   // Register instance on mount
   useEffect(() => {
-    if (!wrapperRef.current) return;
+    if (!wrapperRef.current) {return;}
 
     const element = wrapperRef.current;
-    
-    // Register with PatternInstanceManager
-    PatternInstanceManager.registerInstance({
-      patternName,
-      location: {
-        pathname: window.location.pathname,
-        componentTree: [],
-        iframe: window.parent !== window ? window.location.href : undefined,
+
+    // Register with PropsStore
+    propsStore.registerComponent({
+      id: instanceId,
+      type: 'pattern',
+      name: patternName,
+      props: initialProps,
+      metadata: {
+        category,
+        status,
       },
-      element: element as any, // WeakRef type not available in all environments
-    }, instanceId); // Pass our instanceId to ensure consistency
+    });
+
+    // Register with PatternInstanceManager
+    PatternInstanceManager.registerInstance(
+      {
+        patternName,
+        location: {
+          pathname: window.location.pathname,
+          componentTree: [],
+          iframe: window.parent !== window ? window.location.href : undefined,
+        },
+        element: element as any, // WeakRef type not available in all environments
+      },
+      instanceId
+    ); // Pass our instanceId to ensure consistency
 
     // Register with AI Design Mode context (only in main app)
     if (isInMainApp && registerPatternInstance) {
@@ -68,32 +94,34 @@ export const PatternWrapper: React.FC<PatternWrapperProps> = ({
         status,
         category,
         instanceId,
-        props: currentProps,
+        props: initialProps, // Use initialProps instead of currentProps
         element,
         rect: element.getBoundingClientRect(),
       };
-      
+
       registerPatternInstance(patternInfo);
     }
 
     // Cleanup on unmount
     return () => {
+      propsStore.unregisterComponent(instanceId);
       PatternInstanceManager.unregisterInstance(instanceId);
       if (isInMainApp && unregisterPatternInstance) {
         unregisterPatternInstance(instanceId);
       }
     };
-  }, [instanceId, patternName, status, category, isInMainApp, registerPatternInstance, unregisterPatternInstance]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [instanceId]); // Only depend on instanceId which is stable
 
   // Subscribe to updates for this instance
   useEffect(() => {
     const handleUpdateRequest = (event: CustomEvent) => {
       const { instanceId: targetId, patternName: targetPattern, props, updateAll } = event.detail;
-      
+
       if (updateAll && targetPattern === patternName) {
-        updateAllProps(props);
+        propsStore.updateAllByName(patternName, props);
       } else if (targetId === instanceId) {
-        updateAllProps(props);
+        propsStore.updateProps(instanceId, props);
       }
     };
 
@@ -104,17 +132,15 @@ export const PatternWrapper: React.FC<PatternWrapperProps> = ({
     }) => {
       // Handle cross-frame updates without props (props are managed by context)
       if (data.updateAll && data.patternName === patternName) {
-        // Force re-render to pick up any external changes
-        setCurrentProps(prev => ({ ...prev }));
+        // Props will be updated via PropsStore subscription
       } else if (data.instanceId === instanceId) {
-        // Force re-render to pick up any external changes
-        setCurrentProps(prev => ({ ...prev }));
+        // Props will be updated via PropsStore subscription
       }
     };
 
     // Listen for update requests
     window.addEventListener('pattern-update-request', handleUpdateRequest as EventListener);
-    
+
     // Subscribe to pattern updates for cross-frame communication
     PatternInstanceManager.on('pattern-update', handlePatternUpdate);
 
@@ -144,7 +170,7 @@ export const PatternWrapper: React.FC<PatternWrapperProps> = ({
         data-pattern-category={category}
         data-pattern-instance={instanceId}
         data-pattern-props={JSON.stringify(currentProps)}
-        sx={{ 
+        sx={{
           position: 'relative',
           // Use block display to ensure outline works properly
           display: 'block',

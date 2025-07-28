@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  SvgIcon,
-} from '@mui/material';
+import { Box, Card, CardContent, Typography, Button, SvgIcon } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import InboxIcon from '@mui/icons-material/Inbox';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -51,14 +44,14 @@ export const EmptyStateCard: React.FC<EmptyStateCardProps> = ({
   const theme = useTheme();
 
   const getIcon = () => {
-    if (customIcon) return customIcon;
-    
+    if (customIcon) {return customIcon;}
+
     const iconSizes = {
       small: 48,
       medium: 64,
       large: 96,
     };
-    
+
     const size = iconSizes[iconSize];
     const iconProps = {
       sx: {
@@ -92,7 +85,7 @@ export const EmptyStateCard: React.FC<EmptyStateCardProps> = ({
       case 'no-results':
         return {
           title: 'No results found',
-          description: 'Try adjusting your search or filters to find what you\'re looking for.',
+          description: "Try adjusting your search or filters to find what you're looking for.",
           actionLabel: 'Clear Filters',
         };
       case 'no-data':
@@ -137,16 +130,11 @@ export const EmptyStateCard: React.FC<EmptyStateCardProps> = ({
           }}
         >
           {showIcon && getIcon()}
-          
-          <Typography
-            variant={titleVariant}
-            component="h3"
-            gutterBottom
-            sx={{ mb: 1 }}
-          >
+
+          <Typography variant={titleVariant} component="h3" gutterBottom sx={{ mb: 1 }}>
             {displayTitle}
           </Typography>
-          
+
           <Typography
             variant={descriptionVariant}
             color="text.secondary"
@@ -154,14 +142,9 @@ export const EmptyStateCard: React.FC<EmptyStateCardProps> = ({
           >
             {displayDescription}
           </Typography>
-          
+
           {showAction && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={onAction}
-              size="medium"
-            >
+            <Button variant="contained" color="primary" onClick={onAction} size="medium">
               {displayActionLabel}
             </Button>
           )}

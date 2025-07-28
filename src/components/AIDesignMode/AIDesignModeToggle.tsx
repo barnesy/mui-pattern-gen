@@ -1,9 +1,6 @@
 import React from 'react';
 import { Fab, Tooltip, Box, Badge, IconButton } from '@mui/material';
-import { 
-  AutoAwesome as AIIcon,
-  Close as CloseIcon 
-} from '@mui/icons-material';
+import { AutoAwesome as AIIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useAIDesignMode } from '../../contexts/AIDesignModeContext';
 
 interface AIDesignModeToggleProps {
@@ -14,9 +11,9 @@ export const AIDesignModeToggle: React.FC<AIDesignModeToggleProps> = ({ variant 
   const { isEnabled, toggleEnabled } = useAIDesignMode();
 
   const buttonContent = (
-    <Tooltip 
-      title={isEnabled ? "Exit AI Design Mode" : "Enter AI Design Mode"}
-      placement={variant === 'fab' ? "left" : "bottom"}
+    <Tooltip
+      title={isEnabled ? 'Exit AI Design Mode' : 'Enter AI Design Mode'}
+      placement={variant === 'fab' ? 'left' : 'bottom'}
     >
       <Badge
         color="primary"
@@ -52,14 +49,14 @@ export const AIDesignModeToggle: React.FC<AIDesignModeToggleProps> = ({ variant 
       >
         {variant === 'fab' ? (
           <Fab
-            color={isEnabled ? "secondary" : "primary"}
+            color={isEnabled ? 'secondary' : 'primary'}
             onClick={toggleEnabled}
             aria-label="toggle AI Design Mode"
             sx={{
               transition: 'all 0.3s ease',
               transform: isEnabled ? 'scale(1.1)' : 'scale(1)',
-              boxShadow: isEnabled 
-                ? (theme) => `0 0 20px ${theme.palette.secondary.main}80` 
+              boxShadow: isEnabled
+                ? (theme) => `0 0 20px ${theme.palette.secondary.main}80`
                 : undefined,
             }}
           >
@@ -67,7 +64,7 @@ export const AIDesignModeToggle: React.FC<AIDesignModeToggleProps> = ({ variant 
           </Fab>
         ) : (
           <IconButton
-            color={isEnabled ? "secondary" : "inherit"}
+            color={isEnabled ? 'secondary' : 'inherit'}
             onClick={toggleEnabled}
             aria-label="toggle AI Design Mode"
             sx={{

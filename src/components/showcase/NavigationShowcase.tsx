@@ -92,7 +92,7 @@ export const NavigationShowcase: React.FC = () => {
                 </Link>
                 <Typography color="text.primary">Products</Typography>
               </Breadcrumbs>
-              
+
               <Breadcrumbs separator="›">
                 <Link underline="hover" color="inherit" href="#">
                   MUI
@@ -114,11 +114,7 @@ export const NavigationShowcase: React.FC = () => {
             <Button variant="contained" onClick={() => setDrawerOpen(true)}>
               Open Drawer
             </Button>
-            <Drawer
-              anchor="left"
-              open={drawerOpen}
-              onClose={() => setDrawerOpen(false)}
-            >
+            <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
               <Box sx={{ width: 250, p: 2 }}>
                 <Typography variant="h6" gutterBottom>
                   Drawer Content
@@ -144,17 +140,10 @@ export const NavigationShowcase: React.FC = () => {
             <Typography variant="h6" gutterBottom>
               Menu
             </Typography>
-            <Button
-              variant="contained"
-              onClick={(e) => setAnchorEl(e.currentTarget)}
-            >
+            <Button variant="contained" onClick={(e) => setAnchorEl(e.currentTarget)}>
               Open Menu
             </Button>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={() => setAnchorEl(null)}
-            >
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
               <MenuItem onClick={() => setAnchorEl(null)}>Profile</MenuItem>
               <MenuItem onClick={() => setAnchorEl(null)}>My account</MenuItem>
               <MenuItem onClick={() => setAnchorEl(null)}>Logout</MenuItem>
@@ -196,10 +185,7 @@ export const NavigationShowcase: React.FC = () => {
               </Step>
             </Stepper>
             <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-              <Button
-                disabled={activeStep === 0}
-                onClick={() => setActiveStep(activeStep - 1)}
-              >
+              <Button disabled={activeStep === 0} onClick={() => setActiveStep(activeStep - 1)}>
                 Back
               </Button>
               <Button
@@ -239,11 +225,7 @@ export const NavigationShowcase: React.FC = () => {
               icon={<SpeedDialIcon openIcon={<EditIcon />} />}
             >
               {speedDialActions.map((action) => (
-                <SpeedDialAction
-                  key={action.name}
-                  icon={action.icon}
-                  tooltipTitle={action.name}
-                />
+                <SpeedDialAction key={action.name} icon={action.icon} tooltipTitle={action.name} />
               ))}
             </SpeedDial>
           </Paper>

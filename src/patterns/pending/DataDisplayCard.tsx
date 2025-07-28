@@ -57,7 +57,7 @@ export interface DataDisplayCardProps {
   subtitle?: string;
   action?: React.ReactNode;
   menuItems?: Array<{ label: string; onClick: () => void }>;
-  
+
   // Stats variant props
   stats?: Array<{
     label: string;
@@ -66,20 +66,28 @@ export interface DataDisplayCardProps {
     trendValue?: string;
     color?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info';
   }>;
-  
+
   // Label-Value pairs (can be used in stats or mixed variants)
   labelValuePairs?: Array<{
     label: string;
     value: string | number;
     variant?: 'default' | 'inline' | 'stacked' | 'minimal';
     size?: 'small' | 'medium' | 'large';
-    valueColor?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'text.primary' | 'text.secondary';
+    valueColor?:
+      | 'primary'
+      | 'secondary'
+      | 'success'
+      | 'error'
+      | 'warning'
+      | 'info'
+      | 'text.primary'
+      | 'text.secondary';
     helpText?: string;
     trend?: 'up' | 'down' | 'flat';
     trendValue?: string;
     chip?: boolean;
   }>;
-  
+
   // List variant props
   listItems?: Array<{
     id: string;
@@ -89,11 +97,11 @@ export interface DataDisplayCardProps {
     action?: React.ReactNode;
     status?: 'success' | 'warning' | 'error' | 'info';
   }>;
-  
+
   // Table variant props
   tableColumns?: string[];
   tableData?: Array<Record<string, any>>;
-  
+
   // Workflow variant props
   workflowSteps?: Array<{
     id: string;
@@ -102,105 +110,159 @@ export interface DataDisplayCardProps {
     status: 'completed' | 'active' | 'pending' | 'error';
     timestamp?: string;
   }>;
-  
+
   // Mixed content
   customContent?: React.ReactNode;
-  
+
   // Common props
   loading?: boolean;
   error?: string;
   emptyMessage?: string;
-  
+
   // Component toggles
   showHeader?: boolean;
   showDivider?: boolean;
   showSubheader?: boolean;
-  
+
   // Demo data
   demoDataType?: string;
   showMenuItems?: boolean;
   showAction?: boolean;
-  
+
   // Size props
   width?: { mode: 'auto' | '100%' | 'custom'; customValue?: number; unit?: 'px' | '%' };
   height?: { mode: 'auto' | '100%' | 'custom'; customValue?: number; unit?: 'px' | '%' };
-  
+
   // Spacing props
   padding?: SpacingConfig;
   margin?: SpacingConfig;
-  
+
   // Typography
   titleVariant?: string;
   subtitleVariant?: string;
+
+  // Legacy data prop for compatibility
+  data?: Array<{
+    label: string;
+    value: string | number;
+    variant?: 'default' | 'inline' | 'stacked' | 'minimal' | 'metric';
+    size?: 'small' | 'medium' | 'large';
+    valueColor?: string;
+    helpText?: string;
+    trend?: 'up' | 'down' | 'flat';
+    trendValue?: string;
+    chip?: boolean;
+  }>;
 }
 
-export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
-  variant = 'stats',
-  title = 'Performance Overview',
-  subtitle = 'Last 30 days',
-  action,
-  menuItems,
-  stats = [],
-  labelValuePairs = [],
-  listItems = [],
-  tableColumns = [],
-  tableData = [],
-  workflowSteps = [],
-  customContent,
-  loading = false,
-  error,
-  emptyMessage = 'No data available',
-  showHeader = true,
-  showDivider = true,
-  showSubheader = true,
-  demoDataType,
-  showMenuItems = true,
-  showAction = false,
-  width,
-  height,
-  padding,
-  margin,
-  titleVariant = 'h6',
-  subtitleVariant = 'body2',
-}) => {
+export const DataDisplayCard: React.FC<DataDisplayCardProps> = (props) => {
+  const {
+    variant = 'stats',
+    title = 'Performance Overview',
+    subtitle = 'Last 30 days',
+    action,
+    menuItems,
+    stats = [],
+    labelValuePairs = [],
+    listItems = [],
+    tableColumns = [],
+    tableData = [],
+    workflowSteps = [],
+    customContent,
+    loading = false,
+    error,
+    emptyMessage = 'No data available',
+    showHeader = true,
+    showDivider = true,
+    showSubheader = true,
+    demoDataType,
+    showMenuItems = true,
+    showAction = false,
+    width,
+    height,
+    padding,
+    margin,
+    titleVariant = 'h6',
+    subtitleVariant = 'body2',
+    // Handle data prop if provided
+    data,
+    ...otherProps
+  } = props;
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  
+
   // Determine effective demo data type based on variant if not explicitly set
-  const effectiveDemoType = demoDataType || getDemoDataForVariant('DataDisplayCard', variant) || (
-    variant === 'stats' ? 'revenue' : 
-    variant === 'list' ? 'users' : 
-    variant === 'table' ? 'sales' : 
-    variant === 'workflow' ? 'workflow' : 
-    variant === 'mixed' ? 'dashboard' : 
-    'empty'
-  );
-  
+  const effectiveDemoType =
+    demoDataType ||
+    getDemoDataForVariant('DataDisplayCard', variant) ||
+    (variant === 'stats'
+      ? 'revenue'
+      : variant === 'list'
+        ? 'users'
+        : variant === 'table'
+          ? 'sales'
+          : variant === 'workflow'
+            ? 'workflow'
+            : variant === 'mixed'
+              ? 'dashboard'
+              : 'empty');
+
   // Get default padding
   const defaultPadding = { top: 16, right: 16, bottom: 16, left: 16 };
   const effectivePadding = padding || defaultPadding;
-  
+
+  // If data prop is provided, use it based on variant
+  const dataItems = data || [];
+  const hasDataProp = data && data.length > 0;
+
   const demoData = effectiveDemoType !== 'empty' ? getDemoData(effectiveDemoType) : {};
-  const finalStats = stats.length > 0 ? stats : (demoData.stats || []);
-  const finalLabelValuePairs = labelValuePairs.length > 0 ? labelValuePairs : (demoData.labelValuePairs || []);
-  const finalListItems = listItems.length > 0 ? listItems : (demoData.listItems || []);
-  const finalTableColumns = tableColumns.length > 0 ? tableColumns : (demoData.tableColumns || []);
-  const finalTableData = tableData.length > 0 ? tableData : (demoData.tableData || []);
-  const finalWorkflowSteps = workflowSteps.length > 0 ? workflowSteps : (demoData.workflowSteps || []);
-  
+
+  // For stats variant, data prop can provide either stats or labelValuePairs
+  let finalStats = stats;
+  let finalLabelValuePairs = labelValuePairs;
+
+  if (variant === 'stats' && hasDataProp) {
+    // Check if data items are for stats (have trend) or labelValuePairs
+    const isStatsData = dataItems.some((item: any) => 'trend' in item || item.variant === 'metric');
+    if (isStatsData) {
+      finalStats = dataItems;
+      finalLabelValuePairs =
+        labelValuePairs.length > 0 ? labelValuePairs : demoData.labelValuePairs || [];
+    } else {
+      finalStats = stats.length > 0 ? stats : demoData.stats || [];
+      finalLabelValuePairs = dataItems;
+    }
+  } else {
+    finalStats = stats.length > 0 ? stats : demoData.stats || [];
+    finalLabelValuePairs =
+      labelValuePairs.length > 0 ? labelValuePairs : demoData.labelValuePairs || [];
+  }
+
+  const finalListItems = listItems.length > 0 ? listItems : demoData.listItems || [];
+  const finalTableColumns = tableColumns.length > 0 ? tableColumns : demoData.tableColumns || [];
+  const finalTableData = tableData.length > 0 ? tableData : demoData.tableData || [];
+  const finalWorkflowSteps =
+    workflowSteps.length > 0 ? workflowSteps : demoData.workflowSteps || [];
+
   // Generate demo menu items if needed
-  const finalMenuItems = menuItems || (showMenuItems ? [
-    { label: 'Export Data', onClick: () => console.log('Export clicked') },
-    { label: 'Share', onClick: () => console.log('Share clicked') },
-    { label: 'Settings', onClick: () => console.log('Settings clicked') },
-  ] : undefined);
-  
+  const finalMenuItems =
+    menuItems ||
+    (showMenuItems
+      ? [
+          { label: 'Export Data', onClick: () => console.log('Export clicked') },
+          { label: 'Share', onClick: () => console.log('Share clicked') },
+          { label: 'Settings', onClick: () => console.log('Settings clicked') },
+        ]
+      : undefined);
+
   // Generate demo action if needed
-  const finalAction = action || (showAction ? (
-    <Button size="small" startIcon={<ArrowForwardIcon />}>
-      View All
-    </Button>
-  ) : undefined);
+  const finalAction =
+    action ||
+    (showAction ? (
+      <Button size="small" startIcon={<ArrowForwardIcon />}>
+        View All
+      </Button>
+    ) : undefined);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -209,7 +271,6 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -249,9 +310,15 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
             componentType="LabelValuePair"
             index={index}
             componentProps={{
-              ...stat,
+              label: stat.label,
+              value: stat.value,
               variant: 'stacked',
               size: 'large',
+              valueColor: ('color' in stat && stat.color
+                ? (stat.color as any)
+                : 'text.primary'),
+              trend: stat.trend === 'neutral' ? 'flat' : (stat.trend as any),
+              trendValue: stat.trendValue,
             }}
           >
             <LabelValuePair
@@ -259,8 +326,10 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
               value={stat.value}
               variant="stacked"
               size="large"
-              valueColor={('color' in stat && stat.color ? stat.color as any : 'text.primary') as any}
-              trend={stat.trend === 'neutral' ? 'flat' : stat.trend as any}
+              valueColor={
+                ('color' in stat && stat.color ? (stat.color as any) : 'text.primary')
+              }
+              trend={stat.trend === 'neutral' ? 'flat' : (stat.trend as any)}
               trendValue={stat.trendValue}
             />
           </SubComponentWrapper>
@@ -287,7 +356,18 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
             componentName={`labelValuePair-${pair.label.toLowerCase().replace(/\s+/g, '-')}`}
             componentType="LabelValuePair"
             index={index}
-            componentProps={pair}
+            componentProps={{
+              label: pair.label,
+              value: pair.value,
+              variant: pair.variant || 'default',
+              size: pair.size || 'medium',
+              valueColor: pair.valueColor,
+              helpText: pair.helpText,
+              trend: pair.trend,
+              trendValue: pair.trendValue,
+              chip: pair.chip,
+              showTrend: !!pair.trend,
+            }}
           >
             <LabelValuePair
               label={pair.label}
@@ -322,7 +402,7 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
             {'avatar' in item && item.avatar && (
               <ListItemAvatar>
                 {typeof item.avatar === 'string' ? (
-                  <Avatar src={item.avatar as string} />
+                  <Avatar src={item.avatar} />
                 ) : (
                   <Avatar>{item.avatar}</Avatar>
                 )}
@@ -338,9 +418,7 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
               secondary={item.secondary}
             />
             {'action' in item && item.action && (
-              <ListItemSecondaryAction>
-                {item.action}
-              </ListItemSecondaryAction>
+              <ListItemSecondaryAction>{item.action}</ListItemSecondaryAction>
             )}
           </ListItem>
           {index < finalListItems.length - 1 && <Divider component="li" />}
@@ -365,15 +443,9 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
         </TableHead>
         <TableBody>
           {finalTableData.map((row, rowIndex) => (
-            <TableRow
-              key={rowIndex}
-              hover
-              sx={{ '&:last-child td': { border: 0 } }}
-            >
+            <TableRow key={rowIndex} hover sx={{ '&:last-child td': { border: 0 } }}>
               {finalTableColumns.map((column) => (
-                <TableCell key={column}>
-                  {(row as any)[column]}
-                </TableCell>
+                <TableCell key={column}>{(row as any)[column]}</TableCell>
               ))}
             </TableRow>
           ))}
@@ -383,7 +455,7 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
   );
 
   const renderWorkflow = () => (
-    <Timeline 
+    <Timeline
       position="right"
       sx={{
         padding: 0,
@@ -400,10 +472,13 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
           <TimelineSeparator>
             <TimelineDot
               color={
-                step.status === 'completed' ? 'success' :
-                step.status === 'active' ? 'primary' :
-                step.status === 'error' ? 'error' :
-                'grey'
+                step.status === 'completed'
+                  ? 'success'
+                  : step.status === 'active'
+                    ? 'primary'
+                    : step.status === 'error'
+                      ? 'error'
+                      : 'grey'
               }
               variant={step.status === 'active' ? 'filled' : 'outlined'}
               sx={{
@@ -416,14 +491,14 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
               {step.status === 'error' && <ErrorIcon sx={{ fontSize: 16 }} />}
             </TimelineDot>
             {index < finalWorkflowSteps.length - 1 && (
-              <TimelineConnector 
+              <TimelineConnector
                 sx={{
                   bgcolor: step.status === 'completed' ? 'success.main' : 'grey.300',
                 }}
               />
             )}
           </TimelineSeparator>
-          
+
           {/* Timeline content */}
           <TimelineContent sx={{ py: '12px', px: 2 }}>
             <Typography
@@ -442,7 +517,11 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
               </Typography>
             )}
             {step.timestamp && (
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5, display: 'block' }}
+              >
                 {step.timestamp}
               </Typography>
             )}
@@ -456,7 +535,7 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
     <Stack spacing={3}>
       {finalStats.length > 0 && renderStats()}
       {finalLabelValuePairs.length > 0 && renderLabelValuePairs()}
-      {(finalStats.length > 0 || finalLabelValuePairs.length > 0) && 
+      {(finalStats.length > 0 || finalLabelValuePairs.length > 0) &&
         (finalListItems.length > 0 || finalTableData.length > 0) && <Divider />}
       {finalListItems.length > 0 && renderList()}
       {finalTableData.length > 0 && renderTable()}
@@ -482,13 +561,17 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
       );
     }
 
-    const isEmpty = 
+    const isEmpty =
       (variant === 'stats' && finalStats.length === 0 && finalLabelValuePairs.length === 0) ||
       (variant === 'list' && finalListItems.length === 0) ||
       (variant === 'table' && finalTableData.length === 0) ||
       (variant === 'workflow' && finalWorkflowSteps.length === 0) ||
-      (variant === 'mixed' && finalStats.length === 0 && finalLabelValuePairs.length === 0 && 
-        finalListItems.length === 0 && finalTableData.length === 0 && !customContent);
+      (variant === 'mixed' &&
+        finalStats.length === 0 &&
+        finalLabelValuePairs.length === 0 &&
+        finalListItems.length === 0 &&
+        finalTableData.length === 0 &&
+        !customContent);
 
     if (isEmpty) {
       return (
@@ -517,9 +600,9 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
 
   // Calculate size styles
   const getSizeValue = (size?: { mode: string; customValue?: number; unit?: string }) => {
-    if (!size) return 'auto';
-    if (size.mode === 'auto') return 'auto';
-    if (size.mode === '100%') return '100%';
+    if (!size) {return 'auto';}
+    if (size.mode === 'auto') {return 'auto';}
+    if (size.mode === '100%') {return '100%';}
     if (size.mode === 'custom' && size.customValue) {
       return `${size.customValue}${size.unit || 'px'}`;
     }
@@ -527,7 +610,7 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
   };
 
   return (
-    <Card 
+    <Card
       elevation={1}
       sx={{
         width: getSizeValue(width),
@@ -551,11 +634,7 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
                   <IconButton size="small" onClick={handleMenuOpen}>
                     <MoreVertIcon />
                   </IconButton>
-                  <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
-                  >
+                  <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
                     {finalMenuItems.map((item, index) => (
                       <MenuItem
                         key={index}
@@ -579,9 +658,9 @@ export const DataDisplayCard: React.FC<DataDisplayCardProps> = ({
           }}
         />
       )}
-      
+
       {showHeader && showDivider && <Divider />}
-      
+
       <CardContent
         sx={{
           p: getSpacingValue(effectivePadding),

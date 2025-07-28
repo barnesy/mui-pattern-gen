@@ -41,21 +41,22 @@ const PatternRenderer: React.FC<{ pattern: Pattern }> = ({ pattern }) => {
       try {
         setLoading(true);
         setError(null);
-        
-        const modulePath = pattern.status === 'pending'
-          ? `../patterns/pending/${pattern.name}`
-          : `../patterns/${pattern.category}/${pattern.name}`;
-        
+
+        const modulePath =
+          pattern.status === 'pending'
+            ? `../patterns/pending/${pattern.name}`
+            : `../patterns/${pattern.category}/${pattern.name}`;
+
         const module = await import(/* @vite-ignore */ modulePath);
         const OriginalComponent = module[pattern.name] || module.default;
-        
+
         // Wrap the component with PatternWrapper for AI Design Mode
         const WrappedComponent = withPatternWrapper(OriginalComponent, {
           patternName: pattern.name,
           status: pattern.status,
           category: pattern.category,
         });
-        
+
         setComponent(() => WrappedComponent);
       } catch (err) {
         console.error(`Failed to load pattern ${pattern.name}:`, err);
@@ -73,11 +74,19 @@ const PatternRenderer: React.FC<{ pattern: Pattern }> = ({ pattern }) => {
   }
 
   if (error) {
-    return <Typography variant="body2" color="error">{error}</Typography>;
+    return (
+      <Typography variant="body2" color="error">
+        {error}
+      </Typography>
+    );
   }
 
   if (!Component) {
-    return <Typography variant="body2" color="text.secondary">Component not found</Typography>;
+    return (
+      <Typography variant="body2" color="text.secondary">
+        Component not found
+      </Typography>
+    );
   }
 
   // Render the component with AI Design Mode wrapper
@@ -100,13 +109,13 @@ export const PatternViewer: React.FC = () => {
     const loadPatterns = async () => {
       setLoading(true);
       const allPatterns: Pattern[] = [];
-      
+
       // Load pending patterns
       try {
         const contextResponse = await fetch('/src/patterns/pending/.context.json');
         const context = await contextResponse.json();
         setPendingContext(context);
-        
+
         // For demo, add current pending patterns
         if (context.current) {
           allPatterns.push({
@@ -117,16 +126,12 @@ export const PatternViewer: React.FC = () => {
             hasConfig: true,
           });
         }
-        
+
         // List of pending patterns - KEEP THIS UPDATED when patterns are added/removed
         // This should match the actual files in src/patterns/pending/
-        const pendingPatterns = [
-          'PageHeader',
-          'LabelValuePair',
-          'DataDisplayCard',
-        ];
-        
-        pendingPatterns.forEach(pattern => {
+        const pendingPatterns = ['PageHeader', 'LabelValuePair', 'DataDisplayCard'];
+
+        pendingPatterns.forEach((pattern) => {
           if (pattern !== context.current) {
             allPatterns.push({
               name: pattern,
@@ -139,21 +144,21 @@ export const PatternViewer: React.FC = () => {
       } catch (error) {
         console.error('Error loading pending patterns:', error);
       }
-      
+
       // Load accepted patterns from categories
       // IMPORTANT: Keep this updated when approving/rejecting patterns
       // Each array should contain the exact component names that exist in that category
       const acceptedPatterns: Record<string, string[]> = {
-        auth: [],              // Login forms, registration, password reset, 2FA
-        cards: [],             // User profiles, product cards, info cards, stats cards
-        forms: [],             // Contact forms, multi-step forms, search forms, filters
-        navigation: [],        // Headers, sidebars, breadcrumbs, menus, tabs
-        lists: [],             // Data tables, list items, grids, galleries
-        dashboards: [],        // Stats widgets, charts, analytics, KPIs
+        auth: [], // Login forms, registration, password reset, 2FA
+        cards: [], // User profiles, product cards, info cards, stats cards
+        forms: [], // Contact forms, multi-step forms, search forms, filters
+        navigation: [], // Headers, sidebars, breadcrumbs, menus, tabs
+        lists: [], // Data tables, list items, grids, galleries
+        dashboards: [], // Stats widgets, charts, analytics, KPIs
       };
-      
+
       Object.entries(acceptedPatterns).forEach(([category, patternList]) => {
-        patternList.forEach(pattern => {
+        patternList.forEach((pattern) => {
           allPatterns.push({
             name: pattern,
             category,
@@ -162,76 +167,73 @@ export const PatternViewer: React.FC = () => {
           });
         });
       });
-      
+
       setPatterns(allPatterns);
       setLoading(false);
     };
-    
+
     loadPatterns();
   }, []);
 
   // Filter patterns based on category and status
-  const filteredPatterns = patterns.filter(pattern => {
+  const filteredPatterns = patterns.filter((pattern) => {
     const matchesCategory = selectedCategory === 'all' || pattern.category === selectedCategory;
     const matchesStatus = statusFilter === 'all' || pattern.status === statusFilter;
-    
+
     return matchesCategory && matchesStatus;
   });
 
   // Count patterns by status
-  const pendingCount = patterns.filter(p => p.status === 'pending').length;
-  const acceptedCount = patterns.filter(p => p.status === 'accepted').length;
+  const pendingCount = patterns.filter((p) => p.status === 'pending').length;
+  const acceptedCount = patterns.filter((p) => p.status === 'accepted').length;
 
   return (
     <Box>
       <Typography variant="h1" gutterBottom>
         Pattern Library
       </Typography>
-      
+
       <Typography variant="body1" color="text.secondary" gutterBottom>
         Click on any pattern while AI Design Mode is active to customize it
       </Typography>
-      
+
       <Box sx={{ mb: 3 }}>
-        <Tabs 
-          value={statusFilter} 
-          onChange={(_, value) => setStatusFilter(value)}
-        >
-          <Tab 
+        <Tabs value={statusFilter} onChange={(_, value) => setStatusFilter(value)}>
+          <Tab
             label={
               <Badge badgeContent={patterns.length} color="primary">
                 All
               </Badge>
-            } 
-            value="all" 
+            }
+            value="all"
           />
-          <Tab 
+          <Tab
             label={
               <Badge badgeContent={pendingCount} color="warning">
                 Pending
               </Badge>
-            } 
-            value="pending" 
+            }
+            value="pending"
           />
-          <Tab 
+          <Tab
             label={
               <Badge badgeContent={acceptedCount} color="success">
                 Accepted
               </Badge>
-            } 
-            value="accepted" 
+            }
+            value="accepted"
           />
         </Tabs>
       </Box>
 
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-          {categories.map(category => (
+          {categories.map((category) => (
             <Chip
               key={category.id}
               label={category.label}
               onClick={() => setSelectedCategory(category.id)}
-              color={selectedCategory === category.id ? category.color as any : 'default'}
+              color={selectedCategory === category.id ? (category.color as any) : 'default'}
               variant={selectedCategory === category.id ? 'filled' : 'outlined'}
             />
           ))}
@@ -244,7 +246,7 @@ export const PatternViewer: React.FC = () => {
         <Alert severity="warning">No patterns found matching your criteria.</Alert>
       ) : (
         <Stack spacing={4}>
-          {filteredPatterns.map(pattern => (
+          {filteredPatterns.map((pattern) => (
             <Box key={pattern.name}>
               <PatternRenderer pattern={pattern} />
             </Box>

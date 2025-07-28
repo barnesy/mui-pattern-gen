@@ -64,16 +64,15 @@ export const SizeControl: React.FC<SizeControlProps> = ({
     }
   };
 
-  const displayValue = value.mode === 'custom' 
-    ? `${value.customValue}${value.unit || 'px'}`
-    : value.mode;
+  const displayValue =
+    value.mode === 'custom' ? `${value.customValue}${value.unit || 'px'}` : value.mode;
 
   return (
     <Box>
       <Typography variant="body2" gutterBottom>
         {label}: <strong>{displayValue}</strong>
       </Typography>
-      
+
       <Stack spacing={2}>
         <ToggleButtonGroup
           value={value.mode}

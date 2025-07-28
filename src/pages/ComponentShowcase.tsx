@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Tabs,
-  Tab,
-} from '@mui/material';
+import { Box, Typography, Tabs, Tab } from '@mui/material';
 import { InputShowcase } from '../components/showcase/InputShowcase';
 import { DataDisplayShowcase } from '../components/showcase/DataDisplayShowcase';
 import { FeedbackShowcase } from '../components/showcase/FeedbackShowcase';
@@ -50,11 +45,11 @@ export const ComponentShowcase: React.FC = () => {
       <Typography variant="body1" color="text.secondary" paragraph>
         Various variants, states, and configurations organized by category
       </Typography>
-      
+
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs 
-          value={value} 
-          onChange={handleChange} 
+        <Tabs
+          value={value}
+          onChange={handleChange}
           aria-label="component categories"
           variant="scrollable"
           scrollButtons="auto"
@@ -62,7 +57,7 @@ export const ComponentShowcase: React.FC = () => {
             '& .MuiTab-root': {
               minWidth: { xs: 'auto', sm: 90 },
               px: { xs: 2, sm: 3 },
-            }
+            },
           }}
         >
           <Tab label="Inputs" />
@@ -74,7 +69,7 @@ export const ComponentShowcase: React.FC = () => {
           <Tab label="Border Radius" />
         </Tabs>
       </Box>
-      
+
       <TabPanel value={value} index={0}>
         <InputShowcase />
       </TabPanel>

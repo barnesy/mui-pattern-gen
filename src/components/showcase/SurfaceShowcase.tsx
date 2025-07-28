@@ -19,19 +19,17 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material';
-import {
-  ExpandMore as ExpandMoreIcon,
-  Info as InfoIcon,
-} from '@mui/icons-material';
+import { ExpandMore as ExpandMoreIcon, Info as InfoIcon } from '@mui/icons-material';
 
 export const SurfaceShowcase: React.FC = () => {
   const [expanded, setExpanded] = React.useState<string | false>('panel1');
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const handleAccordionChange = (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
-    setExpanded(isExpanded ? panel : false);
-  };
+  const handleAccordionChange =
+    (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : false);
+    };
 
   const imageData = [
     { id: 1, img: 'https://placehold.co/400x300/1976d2/white?text=Image+1', title: 'Image 1' },
@@ -98,7 +96,7 @@ export const SurfaceShowcase: React.FC = () => {
                 </CardActions>
               </Card>
             </Grid>
-            
+
             <Grid item xs={12}>
               <Card>
                 <CardMedia
@@ -130,38 +128,47 @@ export const SurfaceShowcase: React.FC = () => {
               Accordion
             </Typography>
             <Box>
-              <Accordion expanded={expanded === 'panel1'} onChange={handleAccordionChange('panel1')}>
+              <Accordion
+                expanded={expanded === 'panel1'}
+                onChange={handleAccordionChange('panel1')}
+              >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography>Accordion 1</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Typography>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                    malesuada lacus ex, sit amet blandit leo lobortis eget.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada
+                    lacus ex, sit amet blandit leo lobortis eget.
                   </Typography>
                 </AccordionDetails>
               </Accordion>
-              
-              <Accordion expanded={expanded === 'panel2'} onChange={handleAccordionChange('panel2')}>
+
+              <Accordion
+                expanded={expanded === 'panel2'}
+                onChange={handleAccordionChange('panel2')}
+              >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography>Accordion 2</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Typography>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                    malesuada lacus ex, sit amet blandit leo lobortis eget.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada
+                    lacus ex, sit amet blandit leo lobortis eget.
                   </Typography>
                 </AccordionDetails>
               </Accordion>
-              
-              <Accordion expanded={expanded === 'panel3'} onChange={handleAccordionChange('panel3')}>
+
+              <Accordion
+                expanded={expanded === 'panel3'}
+                onChange={handleAccordionChange('panel3')}
+              >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography>Accordion 3</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Typography>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                    malesuada lacus ex, sit amet blandit leo lobortis eget.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada
+                    lacus ex, sit amet blandit leo lobortis eget.
                   </Typography>
                 </AccordionDetails>
               </Accordion>
@@ -174,10 +181,7 @@ export const SurfaceShowcase: React.FC = () => {
             <Typography variant="h6" gutterBottom>
               Image List
             </Typography>
-            <ImageList 
-              sx={{ width: '100%', height: { xs: 300, sm: 450 } }} 
-              cols={isMobile ? 2 : 3}
-            >
+            <ImageList sx={{ width: '100%', height: { xs: 300, sm: 450 } }} cols={isMobile ? 2 : 3}>
               {imageData.map((item) => (
                 <ImageListItem key={item.id}>
                   <img

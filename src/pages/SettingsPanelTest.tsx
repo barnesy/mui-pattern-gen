@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { Box, Typography, Paper, Divider, Alert, Stack, Chip } from '@mui/material';
 import { SettingsPanel } from '../components/patterns/SettingsPanel';
 import { PropControl } from '../components/patterns/PatternPropsPanel';
-import { labelValuePairControls, getSubComponentConfig } from '../components/AIDesignMode/subComponentConfigs';
+import {
+  labelValuePairControls,
+  getSubComponentConfig,
+} from '../components/AIDesignMode/subComponentConfigs';
 
 // Test configuration with various control types
 const testControls: PropControl[] = [
@@ -78,12 +81,12 @@ export const SettingsPanelTest: React.FC = () => {
 
   const handleBasicChange = (name: string, value: unknown) => {
     console.log('Basic change:', name, value);
-    setBasicValues(prev => ({ ...prev, [name]: value }));
+    setBasicValues((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleLabelValuePairChange = (name: string, value: unknown) => {
     console.log('LabelValuePair change:', name, value);
-    setLabelValuePairValues(prev => ({ ...prev, [name]: value }));
+    setLabelValuePairValues((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -91,7 +94,7 @@ export const SettingsPanelTest: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         SettingsPanel Test Page
       </Typography>
-      
+
       <Alert severity="info" sx={{ mb: 3 }}>
         This page tests the SettingsPanel component with various configurations
       </Alert>
@@ -104,20 +107,21 @@ export const SettingsPanelTest: React.FC = () => {
         <Typography variant="body2" color="text.secondary" gutterBottom>
           Testing all control types with a simple configuration
         </Typography>
-        
+
         <Box sx={{ mt: 2, mb: 2 }}>
           <Typography variant="subtitle2">Current Values:</Typography>
           <pre style={{ fontSize: '0.75rem', overflow: 'auto' }}>
             {JSON.stringify(basicValues, null, 2)}
           </pre>
         </Box>
-        
+
         <Divider sx={{ my: 2 }} />
-        
+
         <SettingsPanel
           controls={testControls}
           values={basicValues}
           onChange={handleBasicChange}
+          debug={true}
         />
       </Paper>
 
@@ -129,12 +133,12 @@ export const SettingsPanelTest: React.FC = () => {
         <Typography variant="body2" color="text.secondary" gutterBottom>
           Testing the exact configuration used for LabelValuePair sub-components
         </Typography>
-        
+
         <Box sx={{ mt: 2, mb: 2 }}>
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography variant="subtitle2">Config loaded:</Typography>
-            <Chip 
-              label={labelValuePairControls.length > 0 ? 'YES' : 'NO'} 
+            <Chip
+              label={labelValuePairControls.length > 0 ? 'YES' : 'NO'}
               color={labelValuePairControls.length > 0 ? 'success' : 'error'}
               size="small"
             />
@@ -143,16 +147,16 @@ export const SettingsPanelTest: React.FC = () => {
             </Typography>
           </Stack>
         </Box>
-        
+
         <Box sx={{ mt: 2, mb: 2 }}>
           <Typography variant="subtitle2">Current Values:</Typography>
           <pre style={{ fontSize: '0.75rem', overflow: 'auto' }}>
             {JSON.stringify(labelValuePairValues, null, 2)}
           </pre>
         </Box>
-        
+
         <Divider sx={{ my: 2 }} />
-        
+
         <SettingsPanel
           controls={labelValuePairControls}
           values={labelValuePairValues}
@@ -168,16 +172,16 @@ export const SettingsPanelTest: React.FC = () => {
         <Typography variant="body2" color="text.secondary" gutterBottom>
           Testing getSubComponentConfig function
         </Typography>
-        
+
         <Box sx={{ mt: 2 }}>
-          {['LabelValuePair', 'UnknownComponent'].map(componentType => {
+          {['LabelValuePair', 'UnknownComponent'].map((componentType) => {
             const config = getSubComponentConfig(componentType);
             return (
               <Box key={componentType} sx={{ mb: 2 }}>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <Typography variant="subtitle2">{componentType}:</Typography>
-                  <Chip 
-                    label={config ? `${config.length} controls` : 'No config'} 
+                  <Chip
+                    label={config ? `${config.length} controls` : 'No config'}
                     color={config ? 'success' : 'default'}
                     size="small"
                   />
@@ -196,15 +200,11 @@ export const SettingsPanelTest: React.FC = () => {
         <Typography variant="body2" color="text.secondary" gutterBottom>
           Testing SettingsPanel with no controls
         </Typography>
-        
+
         <Divider sx={{ my: 2 }} />
-        
-        <SettingsPanel
-          controls={[]}
-          values={emptyValues}
-          onChange={() => {}}
-        />
-        
+
+        <SettingsPanel controls={[]} values={emptyValues} onChange={() => {}} />
+
         <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
           Should show "No settings available" message
         </Typography>

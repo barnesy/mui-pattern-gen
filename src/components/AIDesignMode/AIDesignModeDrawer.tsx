@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -13,6 +13,8 @@ import {
   Switch,
   Breadcrumbs,
   Link,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -28,8 +30,15 @@ import { PatternInstance, PatternInstanceManager } from '../../services/PatternI
 import { SettingsPanel } from '../patterns/SettingsPanel';
 import { PatternPropsPanel, PropControl } from '../patterns/PatternPropsPanel';
 import { getSubComponentConfig } from './subComponentConfigs';
+import { usePropsStore } from '../../contexts/PropsStoreContext';
 
-export const AIDesignModeDrawer: React.FC = () => {
+interface AIDesignModeDrawerProps {
+  onClose?: () => void;
+}
+
+export const AIDesignModeDrawer: React.FC<AIDesignModeDrawerProps> = ({ onClose }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const {
     isEnabled,
     selectedPattern,
@@ -42,8 +51,9 @@ export const AIDesignModeDrawer: React.FC = () => {
     findPatternInstanceById,
   } = useAIDesignMode();
 
+  const propsStore = usePropsStore();
+
   const [patternConfig, setPatternConfig] = useState<PropControl[]>([]);
-  const [componentProps, setComponentProps] = useState<Record<string, unknown>>({});
   const [configLoading, setConfigLoading] = useState(false);
   const [copiedConfig, setCopiedConfig] = useState(false);
   const [updateAllInstances, setUpdateAllInstances] = useState(true);
@@ -53,7 +63,6 @@ export const AIDesignModeDrawer: React.FC = () => {
   useEffect(() => {
     if (!selectedPattern) {
       setPatternConfig([]);
-      setComponentProps({});
       setPatternInstances([]);
       return;
     }
@@ -62,33 +71,37 @@ export const AIDesignModeDrawer: React.FC = () => {
       // Handle sub-components
       if (selectedPattern.isSubComponent) {
         setConfigLoading(false);
-        
+
         // Try to get sub-component config
+        // For subcomponents, the category contains the componentType (e.g., "LabelValuePair")
         const subConfig = getSubComponentConfig(selectedPattern.category);
+
         if (subConfig) {
           setPatternConfig(subConfig);
-          
-          // Initialize props with defaults and merge with current props
+
+          // Initialize props with defaults
           const defaults: Record<string, unknown> = {};
           subConfig.forEach((control) => {
             if (control.defaultValue !== undefined) {
               defaults[control.name] = control.defaultValue;
             }
           });
-          setComponentProps({ ...defaults, ...selectedPattern.props });
+
+          // Props are now managed directly through PropsStore
         } else {
+          // If no config found for subcomponent, still show the props
           setPatternConfig([]);
-          setComponentProps(selectedPattern.props || {});
         }
-        
+
         return;
       }
-      
+
       setConfigLoading(true);
       try {
-        const configPath = selectedPattern.status === 'pending'
-          ? `../../patterns/pending/${selectedPattern.name}.config`
-          : `../../patterns/${selectedPattern.category}/${selectedPattern.name}.config`;
+        const configPath =
+          selectedPattern.status === 'pending'
+            ? `../../patterns/pending/${selectedPattern.name}.config`
+            : `../../patterns/${selectedPattern.category}/${selectedPattern.name}.config`;
 
         const configModule = await import(/* @vite-ignore */ configPath);
         const controlsKey = `${selectedPattern.name.charAt(0).toLowerCase() + selectedPattern.name.slice(1)}Controls`;
@@ -102,14 +115,13 @@ export const AIDesignModeDrawer: React.FC = () => {
             defaults[control.name] = control.defaultValue;
           }
         });
-        
-        // Merge with current pattern props
-        setComponentProps({ ...defaults, ...selectedPattern.props });
-        
+
+        // Props are now managed directly through PropsStore
+
         // Load all instances of this pattern
         const instances = getPatternInstances(selectedPattern.name);
         setPatternInstances(instances);
-        
+
         // Always update selected instance when pattern changes
         setSelectedInstanceId(selectedPattern.instanceId || null);
       } catch (error) {
@@ -121,60 +133,20 @@ export const AIDesignModeDrawer: React.FC = () => {
     };
 
     loadConfig();
-  }, [selectedPattern, getPatternInstances, setSelectedInstanceId]);
+  }, [selectedPattern, getPatternInstances, setSelectedInstanceId, propsStore]);
 
-  // Sync props when selected instance changes
-  useEffect(() => {
-    if (!selectedInstanceId || !selectedPattern) return;
-    
-    // Find the selected instance
-    const instance = patternInstances.find(inst => inst.id === selectedInstanceId);
-    if (instance) {
-      // Get the element and extract props
-      const element = instance.element; // Direct reference, not WeakRef
-      if (element) {
-        const propsAttr = element.getAttribute('data-pattern-props');
-        if (propsAttr) {
-          try {
-            const instanceProps = JSON.parse(propsAttr);
-            setComponentProps(prev => ({ ...prev, ...instanceProps }));
-          } catch (e) {
-            console.error('Failed to parse instance props:', e);
-          }
-        }
-      }
-    }
-  }, [selectedInstanceId, patternInstances, selectedPattern]);
-
-  // Handle prop changes
-  const handlePropChange = useCallback((name: string, value: unknown) => {
-    const newProps = { ...componentProps, [name]: value };
-    setComponentProps(newProps);
-    
-    // Update pattern instances
-    if (selectedPattern) {
-      if (selectedPattern.isSubComponent) {
-        // For sub-components, we need to update the parent pattern
-        // This is a temporary solution - ideally we'd update just the sub-component
-        console.warn('Sub-component prop updates not yet implemented');
-        // TODO: Implement sub-component prop updates through parent
-      } else {
-        if (updateAllInstances) {
-          updateAllPatternInstances(selectedPattern.name, newProps);
-        } else if (selectedInstanceId) {
-          updatePatternInstance(selectedInstanceId, newProps);
-        }
-      }
-    }
-  }, [componentProps, selectedPattern, selectedInstanceId, updateAllInstances, updatePatternInstance, updateAllPatternInstances]);
+  // Removed prop syncing - now handled directly in MemoizedPropsPanel
 
   // Handle configuration copy
   const handleCopyConfig = () => {
-    if (!selectedPattern) return;
+    if (!selectedPattern) {return;}
+
+    // Get current props from PropsStore
+    const currentProps = propsStore.getComponentProps(selectedPattern.instanceId) || {};
 
     const prompt = `Create a ${selectedPattern.name} component with the following configuration:
 
-${JSON.stringify(componentProps, null, 2)}
+${JSON.stringify(currentProps, null, 2)}
 
 Requirements:
 - Use Material-UI (MUI) v5 components
@@ -196,9 +168,116 @@ Requirements:
         defaults[control.name] = control.defaultValue;
       }
     });
-    setComponentProps(defaults);
-    handlePropChange('_reset', Date.now()); // Trigger update
+
+    // Update in PropsStore directly
+    if (selectedPattern && selectedPattern.instanceId) {
+      propsStore.updateProps(selectedPattern.instanceId, defaults);
+
+      if (!selectedPattern.isSubComponent && updateAllInstances) {
+        propsStore.updateAllByName(selectedPattern.name, defaults);
+      }
+    }
   };
+
+  // Memoized props panel that connects directly to PropsStore
+  const MemoizedPropsPanel = React.memo<{
+    instanceId: string;
+    controls: PropControl[];
+    isSubComponent: boolean;
+    patternName?: string;
+    updateAllInstances?: boolean;
+  }>(
+    ({ instanceId, controls, isSubComponent, patternName, updateAllInstances }) => {
+      const propsStoreRef = useRef(propsStore);
+      const updateAllRef = useRef(updateAllInstances);
+      const patternNameRef = useRef(patternName);
+
+      // Update refs when props change
+      useEffect(() => {
+        updateAllRef.current = updateAllInstances;
+        patternNameRef.current = patternName;
+      }, [updateAllInstances, patternName]);
+
+      // Store props in state but use deep comparison to prevent unnecessary updates
+      const [localProps, setLocalProps] = useState<Record<string, unknown>>(
+        () => propsStoreRef.current.getComponentProps(instanceId) || {}
+      );
+
+      // Use a ref to track the stringified props for comparison
+      const propsStringRef = useRef(JSON.stringify(localProps));
+
+      // Subscribe to props changes
+      useEffect(() => {
+        // Get initial props if instanceId changed
+        const initialProps = propsStoreRef.current.getComponentProps(instanceId) || {};
+        const initialPropsString = JSON.stringify(initialProps);
+        if (propsStringRef.current !== initialPropsString) {
+          propsStringRef.current = initialPropsString;
+          setLocalProps(initialProps);
+        }
+
+        const unsubscribe = propsStoreRef.current.subscribe(instanceId, (newProps) => {
+          const newPropsString = JSON.stringify(newProps);
+          // Only update state if props actually changed
+          if (propsStringRef.current !== newPropsString) {
+            propsStringRef.current = newPropsString;
+            setLocalProps(newProps);
+          }
+        });
+
+        return unsubscribe;
+      }, [instanceId]);
+
+      // Stable onChange callback - no dependencies that change
+      const handleChange = useCallback(
+        (name: string, value: unknown) => {
+          propsStoreRef.current.updateProps(instanceId, { [name]: value });
+
+          if (isSubComponent) {
+            // For sub-components, also dispatch the update event
+            const currentProps = propsStoreRef.current.getComponentProps(instanceId) || {};
+            const updatedProps = { ...currentProps, [name]: value };
+
+            const event = new CustomEvent('subcomponent-update-request', {
+              detail: {
+                instanceId,
+                props: updatedProps,
+              },
+              bubbles: true,
+            });
+            window.dispatchEvent(event);
+          } else {
+            // For patterns, handle update all instances
+            if (updateAllRef.current && patternNameRef.current) {
+              propsStoreRef.current.updateAllByName(patternNameRef.current, { [name]: value });
+            }
+          }
+        },
+        [instanceId, isSubComponent]
+      );
+
+      return isSubComponent ? (
+        <PatternPropsPanel
+          controls={controls}
+          values={localProps}
+          onChange={handleChange}
+          hideActions={true}
+        />
+      ) : (
+        <SettingsPanel controls={controls} values={localProps} onChange={handleChange} />
+      );
+    },
+    (prevProps, nextProps) => {
+      // Custom comparison to prevent unnecessary re-renders
+      return (
+        prevProps.instanceId === nextProps.instanceId &&
+        prevProps.controls === nextProps.controls &&
+        prevProps.isSubComponent === nextProps.isSubComponent &&
+        prevProps.patternName === nextProps.patternName &&
+        prevProps.updateAllInstances === nextProps.updateAllInstances
+      );
+    }
+  );
 
   // Render content based on AI mode state
   if (!isEnabled) {
@@ -214,16 +293,33 @@ Requirements:
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }} data-ai-ignore="true">
       <Toolbar /> {/* Spacer for app bar */}
-      
       {/* Header */}
-      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+      <Box
+        sx={{
+          p: isMobile ? 1.5 : 2,
+          borderBottom: 1,
+          borderColor: 'divider',
+          backgroundColor:
+            theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.6)' : 'rgba(250, 250, 250, 0.6)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+        }}
+      >
+        {isMobile && onClose && (
+          <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+            <Typography variant="h6">Pattern Inspector</Typography>
+            <IconButton onClick={onClose} size="small">
+              <CloseIcon />
+            </IconButton>
+          </Stack>
+        )}
         {selectedPattern ? (
           <>
             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-              <Stack direction="row" alignItems="center" spacing={1}>
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ flex: 1, minWidth: 0 }}>
                 {selectedPattern.isSubComponent ? (
                   <Box>
-                    <Breadcrumbs 
+                    <Breadcrumbs
                       separator={<NavigateNextIcon fontSize="small" />}
                       aria-label="component hierarchy"
                       sx={{ mb: 1 }}
@@ -238,19 +334,24 @@ Requirements:
                           const parentInstanceId = selectedPattern.parentInstanceId;
                           if (parentInstanceId) {
                             const parentInstance = findPatternInstanceById(parentInstanceId);
-                            if (parentInstance && parentInstance.element) {
-                              const patternName = parentInstance.element.getAttribute('data-pattern-name');
-                              const status = parentInstance.element.getAttribute('data-pattern-status') as 'pending' | 'accepted';
-                              const category = parentInstance.element.getAttribute('data-pattern-category') || '';
-                              const propsStr = parentInstance.element.getAttribute('data-pattern-props');
-                              
+                            if (parentInstance?.element) {
+                              const patternName =
+                                parentInstance.element.getAttribute('data-pattern-name');
+                              const status = parentInstance.element.getAttribute(
+                                'data-pattern-status'
+                              ) as 'pending' | 'accepted';
+                              const category =
+                                parentInstance.element.getAttribute('data-pattern-category') || '';
+                              const propsStr =
+                                parentInstance.element.getAttribute('data-pattern-props');
+
                               let props = {};
                               try {
                                 props = propsStr ? JSON.parse(propsStr) : {};
                               } catch (e) {
                                 console.error('Failed to parse pattern props:', e);
                               }
-                              
+
                               setSelectedPattern({
                                 name: patternName || '',
                                 status,
@@ -266,19 +367,17 @@ Requirements:
                         }}
                       >
                         {(() => {
-                          const parentInstance = findPatternInstanceById(selectedPattern.parentInstanceId || '');
-                          const parentName = parentInstance?.element.getAttribute('data-pattern-name');
+                          const parentInstance = findPatternInstanceById(
+                            selectedPattern.parentInstanceId || ''
+                          );
+                          const parentName =
+                            parentInstance?.element.getAttribute('data-pattern-name');
                           return parentName || 'Parent Component';
                         })()}
                       </Link>
                       <Typography color="text.primary">{selectedPattern.name}</Typography>
                     </Breadcrumbs>
-                    <Chip
-                      label="Sub-component"
-                      size="small"
-                      color="secondary"
-                      variant="outlined"
-                    />
+                    <Chip label="Sub-component" size="small" color="secondary" variant="outlined" />
                   </Box>
                 ) : (
                   <>
@@ -300,7 +399,6 @@ Requirements:
                 onClick={() => {
                   setSelectedPattern(null);
                   setSelectedInstanceId(null);
-                  setComponentProps({});
                   setPatternConfig([]);
                   setPatternInstances([]);
                 }}
@@ -308,30 +406,22 @@ Requirements:
                 <CloseIcon />
               </IconButton>
             </Stack>
-            
+
             <Stack direction="row" spacing={1} mb={2}>
-              <Chip 
-                label={selectedPattern.category} 
-                size="small" 
-                color="primary"
-              />
+              <Chip label={selectedPattern.category} size="small" color="primary" />
               {selectedPattern.hasConfig !== false && (
-                <Chip 
-                  label="Interactive" 
-                  size="small" 
-                  variant="outlined"
-                />
+                <Chip label="Interactive" size="small" variant="outlined" />
               )}
               {patternInstances.length > 1 && (
-                <Chip 
-                  icon={<LayersIcon />} 
-                  label={`${patternInstances.length} instances`} 
-                  size="small" 
+                <Chip
+                  icon={<LayersIcon />}
+                  label={`${patternInstances.length} instances`}
+                  size="small"
                   color="secondary"
                 />
               )}
             </Stack>
-            
+
             {/* Instance Selector */}
             {patternInstances.length > 1 && (
               <Stack spacing={2}>
@@ -361,7 +451,7 @@ Requirements:
                       {patternInstances.map((instance) => {
                         const isSelected = selectedInstanceId === instance.id;
                         const isClickedInstance = selectedPattern.instanceId === instance.id;
-                        
+
                         return (
                           <Chip
                             key={instance.id}
@@ -375,8 +465,8 @@ Requirements:
                               PatternInstanceManager.scrollToInstance(instance.id);
                             }}
                             data-ai-ignore="true"
-                            color={isSelected ? "primary" : "default"}
-                            variant={isSelected ? "filled" : "outlined"}
+                            color={isSelected ? 'primary' : 'default'}
+                            variant={isSelected ? 'filled' : 'outlined'}
                           />
                         );
                       })}
@@ -392,11 +482,26 @@ Requirements:
           </Typography>
         )}
       </Box>
-
       {/* Content */}
-      <Box sx={{ flex: 1, overflow: 'auto' }}>
+      <Box
+        sx={{
+          flex: 1,
+          overflow: 'auto',
+          overflowX: 'hidden',
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'transparent',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'divider',
+            borderRadius: '4px',
+          },
+        }}
+      >
         {!selectedPattern ? (
-          <Stack spacing={2} sx={{ p: 2, py: 4, textAlign: 'center' }}>
+          <Stack spacing={2} sx={{ p: isMobile ? 1.5 : 2, py: 4, textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
               Click on any pattern to inspect and modify its properties
             </Typography>
@@ -411,48 +516,64 @@ Requirements:
         ) : selectedPattern.isSubComponent && patternConfig.length === 0 ? (
           <Stack spacing={2} sx={{ p: 2 }}>
             <Alert severity="info">
-              <Typography variant="body2">
-                Sub-component properties
-              </Typography>
+              <Typography variant="body2">Sub-component properties</Typography>
             </Alert>
-            
+
             {/* Show sub-component props in a simple view */}
-            <Box sx={{ bgcolor: 'background.paper', p: 2, borderRadius: 1, border: 1, borderColor: 'divider' }}>
+            <Box
+              sx={{
+                bgcolor: 'background.paper',
+                p: 2,
+                borderRadius: 1,
+                border: 1,
+                borderColor: 'divider',
+              }}
+            >
               <Typography variant="subtitle2" gutterBottom>
                 Current Props:
               </Typography>
-              <pre style={{ 
-                margin: 0, 
-                fontSize: '0.75rem',
-                overflow: 'auto',
-                maxHeight: '300px'
-              }}>
-                {JSON.stringify(componentProps, null, 2)}
+              <pre
+                style={{
+                  margin: 0,
+                  fontSize: '0.75rem',
+                  overflow: 'auto',
+                  maxHeight: '300px',
+                }}
+              >
+                {JSON.stringify(
+                  propsStore.getComponentProps(selectedPattern.instanceId) || {},
+                  null,
+                  2
+                )}
               </pre>
             </Box>
-            
+
             <Typography variant="caption" color="text.secondary">
               No configuration available for this sub-component type.
             </Typography>
           </Stack>
         ) : patternConfig.length > 0 ? (
           <Stack spacing={3}>
-            {/* Use PatternPropsPanel for sub-components, SettingsPanel for regular patterns */}
+            {/* Use PatternPropsPanel for sub-components (shows all controls including content) */}
+            {/* Use SettingsPanel for patterns (shows only settings, not content) */}
             {selectedPattern.isSubComponent ? (
-              <PatternPropsPanel
+              <MemoizedPropsPanel
+                key={selectedPattern.instanceId}
+                instanceId={selectedPattern.instanceId}
                 controls={patternConfig}
-                values={componentProps}
-                onChange={handlePropChange}
-                onReset={handleReset}
+                isSubComponent={true}
               />
             ) : (
-              <SettingsPanel
+              <MemoizedPropsPanel
+                key={selectedPattern.instanceId}
+                instanceId={selectedPattern.instanceId}
                 controls={patternConfig}
-                values={componentProps}
-                onChange={handlePropChange}
+                isSubComponent={false}
+                patternName={selectedPattern.name}
+                updateAllInstances={updateAllInstances}
               />
             )}
-            
+
             {/* Action Buttons - only show for regular patterns */}
             {!selectedPattern.isSubComponent && (
               <Stack direction="row" spacing={1} sx={{ p: '20px' }}>
@@ -477,6 +598,7 @@ Requirements:
                 </Button>
               </Stack>
             )}
+          </Stack>
         ) : (
           <Alert severity="info">
             <Typography variant="body2">

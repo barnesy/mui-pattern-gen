@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  TextField,
-  InputAdornment,
-  IconButton,
-  Popover,
-  Stack,
-} from '@mui/material';
+import { Box, TextField, InputAdornment, IconButton, Popover, Stack } from '@mui/material';
 import { Palette as PaletteIcon } from '@mui/icons-material';
 
 interface ColorPickerProps {
@@ -83,15 +76,42 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 0.5 }}>
               {/* Material Design Colors */}
               {[
-                '#F44336', '#E91E63', '#9C27B0', '#673AB7',
-                '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4',
-                '#009688', '#4CAF50', '#8BC34A', '#CDDC39',
-                '#FFEB3B', '#FFC107', '#FF9800', '#FF5722',
-                '#795548', '#9E9E9E', '#607D8B', '#000000',
-                '#FFFFFF', '#F5F5F5', '#E0E0E0', '#BDBDBD',
-                '#9E9E9E', '#757575', '#616161', '#424242',
-                '#212121', '#4B3FFF', '#F86A0B', '#3AAB68',
-                '#ED4B48', '#DCE6F4', '#31414E', '#FAFAFA',
+                '#F44336',
+                '#E91E63',
+                '#9C27B0',
+                '#673AB7',
+                '#3F51B5',
+                '#2196F3',
+                '#03A9F4',
+                '#00BCD4',
+                '#009688',
+                '#4CAF50',
+                '#8BC34A',
+                '#CDDC39',
+                '#FFEB3B',
+                '#FFC107',
+                '#FF9800',
+                '#FF5722',
+                '#795548',
+                '#9E9E9E',
+                '#607D8B',
+                '#000000',
+                '#FFFFFF',
+                '#F5F5F5',
+                '#E0E0E0',
+                '#BDBDBD',
+                '#9E9E9E',
+                '#757575',
+                '#616161',
+                '#424242',
+                '#212121',
+                '#4B3FFF',
+                '#F86A0B',
+                '#3AAB68',
+                '#ED4B48',
+                '#DCE6F4',
+                '#31414E',
+                '#FAFAFA',
               ].map((color) => (
                 <Box
                   key={color}

@@ -26,19 +26,25 @@ export const BorderRadiusTest: React.FC = () => {
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Box>
-          <Typography variant="h6" gutterBottom>Button (base: {theme.shape.borderRadius}px)</Typography>
+          <Typography variant="h6" gutterBottom>
+            Button (base: {theme.shape.borderRadius}px)
+          </Typography>
           <Button variant="contained">Test Button</Button>
         </Box>
 
         <Box>
-          <Typography variant="h6" gutterBottom>Paper (2× base: {theme.shape.borderRadius * 2}px)</Typography>
+          <Typography variant="h6" gutterBottom>
+            Paper (2× base: {theme.shape.borderRadius * 2}px)
+          </Typography>
           <Paper sx={{ p: 2 }}>
             <Typography>Test Paper</Typography>
           </Paper>
         </Box>
 
         <Box>
-          <Typography variant="h6" gutterBottom>Card (3× base: {theme.shape.borderRadius * 3}px)</Typography>
+          <Typography variant="h6" gutterBottom>
+            Card (3× base: {theme.shape.borderRadius * 3}px)
+          </Typography>
           <Card>
             <CardContent>
               <Typography>Test Card</Typography>
@@ -47,17 +53,23 @@ export const BorderRadiusTest: React.FC = () => {
         </Box>
 
         <Box>
-          <Typography variant="h6" gutterBottom>TextField (base: {theme.shape.borderRadius}px)</Typography>
+          <Typography variant="h6" gutterBottom>
+            TextField (base: {theme.shape.borderRadius}px)
+          </Typography>
           <TextField label="Test Input" variant="outlined" />
         </Box>
 
         <Box>
-          <Typography variant="h6" gutterBottom>Chip (4× base: {theme.shape.borderRadius * 4}px)</Typography>
+          <Typography variant="h6" gutterBottom>
+            Chip (4× base: {theme.shape.borderRadius * 4}px)
+          </Typography>
           <Chip label="Test Chip" />
         </Box>
 
         <Box>
-          <Typography variant="h6" gutterBottom>Alert (2× base: {theme.shape.borderRadius * 2}px)</Typography>
+          <Typography variant="h6" gutterBottom>
+            Alert (2× base: {theme.shape.borderRadius * 2}px)
+          </Typography>
           <Alert severity="info">Test Alert</Alert>
         </Box>
 

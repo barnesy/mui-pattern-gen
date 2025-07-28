@@ -8,6 +8,7 @@ export const labelValuePairControls: PropControl[] = [
     label: 'Label',
     defaultValue: 'Label',
     group: 'Content',
+    isContent: true,
   },
   {
     name: 'value',
@@ -15,6 +16,7 @@ export const labelValuePairControls: PropControl[] = [
     label: 'Value',
     defaultValue: 'Value',
     group: 'Content',
+    isContent: true,
   },
   {
     name: 'variant',
@@ -62,6 +64,7 @@ export const labelValuePairControls: PropControl[] = [
     defaultValue: '',
     helperText: 'Additional help text shown below the value',
     group: 'Content',
+    isContent: true,
   },
   {
     name: 'showTrend',
@@ -89,6 +92,7 @@ export const labelValuePairControls: PropControl[] = [
     defaultValue: '+5%',
     helperText: 'e.g., +5%, -10%, etc.',
     group: 'Features',
+    isContent: true,
   },
 ];
 

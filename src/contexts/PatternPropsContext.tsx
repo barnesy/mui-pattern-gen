@@ -37,16 +37,15 @@ export const PatternPropsProvider: React.FC<PatternPropsProviderProps> = ({
   patternName,
   updateProp,
 }) => {
-  const value = React.useMemo(() => ({
-    props,
-    instanceId,
-    patternName,
-    updateProp,
-  }), [props, instanceId, patternName, updateProp]);
-
-  return (
-    <PatternPropsContext.Provider value={value}>
-      {children}
-    </PatternPropsContext.Provider>
+  const value = React.useMemo(
+    () => ({
+      props,
+      instanceId,
+      patternName,
+      updateProp,
+    }),
+    [props, instanceId, patternName, updateProp]
   );
+
+  return <PatternPropsContext.Provider value={value}>{children}</PatternPropsContext.Provider>;
 };

@@ -42,24 +42,30 @@ export const SpacingControl: React.FC<SpacingControlProps> = ({
 }) => {
   const theme = useTheme();
   const [linkedSides, setLinkedSides] = useState<'all' | 'none'>('none');
-  
-  const handleSideChange = useCallback((side: keyof SpacingValue, newValue: number) => {
-    if (linkedSides === 'all') {
-      onChange({
-        top: newValue,
-        right: newValue,
-        bottom: newValue,
-        left: newValue,
-      });
-    } else {
-      onChange({
-        ...value,
-        [side]: newValue,
-      });
-    }
-  }, [value, onChange, linkedSides]);
 
-  const handleLinkedChange = (_: React.MouseEvent<HTMLElement>, newValue: 'all' | 'none' | null) => {
+  const handleSideChange = useCallback(
+    (side: keyof SpacingValue, newValue: number) => {
+      if (linkedSides === 'all') {
+        onChange({
+          top: newValue,
+          right: newValue,
+          bottom: newValue,
+          left: newValue,
+        });
+      } else {
+        onChange({
+          ...value,
+          [side]: newValue,
+        });
+      }
+    },
+    [value, onChange, linkedSides]
+  );
+
+  const handleLinkedChange = (
+    _: React.MouseEvent<HTMLElement>,
+    newValue: 'all' | 'none' | null
+  ) => {
     if (newValue !== null) {
       setLinkedSides(newValue);
       if (newValue === 'all') {
@@ -80,12 +86,7 @@ export const SpacingControl: React.FC<SpacingControlProps> = ({
     <Box>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
         <Typography variant="body2">{label}</Typography>
-        <ToggleButtonGroup
-          value={linkedSides}
-          exclusive
-          onChange={handleLinkedChange}
-          size="small"
-        >
+        <ToggleButtonGroup value={linkedSides} exclusive onChange={handleLinkedChange} size="small">
           <ToggleButton value="all" sx={{ px: 1, py: 0.5 }}>
             <Tooltip title="Link all sides">
               <AllIcon fontSize="small" />
@@ -202,7 +203,9 @@ export const SpacingControl: React.FC<SpacingControlProps> = ({
             <Stack direction="row" alignItems="center" spacing={0.5}>
               {side === 'top' && <TopIcon fontSize="small" sx={{ color: 'text.secondary' }} />}
               {side === 'right' && <RightIcon fontSize="small" sx={{ color: 'text.secondary' }} />}
-              {side === 'bottom' && <BottomIcon fontSize="small" sx={{ color: 'text.secondary' }} />}
+              {side === 'bottom' && (
+                <BottomIcon fontSize="small" sx={{ color: 'text.secondary' }} />
+              )}
               {side === 'left' && <LeftIcon fontSize="small" sx={{ color: 'text.secondary' }} />}
               <Typography variant="caption" color="text.secondary">
                 {side.charAt(0).toUpperCase()}

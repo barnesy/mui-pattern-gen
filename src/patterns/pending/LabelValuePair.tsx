@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Stack,
-  Chip,
-  Tooltip,
-  Skeleton,
-} from '@mui/material';
+import { Box, Typography, Stack, Chip, Tooltip, Skeleton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import {
   Info as InfoIcon,
@@ -23,7 +16,15 @@ export interface LabelValuePairProps {
   variant?: 'default' | 'inline' | 'stacked' | 'minimal';
   size?: 'small' | 'medium' | 'large';
   labelColor?: 'primary' | 'secondary' | 'text.primary' | 'text.secondary' | 'text.disabled';
-  valueColor?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'text.primary' | 'text.secondary';
+  valueColor?:
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'error'
+    | 'warning'
+    | 'info'
+    | 'text.primary'
+    | 'text.secondary';
   valueWeight?: 'normal' | 'medium' | 'bold';
   helpText?: string;
   trend?: 'up' | 'down' | 'flat';
@@ -44,32 +45,33 @@ export interface LabelValuePairProps {
   valueVariant?: TypographyVariant;
 }
 
-export const LabelValuePair: React.FC<LabelValuePairProps> = ({
-  label = 'Label',
-  value = 'Value',
-  variant = 'default',
-  size = 'medium',
-  labelColor = 'text.secondary',
-  valueColor = 'text.primary',
-  valueWeight = 'medium',
-  helpText,
-  trend,
-  trendValue,
-  loading = false,
-  chip = false,
-  chipColor = 'default',
-  icon,
-  align = 'left',
-  spacing = 0.5,
-  showLabel = true,
-  showValue = true,
-  showTrend = true,
-  showHelpIcon = true,
-  padding,
-  margin,
-  labelVariant = 'body2',
-  valueVariant = 'body1',
-}) => {
+const LabelValuePairComponent: React.FC<LabelValuePairProps> = (props) => {
+  const {
+    label = 'Label',
+    value = 'Value',
+    variant = 'default',
+    size = 'medium',
+    labelColor = 'text.secondary',
+    valueColor = 'text.primary',
+    valueWeight = 'medium',
+    helpText,
+    trend,
+    trendValue,
+    loading = false,
+    chip = false,
+    chipColor = 'default',
+    icon,
+    align = 'left',
+    spacing = 0.5,
+    showLabel = true,
+    showValue = true,
+    showTrend = true,
+    showHelpIcon = true,
+    padding,
+    margin,
+    labelVariant = 'body2',
+    valueVariant = 'body1',
+  } = props;
   const theme = useTheme();
 
   const sizeMap = {
@@ -96,16 +98,19 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
   const currentSize = sizeMap[size];
 
   const getTrendIcon = () => {
-    if (!trend) return null;
-    const iconProps = { 
+    if (!trend) {return null;}
+    const iconProps = {
       fontSize: size === 'small' ? 'small' : size === 'large' ? 'medium' : 'small',
-      sx: { 
-        color: trend === 'up' ? theme.palette.success.main : 
-               trend === 'down' ? theme.palette.error.main : 
-               theme.palette.text.secondary
-      } 
+      sx: {
+        color:
+          trend === 'up'
+            ? theme.palette.success.main
+            : trend === 'down'
+              ? theme.palette.error.main
+              : theme.palette.text.secondary,
+      },
     } as const;
-    
+
     switch (trend) {
       case 'up':
         return <TrendingUpIcon {...iconProps} />;
@@ -152,15 +157,9 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
     const labelContent = (
       <Stack direction="row" alignItems="center" spacing={0.5}>
         {icon && (
-          <Box sx={{ color: labelColor, display: 'flex', alignItems: 'center' }}>
-            {icon}
-          </Box>
+          <Box sx={{ color: labelColor, display: 'flex', alignItems: 'center' }}>{icon}</Box>
         )}
-        <Typography
-          variant={labelVariant}
-          color={labelColor}
-          component="span"
-        >
+        <Typography variant={labelVariant} color={labelColor} component="span">
           {label}
         </Typography>
         {helpText && showHelpIcon && (
@@ -179,7 +178,7 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
   };
 
   const renderTrend = () => {
-    if (!trend || !showTrend || loading) return null;
+    if (!trend || !showTrend || loading) {return null;}
 
     return (
       <Stack direction="row" alignItems="center" spacing={0.5}>
@@ -188,9 +187,7 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
           <Typography
             variant="caption"
             color={
-              trend === 'up' ? 'success.main' : 
-              trend === 'down' ? 'error.main' : 
-              'text.secondary'
+              trend === 'up' ? 'success.main' : trend === 'down' ? 'error.main' : 'text.secondary'
             }
           >
             {trendValue}
@@ -205,14 +202,18 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
     // Inline variant
     if (variant === 'inline') {
       return (
-        <Stack 
-          direction="row" 
-          alignItems="center" 
+        <Stack
+          direction="row"
+          alignItems="center"
           spacing={spacing}
-          justifyContent={align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'}
+          justifyContent={
+            align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'
+          }
         >
           {showLabel && renderLabel()}
-          <Typography variant={labelVariant} color="text.secondary">:</Typography>
+          <Typography variant={labelVariant} color="text.secondary">
+            :
+          </Typography>
           {showValue && renderValue()}
           {showTrend && renderTrend()}
         </Stack>
@@ -222,11 +223,13 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
     // Minimal variant
     if (variant === 'minimal') {
       return (
-        <Stack 
-          direction="row" 
-          alignItems="baseline" 
+        <Stack
+          direction="row"
+          alignItems="baseline"
           spacing={spacing}
-          justifyContent={align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'}
+          justifyContent={
+            align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'
+          }
         >
           {showValue && renderValue()}
           {showLabel && (
@@ -242,10 +245,7 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
     // Stacked variant
     if (variant === 'stacked') {
       return (
-        <Stack 
-          spacing={spacing}
-          alignItems={align}
-        >
+        <Stack spacing={spacing} alignItems={align}>
           {showLabel && renderLabel()}
           <Stack direction="row" alignItems="center" spacing={1}>
             {showValue && renderValue()}
@@ -281,3 +281,34 @@ export const LabelValuePair: React.FC<LabelValuePairProps> = ({
     </Box>
   );
 };
+
+// Memoize the component to prevent unnecessary re-renders
+export const LabelValuePair = React.memo(LabelValuePairComponent, (prevProps, nextProps) => {
+  // Custom comparison function - only re-render if specific props change
+  return (
+    prevProps.label === nextProps.label &&
+    prevProps.value === nextProps.value &&
+    prevProps.variant === nextProps.variant &&
+    prevProps.size === nextProps.size &&
+    prevProps.labelColor === nextProps.labelColor &&
+    prevProps.valueColor === nextProps.valueColor &&
+    prevProps.valueWeight === nextProps.valueWeight &&
+    prevProps.helpText === nextProps.helpText &&
+    prevProps.trend === nextProps.trend &&
+    prevProps.trendValue === nextProps.trendValue &&
+    prevProps.loading === nextProps.loading &&
+    prevProps.chip === nextProps.chip &&
+    prevProps.chipColor === nextProps.chipColor &&
+    prevProps.icon === nextProps.icon &&
+    prevProps.align === nextProps.align &&
+    prevProps.spacing === nextProps.spacing &&
+    prevProps.showLabel === nextProps.showLabel &&
+    prevProps.showValue === nextProps.showValue &&
+    prevProps.showTrend === nextProps.showTrend &&
+    prevProps.showHelpIcon === nextProps.showHelpIcon &&
+    JSON.stringify(prevProps.padding) === JSON.stringify(nextProps.padding) &&
+    JSON.stringify(prevProps.margin) === JSON.stringify(nextProps.margin) &&
+    prevProps.labelVariant === nextProps.labelVariant &&
+    prevProps.valueVariant === nextProps.valueVariant
+  );
+});

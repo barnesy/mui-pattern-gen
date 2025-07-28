@@ -12,9 +12,22 @@ import { ThemeEditor } from './pages/ThemeEditor';
 import { PatternGenerator } from './pages/PatternGenerator';
 import { PatternViewer } from './pages/PatternViewer';
 import { DashboardExample } from './pages/DashboardExample';
+import GovProcurementDashboard from './pages/GovProcurementDashboard';
+import SubComponentTest from './pages/SubComponentTest';
 import { SubComponentDebug } from './pages/SubComponentDebug';
 import { SimpleSubComponentTest } from './pages/SimpleSubComponentTest';
 import { SettingsPanelTest } from './pages/SettingsPanelTest';
+import TestSubComponents from './pages/TestSubComponents';
+import SubComponentUpdateTest from './pages/SubComponentUpdateTest';
+import SimpleSubComponentDebug from './pages/SimpleSubComponentDebug';
+import { SchemaDemo } from './pages/SchemaDemo';
+import { DesignSystemDemo } from './pages/DesignSystemDemo';
+import { DesignSystemTest } from './pages/DesignSystemTest';
+import { PureDesignSystem } from './pages/PureDesignSystem';
+import { EnhancedDesignSystem } from './pages/EnhancedDesignSystem';
+import { DesignWithPatterns } from './pages/DesignWithPatterns';
+import { NestedDesignSystem } from './pages/NestedDesignSystem';
+import { DragDropDesignSystem } from './pages/DragDropDesignSystem';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { theme as baseTheme } from './theme/theme';
 import { darkPalette } from './theme';
@@ -81,10 +94,12 @@ function AppWithDensity() {
 
   const toggleDensity = () => {
     setDensity((prevDensity) => {
-      const newDensity = 
-        prevDensity === 'comfortable' ? 'compact' : 
-        prevDensity === 'compact' ? 'spacious' : 
-        'comfortable';
+      const newDensity =
+        prevDensity === 'comfortable'
+          ? 'compact'
+          : prevDensity === 'compact'
+            ? 'spacious'
+            : 'comfortable';
       localStorage.setItem('mui-pattern-gen-density', newDensity);
       return newDensity;
     });
@@ -113,8 +128,8 @@ function AppWithDensity() {
           <Route
             path="/"
             element={
-              <ResponsiveLayout 
-                toggleColorMode={toggleColorMode} 
+              <ResponsiveLayout
+                toggleColorMode={toggleColorMode}
                 isDarkMode={mode === 'dark'}
                 toggleDensity={toggleDensity}
                 density={density}
@@ -129,9 +144,22 @@ function AppWithDensity() {
             <Route path="pattern-generator" element={<PatternGenerator />} />
             <Route path="pattern-studio" element={<PatternGenerator />} />
             <Route path="dashboard-example" element={<DashboardExample />} />
+            <Route path="gov-procurement" element={<GovProcurementDashboard />} />
+            <Route path="subcomponent-test" element={<SubComponentTest />} />
             <Route path="debug/subcomponents" element={<SubComponentDebug />} />
             <Route path="debug/simple" element={<SimpleSubComponentTest />} />
             <Route path="debug/settings" element={<SettingsPanelTest />} />
+            <Route path="test-subcomponents" element={<TestSubComponents />} />
+            <Route path="subcomponent-update-test" element={<SubComponentUpdateTest />} />
+            <Route path="simple-debug" element={<SimpleSubComponentDebug />} />
+            <Route path="schema-demo" element={<SchemaDemo />} />
+            <Route path="design-system" element={<DesignSystemDemo />} />
+            <Route path="design-test" element={<DesignSystemTest />} />
+            <Route path="pure-design" element={<PureDesignSystem />} />
+            <Route path="enhanced-design" element={<EnhancedDesignSystem />} />
+            <Route path="design-patterns" element={<DesignWithPatterns />} />
+            <Route path="nested-design" element={<NestedDesignSystem />} />
+            <Route path="drag-drop-design" element={<DragDropDesignSystem />} />
           </Route>
         </Routes>
       </BrowserRouter>

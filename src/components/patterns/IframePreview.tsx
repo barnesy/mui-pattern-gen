@@ -20,7 +20,7 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
   onLoad,
   isFullscreen = false,
   componentPath,
-  density = 'comfortable'
+  density = 'comfortable',
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,7 +30,7 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
   // Generate iframe URL with component name and path
   const params = new URLSearchParams({
     component: componentName,
-    theme: theme
+    theme: theme,
   });
   if (componentPath) {
     params.append('path', componentPath);
@@ -56,40 +56,51 @@ export const IframePreview: React.FC<IframePreviewProps> = ({
   // Send props to iframe when ready
   useEffect(() => {
     if (iframeReady && iframeRef.current) {
-      iframeRef.current.contentWindow?.postMessage({
-        type: 'UPDATE_PROPS',
-        props: componentProps
-      }, '*');
+      iframeRef.current.contentWindow?.postMessage(
+        {
+          type: 'UPDATE_PROPS',
+          props: componentProps,
+        },
+        '*'
+      );
     }
   }, [componentProps, iframeReady]);
 
   // Send theme updates
   useEffect(() => {
     if (iframeReady && iframeRef.current) {
-      iframeRef.current.contentWindow?.postMessage({
-        type: 'UPDATE_THEME',
-        theme
-      }, '*');
+      iframeRef.current.contentWindow?.postMessage(
+        {
+          type: 'UPDATE_THEME',
+          theme,
+        },
+        '*'
+      );
     }
   }, [theme, iframeReady]);
 
   // Send density updates
   useEffect(() => {
     if (iframeReady && iframeRef.current) {
-      iframeRef.current.contentWindow?.postMessage({
-        type: 'UPDATE_DENSITY',
-        density
-      }, '*');
+      iframeRef.current.contentWindow?.postMessage(
+        {
+          type: 'UPDATE_DENSITY',
+          density,
+        },
+        '*'
+      );
     }
   }, [density, iframeReady]);
 
   return (
-    <Box sx={{ 
-      position: 'relative', 
-      width, 
-      height: isFullscreen ? '100vh' : 'auto',
-      minHeight: isFullscreen ? '100vh' : iframeHeight 
-    }}>
+    <Box
+      sx={{
+        position: 'relative',
+        width,
+        height: isFullscreen ? '100vh' : 'auto',
+        minHeight: isFullscreen ? '100vh' : iframeHeight,
+      }}
+    >
       {isLoading && (
         <Box
           sx={{

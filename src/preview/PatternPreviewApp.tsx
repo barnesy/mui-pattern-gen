@@ -34,8 +34,8 @@ function PatternPreviewApp() {
   const params = new URLSearchParams(window.location.search);
   const componentName = params.get('component');
   const componentPath = params.get('path');
-  const initialTheme = params.get('theme') as 'light' | 'dark' || 'light';
-  
+  const initialTheme = (params.get('theme') as 'light' | 'dark') || 'light';
+
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>(initialTheme);
   const [density, setDensity] = useState<'comfortable' | 'compact' | 'spacious'>('comfortable');
 
@@ -53,9 +53,12 @@ function PatternPreviewApp() {
           MuiButton: {
             styleOverrides: {
               root: {
-                padding: density === 'compact' ? '4px 12px' : 
-                        density === 'spacious' ? '8px 20px' : 
-                        '6px 16px',
+                padding:
+                  density === 'compact'
+                    ? '4px 12px'
+                    : density === 'spacious'
+                      ? '8px 20px'
+                      : '6px 16px',
               },
             },
           },
@@ -92,12 +95,12 @@ function PatternPreviewApp() {
 
   // Load component
   useEffect(() => {
-    if (!componentName) return;
+    if (!componentName) {return;}
 
     const loadComponent = async () => {
       try {
         let module;
-        
+
         if (componentPath) {
           // Try the provided path
           try {
@@ -111,23 +114,24 @@ function PatternPreviewApp() {
           // Default to pending directory
           module = await import(`../patterns/pending/${componentName}.tsx`);
         }
-        
+
         const Component = module[componentName] || module.default;
-        
+
         // Wrap component with pattern wrapper for AI Design Mode
         const status = componentPath?.includes('/pending/') ? 'pending' : 'accepted';
-        const category = componentPath?.includes('/pending/') ? 'pending' : 
-                       componentPath?.match(/\/patterns\/([^/]+)\//)?.[1] || 'unknown';
-        
+        const category = componentPath?.includes('/pending/')
+          ? 'pending'
+          : componentPath?.match(/\/patterns\/([^/]+)\//)?.[1] || 'unknown';
+
         const WrappedComponent = withPatternWrapper(Component, {
           patternName: componentName,
           status,
           category,
         });
-        
+
         setComponent(() => WrappedComponent);
         setError(null);
-        
+
         // Notify parent that preview is ready
         window.parent.postMessage({ type: 'PREVIEW_READY' }, '*');
       } catch (err) {
@@ -165,7 +169,7 @@ function PatternPreviewApp() {
 
     window.addEventListener('message', handleMessage);
     window.addEventListener('pattern-props-update', handlePatternUpdate as EventListener);
-    
+
     return () => {
       window.removeEventListener('message', handleMessage);
       window.removeEventListener('pattern-props-update', handlePatternUpdate as EventListener);
@@ -177,18 +181,18 @@ function PatternPreviewApp() {
     const reportHeight = () => {
       // Try multiple methods to get the most accurate height
       const heights = [];
-      
+
       if (contentRef.current) {
         heights.push(contentRef.current.getBoundingClientRect().height);
         heights.push(contentRef.current.offsetHeight);
       }
-      
+
       // Also check document body height
       heights.push(document.body.scrollHeight);
       heights.push(document.body.offsetHeight);
       heights.push(document.documentElement.scrollHeight);
       heights.push(document.documentElement.offsetHeight);
-      
+
       // Use the maximum height found
       const height = Math.ceil(Math.max(...heights));
       window.parent.postMessage({ type: 'CONTENT_HEIGHT', height }, '*');
@@ -201,7 +205,7 @@ function PatternPreviewApp() {
     const resizeObserver = new ResizeObserver(() => {
       requestAnimationFrame(reportHeight);
     });
-    
+
     if (contentRef.current) {
       resizeObserver.observe(contentRef.current);
     }
@@ -217,18 +221,12 @@ function PatternPreviewApp() {
   }, [props, themeMode, component, density]);
 
   if (error) {
-    return (
-      <Box sx={{ p: 4, textAlign: 'center', color: 'error.main' }}>
-        {error}
-      </Box>
-    );
+    return <Box sx={{ p: 4, textAlign: 'center', color: 'error.main' }}>{error}</Box>;
   }
 
   if (!component) {
     return (
-      <Box sx={{ p: 4, textAlign: 'center', color: 'text.secondary' }}>
-        Loading preview...
-      </Box>
+      <Box sx={{ p: 4, textAlign: 'center', color: 'text.secondary' }}>Loading preview...</Box>
     );
   }
 

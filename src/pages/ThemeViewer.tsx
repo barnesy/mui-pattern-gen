@@ -221,7 +221,7 @@ export const ThemeViewer: React.FC = () => {
                 </TableHead>
                 <TableBody>
                   {Object.entries(theme.typography).map(([variant, styles]) => {
-                    if (typeof styles !== 'object' || !('fontSize' in styles)) return null;
+                    if (typeof styles !== 'object' || !('fontSize' in styles)) {return null;}
                     return (
                       <TableRow key={variant}>
                         <TableCell>{variant}</TableCell>
@@ -230,9 +230,7 @@ export const ThemeViewer: React.FC = () => {
                         <TableCell>{styles.lineHeight}</TableCell>
                         <TableCell>{styles.letterSpacing}</TableCell>
                         <TableCell>
-                          <Typography variant={variant as any}>
-                            The quick brown fox
-                          </Typography>
+                          <Typography variant={variant as any}>The quick brown fox</Typography>
                         </TableCell>
                       </TableRow>
                     );
@@ -272,9 +270,7 @@ export const ThemeViewer: React.FC = () => {
                   >
                     {value}
                   </Box>
-                  <Typography variant="caption">
-                    {theme.spacing(value)}px
-                  </Typography>
+                  <Typography variant="caption">{theme.spacing(value)}px</Typography>
                 </Box>
               ))}
             </Box>
@@ -368,9 +364,7 @@ export const ThemeViewer: React.FC = () => {
                   borderRadius: `${theme.shape.borderRadius}px`,
                 }}
               />
-              <Typography>
-                Default: {theme.shape.borderRadius}px
-              </Typography>
+              <Typography>Default: {theme.shape.borderRadius}px</Typography>
             </Box>
           </Paper>
         </Grid>

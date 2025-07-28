@@ -38,9 +38,10 @@ export const components: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({
         borderRadius: theme.shape.borderRadius,
-        boxShadow: theme.palette.mode === 'light'
-          ? '0 2px 8px rgba(0,0,0,0.1)'
-          : '0 2px 8px rgba(0,0,0,0.3)',
+        boxShadow:
+          theme.palette.mode === 'light'
+            ? '0 2px 8px rgba(0,0,0,0.1)'
+            : '0 2px 8px rgba(0,0,0,0.3)',
       }),
     },
   },
@@ -50,19 +51,22 @@ export const components: Components<Theme> = {
         borderRadius: theme.shape.borderRadius,
       }),
       elevation1: ({ theme }) => ({
-        boxShadow: theme.palette.mode === 'light' 
-          ? '0 2px 4px rgba(0,0,0,0.05)' 
-          : '0 2px 4px rgba(0,0,0,0.2)',
+        boxShadow:
+          theme.palette.mode === 'light'
+            ? '0 2px 4px rgba(0,0,0,0.05)'
+            : '0 2px 4px rgba(0,0,0,0.2)',
       }),
       elevation2: ({ theme }) => ({
-        boxShadow: theme.palette.mode === 'light'
-          ? '0 4px 8px rgba(0,0,0,0.08)'
-          : '0 4px 8px rgba(0,0,0,0.3)',
+        boxShadow:
+          theme.palette.mode === 'light'
+            ? '0 4px 8px rgba(0,0,0,0.08)'
+            : '0 4px 8px rgba(0,0,0,0.3)',
       }),
       elevation3: ({ theme }) => ({
-        boxShadow: theme.palette.mode === 'light'
-          ? '0 8px 16px rgba(0,0,0,0.1)'
-          : '0 8px 16px rgba(0,0,0,0.4)',
+        boxShadow:
+          theme.palette.mode === 'light'
+            ? '0 8px 16px rgba(0,0,0,0.1)'
+            : '0 8px 16px rgba(0,0,0,0.4)',
       }),
     },
   },

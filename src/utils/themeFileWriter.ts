@@ -4,6 +4,7 @@
 
 import { PaletteOptions } from '@mui/material/styles';
 import { TypographyOptions } from '@mui/material/styles/createTypography';
+import { logger } from '../services/logger';
 
 export interface ThemeFiles {
   palette: string;
@@ -95,24 +96,20 @@ export const theme = createTheme({
 
 // Helper function to display generated files in console for manual copying
 // Note: This function is for development/debugging purposes only
-export const logThemeFiles = (files: ThemeFiles) => {
-  console.log('=== COPY THESE FILES TO YOUR THEME DIRECTORY ===\n');
-  
-  console.log('=== src/theme/palette.ts ===');
-  console.log(files.palette);
-  console.log('\n');
-  
-  console.log('=== src/theme/darkPalette.ts ===');
-  console.log(files.darkPalette);
-  console.log('\n');
-  
-  console.log('=== src/theme/typography.ts ===');
-  console.log(files.typography);
-  console.log('\n');
-  
-  console.log('=== src/theme/theme.ts ===');
-  console.log(files.theme);
-  console.log('\n');
-  
-  console.log('=== END OF FILES ===');
+export const logThemeFiles = (files: ThemeFiles): void => {
+  logger.info('=== COPY THESE FILES TO YOUR THEME DIRECTORY ===', 'ThemeFileWriter');
+
+  logger.info('=== src/theme/palette.ts ===', 'ThemeFileWriter');
+  logger.info(files.palette, 'ThemeFileWriter');
+
+  logger.info('=== src/theme/darkPalette.ts ===', 'ThemeFileWriter');
+  logger.info(files.darkPalette, 'ThemeFileWriter');
+
+  logger.info('=== src/theme/typography.ts ===', 'ThemeFileWriter');
+  logger.info(files.typography, 'ThemeFileWriter');
+
+  logger.info('=== src/theme/theme.ts ===', 'ThemeFileWriter');
+  logger.info(files.theme, 'ThemeFileWriter');
+
+  logger.info('=== END OF FILES ===', 'ThemeFileWriter');
 };

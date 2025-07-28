@@ -17,12 +17,12 @@ export const defaultVariantDemoMappings: VariantDemoMapping[] = [
   {
     pattern: 'DataDisplayCard',
     variantData: {
-      stats: 'revenue',      // Stats variant shows revenue data
-      list: 'users',         // List variant shows user data
-      table: 'sales',        // Table variant shows sales data
-      workflow: 'workflow',  // Workflow variant shows workflow data
-      mixed: 'revenue'       // Mixed variant shows revenue data
-    }
+      stats: 'revenue', // Stats variant shows revenue data
+      list: 'users', // List variant shows user data
+      table: 'sales', // Table variant shows sales data
+      workflow: 'workflow', // Workflow variant shows workflow data
+      mixed: 'revenue', // Mixed variant shows revenue data
+    },
   },
   {
     pattern: 'LabelValuePair',
@@ -30,8 +30,8 @@ export const defaultVariantDemoMappings: VariantDemoMapping[] = [
       default: 'metric',
       compact: 'simple',
       minimal: 'text',
-      detailed: 'full'
-    }
+      detailed: 'full',
+    },
   },
   {
     pattern: 'PageHeader',
@@ -39,24 +39,19 @@ export const defaultVariantDemoMappings: VariantDemoMapping[] = [
       default: 'standard',
       compact: 'simple',
       minimal: 'basic',
-      detailed: 'full'
-    }
-  }
+      detailed: 'full',
+    },
+  },
 ];
 
 /**
  * Get demo data type for a specific pattern and variant
  */
-export function getDemoDataForVariant(
-  patternName: string,
-  variant: string
-): string | undefined {
-  const mapping = defaultVariantDemoMappings.find(
-    m => m.pattern === patternName
-  );
-  
-  if (!mapping) return undefined;
-  
+export function getDemoDataForVariant(patternName: string, variant: string): string | undefined {
+  const mapping = defaultVariantDemoMappings.find((m) => m.pattern === patternName);
+
+  if (!mapping) {return undefined;}
+
   return mapping.variantData[variant];
 }
 
@@ -64,18 +59,16 @@ export function getDemoDataForVariant(
  * Check if a pattern has variant demo mappings
  */
 export function hasVariantDemoMapping(patternName: string): boolean {
-  return defaultVariantDemoMappings.some(m => m.pattern === patternName);
+  return defaultVariantDemoMappings.some((m) => m.pattern === patternName);
 }
 
 /**
  * Get all demo data types for a pattern
  */
 export function getAllDemoDataTypes(patternName: string): string[] {
-  const mapping = defaultVariantDemoMappings.find(
-    m => m.pattern === patternName
-  );
-  
-  if (!mapping) return [];
-  
+  const mapping = defaultVariantDemoMappings.find((m) => m.pattern === patternName);
+
+  if (!mapping) {return [];}
+
   return [...new Set(Object.values(mapping.variantData))];
 }

@@ -23,7 +23,7 @@ class BrowserEventEmitter {
   emit(event: string, data: any): void {
     const handlers = this.events.get(event);
     if (handlers) {
-      handlers.forEach(handler => handler(data));
+      handlers.forEach((handler) => handler(data));
     }
   }
 }
@@ -103,7 +103,10 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
     setInterval(() => this.cleanupDeadReferences(), 30000);
   }
 
-  registerInstance(instance: Omit<PatternInstance, 'id' | 'timestamp'>, providedId?: string): string {
+  registerInstance(
+    instance: Omit<PatternInstance, 'id' | 'timestamp'>,
+    providedId?: string
+  ): string {
     const id = providedId || this.generateInstanceId();
     const fullInstance: PatternInstance = {
       ...instance,
@@ -121,15 +124,15 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
 
   unregisterInstance(instanceId: string) {
     for (const [patternName, instances] of this.registry.entries()) {
-      const instance = Array.from(instances).find(inst => inst.id === instanceId);
+      const instance = Array.from(instances).find((inst) => inst.id === instanceId);
       if (instance) {
         // Unregister all sub-components first
         if (instance.subComponents) {
-          instance.subComponents.forEach(subComponent => {
+          instance.subComponents.forEach((subComponent) => {
             this.unregisterSubComponent(subComponent.id);
           });
         }
-        
+
         instances.delete(instance);
         if (instances.size === 0) {
           this.registry.delete(patternName);
@@ -149,7 +152,7 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
       }
       parentInstance.subComponents.set(subComponent.id, subComponent);
     }
-    
+
     // Also register in flat registry for quick lookup
     this.subComponentRegistry.set(subComponent.id, subComponent);
     this.emit('subcomponent-registered', subComponent);
@@ -160,10 +163,10 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
     if (subComponent) {
       // Remove from parent
       const parentInstance = this.findInstanceById(subComponent.parentInstanceId);
-      if (parentInstance && parentInstance.subComponents) {
+      if (parentInstance?.subComponents) {
         parentInstance.subComponents.delete(subComponentId);
       }
-      
+
       // Remove from registry
       this.subComponentRegistry.delete(subComponentId);
       this.emit('subcomponent-unregistered', { subComponentId });
@@ -176,7 +179,7 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
 
   getSubComponents(parentInstanceId: string): SubComponentInstance[] {
     const parentInstance = this.findInstanceById(parentInstanceId);
-    if (parentInstance && parentInstance.subComponents) {
+    if (parentInstance?.subComponents) {
       return Array.from(parentInstance.subComponents.values());
     }
     return [];
@@ -225,8 +228,8 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
 
   findInstanceById(instanceId: string): PatternInstance | null {
     for (const instances of this.registry.values()) {
-      const instance = Array.from(instances).find(inst => inst.id === instanceId);
-      if (instance) return instance;
+      const instance = Array.from(instances).find((inst) => inst.id === instanceId);
+      if (instance) {return instance;}
     }
     return null;
   }
@@ -245,12 +248,15 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
 
     // Send to all iframes
     const iframes = document.querySelectorAll('iframe');
-    iframes.forEach(iframe => {
+    iframes.forEach((iframe) => {
       try {
-        iframe.contentWindow?.postMessage({
-          type: 'PATTERN_UPDATE',
-          ...update,
-        }, '*');
+        iframe.contentWindow?.postMessage(
+          {
+            type: 'PATTERN_UPDATE',
+            ...update,
+          },
+          '*'
+        );
       } catch (error) {
         console.warn('Failed to send update to iframe:', error);
       }
@@ -258,10 +264,13 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
 
     // Send to parent if in iframe
     if (window.parent !== window) {
-      window.parent.postMessage({
-        type: 'PATTERN_UPDATE',
-        ...update,
-      }, '*');
+      window.parent.postMessage(
+        {
+          type: 'PATTERN_UPDATE',
+          ...update,
+        },
+        '*'
+      );
     }
   }
 
@@ -271,7 +280,7 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
     if (updateAll) {
       const instances = this.registry.get(patternName);
       if (instances) {
-        instances.forEach(instance => {
+        instances.forEach((instance) => {
           instance.props = { ...instance.props, ...props };
           this.notifyInstanceUpdate(instance);
         });
@@ -287,28 +296,27 @@ class PatternInstanceManagerClass extends BrowserEventEmitter {
 
   scrollToInstance(instanceId: string) {
     const instance = this.findInstanceById(instanceId);
-    if (!instance) return;
+    if (!instance) {return;}
 
     const element = instance.element;
-    if (!element) return;
+    if (!element) {return;}
 
     // Scroll into view
     element.scrollIntoView({
       behavior: 'smooth',
       block: 'center',
-      inline: 'center'
+      inline: 'center',
     });
 
     // Emit event for other components to react
     this.emit('instance-scrolled', { instanceId, element });
   }
 
-
   private cleanupDeadReferences() {
     for (const [patternName, instances] of this.registry.entries()) {
       const aliveInstances = new Set<PatternInstance>();
-      
-      instances.forEach(instance => {
+
+      instances.forEach((instance) => {
         // Check if element still exists
         if (instance.element && document.contains(instance.element)) {
           aliveInstances.add(instance);

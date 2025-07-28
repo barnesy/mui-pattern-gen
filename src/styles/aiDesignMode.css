@@ -105,12 +105,7 @@ body[data-ai-mode="true"] [data-subcomponent-id] {
   cursor: pointer;
 }
 
-/* Sub-component hover state - subtle dashed outline */
-body[data-ai-mode="true"] [data-subcomponent-id]:hover {
-  outline: 2px dashed rgba(156, 39, 176, 0.5) !important;
-  outline-offset: 2px;
-  border-radius: 4px;
-}
+/* Sub-component hover state removed - was interfering with selection */
 
 /* Selected sub-component gets solid outline */
 body[data-ai-mode="true"] [data-subcomponent-id][data-ai-selected="true"] {

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Box, 
-  Paper, 
-  Typography, 
-  Chip, 
+import {
+  Box,
+  Paper,
+  Typography,
+  Chip,
   Stack,
   IconButton,
   Collapse,
@@ -12,7 +12,7 @@ import {
   Fade,
   Popper,
 } from '@mui/material';
-import { 
+import {
   ContentCopy as CopyIcon,
   ExpandMore as ExpandIcon,
   ExpandLess as CollapseIcon,
@@ -23,7 +23,8 @@ import { useAIDesignMode } from '../../contexts/AIDesignModeContext';
 import { getComponentMetadata } from '../../theme/componentMetadata';
 
 export const AIDesignModeOverlay: React.FC = () => {
-  const { isEnabled, hoveredComponent, selectedComponent, showOverlay, setSelectedComponent } = useAIDesignMode();
+  const { isEnabled, hoveredComponent, selectedComponent, showOverlay, setSelectedComponent } =
+    useAIDesignMode();
   const [expanded, setExpanded] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
@@ -50,13 +51,13 @@ export const AIDesignModeOverlay: React.FC = () => {
   };
 
   const generateCodeSnippet = () => {
-    if (!component) return '';
-    
+    if (!component) {return '';}
+
     const props = Object.entries(component.props)
       .filter(([key]) => key !== 'children')
       .map(([key, value]) => {
-        if (typeof value === 'string') return `${key}="${value}"`;
-        if (typeof value === 'boolean' && value) return key;
+        if (typeof value === 'string') {return `${key}="${value}"`;}
+        if (typeof value === 'boolean' && value) {return key;}
         return `${key}={${JSON.stringify(value)}}`;
       })
       .join(' ');
@@ -64,7 +65,7 @@ export const AIDesignModeOverlay: React.FC = () => {
     return `<${component.name} ${props} />`;
   };
 
-  if (!isEnabled || !showOverlay || !component) return null;
+  if (!isEnabled || !showOverlay || !component) {return null;}
 
   const anchorEl = component.element;
 
@@ -99,9 +100,8 @@ export const AIDesignModeOverlay: React.FC = () => {
               p: 2,
               maxWidth: 400,
               minWidth: 280,
-              background: (theme) => theme.palette.mode === 'dark' 
-                ? 'rgba(0, 0, 0, 0.9)' 
-                : 'rgba(255, 255, 255, 0.95)',
+              background: (theme) =>
+                theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(10px)',
               border: '1px solid',
               borderColor: 'primary.main',
@@ -112,9 +112,9 @@ export const AIDesignModeOverlay: React.FC = () => {
               {/* Header */}
               <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Box>
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
+                  <Typography
+                    variant="h6"
+                    sx={{
                       color: 'primary.main',
                       fontWeight: 'bold',
                       display: 'flex',
@@ -131,9 +131,9 @@ export const AIDesignModeOverlay: React.FC = () => {
                     </Typography>
                   )}
                   {component.displayReference && (
-                    <Typography 
-                      variant="caption" 
-                      sx={{ 
+                    <Typography
+                      variant="caption"
+                      sx={{
                         color: 'primary.light',
                         fontFamily: 'monospace',
                         fontSize: '0.7rem',
@@ -174,8 +174,8 @@ export const AIDesignModeOverlay: React.FC = () => {
                     <Button
                       size="small"
                       startIcon={<CopyIcon />}
-                      onClick={() => handleCopyRef(component.reference!)}
-                      sx={{ 
+                      onClick={() => handleCopyRef(component.reference)}
+                      sx={{
                         color: copiedRef ? 'success.main' : 'grey.400',
                         fontSize: '0.7rem',
                         minWidth: 'auto',
@@ -205,26 +205,26 @@ export const AIDesignModeOverlay: React.FC = () => {
               {/* Quick Info */}
               <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                 {component.variant && (
-                  <Chip 
-                    label={`variant: ${component.variant}`} 
-                    size="small" 
+                  <Chip
+                    label={`variant: ${component.variant}`}
+                    size="small"
                     color="primary"
                     variant="outlined"
                   />
                 )}
                 {component.size && (
-                  <Chip 
-                    label={`size: ${component.size}`} 
-                    size="small" 
+                  <Chip
+                    label={`size: ${component.size}`}
+                    size="small"
                     color="secondary"
                     variant="outlined"
                   />
                 )}
                 {component.color && (
-                  <Chip 
-                    label={`color: ${component.color}`} 
-                    size="small" 
-                    sx={{ 
+                  <Chip
+                    label={`color: ${component.color}`}
+                    size="small"
+                    sx={{
                       borderColor: 'success.main',
                       color: 'success.main',
                     }}
@@ -232,10 +232,10 @@ export const AIDesignModeOverlay: React.FC = () => {
                   />
                 )}
                 {component.gridPosition && (
-                  <Chip 
-                    label={component.gridPosition} 
-                    size="small" 
-                    sx={{ 
+                  <Chip
+                    label={component.gridPosition}
+                    size="small"
+                    sx={{
                       borderColor: 'warning.main',
                       color: 'warning.main',
                     }}
@@ -256,7 +256,7 @@ export const AIDesignModeOverlay: React.FC = () => {
                     size="small"
                     startIcon={<CopyIcon />}
                     onClick={() => handleCopyCode(generateCodeSnippet())}
-                    sx={{ 
+                    sx={{
                       color: copiedCode ? 'success.main' : 'grey.400',
                       fontSize: '0.75rem',
                     }}
@@ -297,18 +297,18 @@ export const AIDesignModeOverlay: React.FC = () => {
                   >
                     {Object.entries(component.props).map(([key, value]) => (
                       <Box key={key} sx={{ mb: 0.5 }}>
-                        <Typography 
-                          variant="caption" 
-                          sx={{ 
+                        <Typography
+                          variant="caption"
+                          sx={{
                             fontFamily: 'monospace',
                             color: 'info.main',
                           }}
                         >
                           {key}:
                         </Typography>
-                        <Typography 
-                          variant="caption" 
-                          sx={{ 
+                        <Typography
+                          variant="caption"
+                          sx={{
                             fontFamily: 'monospace',
                             color: 'grey.300',
                             ml: 1,

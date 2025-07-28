@@ -9,9 +9,7 @@ import {
   Stack,
   CircularProgress,
 } from '@mui/material';
-import { 
-  Pending,
-} from '@mui/icons-material';
+import { Pending } from '@mui/icons-material';
 import { withPatternWrapper } from '../utils/withPatternWrapper';
 
 interface PatternContext {
@@ -20,8 +18,8 @@ interface PatternContext {
 }
 
 // Component renderer with AI Design Mode support
-const PatternRenderer: React.FC<{ 
-  componentName: string; 
+const PatternRenderer: React.FC<{
+  componentName: string;
 }> = ({ componentName }) => {
   const [Component, setComponent] = useState<React.ComponentType<any> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,17 +30,17 @@ const PatternRenderer: React.FC<{
       try {
         setLoading(true);
         setError(null);
-        
+
         const module = await import(/* @vite-ignore */ `../patterns/pending/${componentName}`);
         const OriginalComponent = module[componentName] || module.default;
-        
+
         // Wrap with AI Design Mode support
         const WrappedComponent = withPatternWrapper(OriginalComponent, {
           patternName: componentName,
           status: 'pending',
           category: 'pending',
         });
-        
+
         setComponent(() => WrappedComponent);
       } catch (err) {
         console.error(`Failed to load pattern ${componentName}:`, err);
@@ -60,11 +58,19 @@ const PatternRenderer: React.FC<{
   }
 
   if (error) {
-    return <Typography variant="body2" color="error">{error}</Typography>;
+    return (
+      <Typography variant="body2" color="error">
+        {error}
+      </Typography>
+    );
   }
 
   if (!Component) {
-    return <Typography variant="body2" color="text.secondary">Component not found</Typography>;
+    return (
+      <Typography variant="body2" color="text.secondary">
+        Component not found
+      </Typography>
+    );
   }
 
   return (
@@ -77,17 +83,17 @@ const PatternRenderer: React.FC<{
 export const PatternGenerator: React.FC = () => {
   const [context, setContext] = useState<PatternContext>({ current: null, category: null });
   const [error, setError] = useState<string | null>(null);
-  
+
   const loadedComponentRef = useRef<string | null>(null);
   const intervalRef = useRef<number | null>(null);
 
   // Initial load and periodic context check
   useEffect(() => {
     let mounted = true;
-    
+
     const checkContext = async () => {
-      if (!mounted) return;
-      
+      if (!mounted) {return;}
+
       try {
         const response = await fetch('/src/patterns/pending/.context.json');
         if (!response.ok) {
@@ -97,17 +103,17 @@ export const PatternGenerator: React.FC = () => {
           }
           return;
         }
-        
+
         const data: PatternContext = await response.json();
-        
+
         // Only update context if it actually changed
-        setContext(prev => {
+        setContext((prev) => {
           if (prev.current !== data.current || prev.category !== data.category) {
             return data;
           }
           return prev;
         });
-        
+
         // Update loaded component ref
         if (data.current !== loadedComponentRef.current) {
           loadedComponentRef.current = data.current;
@@ -116,13 +122,13 @@ export const PatternGenerator: React.FC = () => {
         // Ignore errors to prevent console spam
       }
     };
-    
+
     // Initial check
     checkContext();
-    
+
     // Set up interval for context checks only
     intervalRef.current = setInterval(checkContext, 2000); // Check less frequently
-    
+
     return () => {
       mounted = false;
       if (intervalRef.current) {
@@ -146,7 +152,7 @@ export const PatternGenerator: React.FC = () => {
       <Typography variant="h5" color="text.secondary" gutterBottom>
         Tell Claude to generate a pattern...
       </Typography>
-      
+
       <Box sx={{ mt: 4, mb: 4, p: 3, bgcolor: 'background.paper', borderRadius: 2, maxWidth: 600 }}>
         <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'medium' }}>
           Current Context:
@@ -172,9 +178,10 @@ export const PatternGenerator: React.FC = () => {
           <strong>Example prompts:</strong>
         </Typography>
         <Typography variant="body2" sx={{ mt: 1 }}>
-          • "Generate a user profile card with avatar and social links"<br/>
-          • "Create a login form with remember me option"<br/>
-          • "Make a stats dashboard widget with chart"
+          • "Generate a user profile card with avatar and social links"
+          <br />
+          • "Create a login form with remember me option"
+          <br />• "Make a stats dashboard widget with chart"
         </Typography>
       </Alert>
     </Box>
@@ -184,20 +191,15 @@ export const PatternGenerator: React.FC = () => {
     return (
       <Box>
         <Paper sx={{ p: 3, mb: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-            <Typography variant="h5">
-              Current Pattern: {context.current}
-            </Typography>
-            <Chip
-              icon={<Pending />}
-              label="Pending"
-              color="warning"
-              size="small"
-            />
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}
+          >
+            <Typography variant="h5">Current Pattern: {context.current}</Typography>
+            <Chip icon={<Pending />} label="Pending" color="warning" size="small" />
           </Box>
-          
+
           <Divider sx={{ mb: 2 }} />
-          
+
           <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
             <Typography variant="body2" color="text.secondary">
               <strong>Location:</strong> src/patterns/pending/
@@ -208,7 +210,7 @@ export const PatternGenerator: React.FC = () => {
               </Typography>
             )}
           </Stack>
-          
+
           <Alert severity="info" icon={false}>
             <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 1 }}>
               Tell Claude to:
@@ -220,9 +222,7 @@ export const PatternGenerator: React.FC = () => {
               <Typography variant="body2">
                 • Approve as {context.category || '[category]'} pattern
               </Typography>
-              <Typography variant="body2">
-                • Reject and delete
-              </Typography>
+              <Typography variant="body2">• Reject and delete</Typography>
             </Stack>
           </Alert>
         </Paper>
@@ -233,10 +233,8 @@ export const PatternGenerator: React.FC = () => {
             Click the pattern while AI Design Mode is active to customize it
           </Typography>
         </Box>
-        
-        {context.current && (
-          <PatternRenderer componentName={context.current} />
-        )}
+
+        {context.current && <PatternRenderer componentName={context.current} />}
       </Box>
     );
   };
@@ -246,13 +244,13 @@ export const PatternGenerator: React.FC = () => {
       <Typography variant="h1" gutterBottom>
         Pattern Generator
       </Typography>
-      
+
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
           {error}
         </Alert>
       )}
-      
+
       {context.current ? <PendingPattern /> : <NoPendingPattern />}
     </Box>
   );

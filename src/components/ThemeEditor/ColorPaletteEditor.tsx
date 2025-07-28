@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Grid,
-  Paper,
-  Typography,
-  Stack,
-} from '@mui/material';
+import { Grid, Paper, Typography, Stack } from '@mui/material';
 import { PaletteOptions } from '@mui/material/styles';
 import { ColorPicker } from './ColorPicker';
 
@@ -35,8 +30,15 @@ export const ColorPaletteEditor: React.FC<ColorPaletteEditorProps> = ({
               {COLOR_VARIANTS.map((variant) => (
                 <ColorPicker
                   key={variant}
-                  label={variant === 'contrastText' ? 'Contrast' : variant.charAt(0).toUpperCase() + variant.slice(1)}
-                  value={(palette[colorKey] as Record<string, string>)?.[variant] || (variant === 'contrastText' ? '#ffffff' : '#000000')}
+                  label={
+                    variant === 'contrastText'
+                      ? 'Contrast'
+                      : variant.charAt(0).toUpperCase() + variant.slice(1)
+                  }
+                  value={
+                    (palette[colorKey] as Record<string, string>)?.[variant] ||
+                    (variant === 'contrastText' ? '#ffffff' : '#000000')
+                  }
                   onChange={(value) => onColorChange(colorKey, variant, value, isDarkMode)}
                 />
               ))}
@@ -80,12 +82,18 @@ export const ColorPaletteEditor: React.FC<ColorPaletteEditorProps> = ({
             />
             <ColorPicker
               label="Secondary"
-              value={palette.text?.secondary || (isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)')}
+              value={
+                palette.text?.secondary ||
+                (isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)')
+              }
               onChange={(value) => onColorChange('text', 'secondary', value, isDarkMode)}
             />
             <ColorPicker
               label="Disabled"
-              value={palette.text?.disabled || (isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)')}
+              value={
+                palette.text?.disabled ||
+                (isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)')
+              }
               onChange={(value) => onColorChange('text', 'disabled', value, isDarkMode)}
             />
           </Stack>
@@ -101,7 +109,10 @@ export const ColorPaletteEditor: React.FC<ColorPaletteEditorProps> = ({
           <Stack spacing={1}>
             <ColorPicker
               label="Divider"
-              value={palette.divider || (isDarkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)')}
+              value={
+                palette.divider ||
+                (isDarkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)')
+              }
               onChange={(value) => onColorChange('divider', '', value, isDarkMode)}
             />
           </Stack>

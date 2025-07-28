@@ -16,6 +16,9 @@ import {
   ViewModule as ViewModuleIcon,
   AddBox as AddBoxIcon,
   Analytics as AnalyticsIcon,
+  AccountBalance as AccountBalanceIcon,
+  DataObject as DataObjectIcon,
+  Architecture as ArchitectureIcon,
 } from '@mui/icons-material';
 
 interface NavigationItem {
@@ -34,7 +37,11 @@ const navigationItems: NavigationItem[] = [
   { text: 'Components', path: '/components', icon: <DashboardIcon /> },
   { text: 'Pattern Generator', path: '/pattern-generator', icon: <AddBoxIcon /> },
   { text: 'Pattern Library', path: '/patterns', icon: <ViewModuleIcon /> },
+  { text: 'Schema Demo', path: '/schema-demo', icon: <DataObjectIcon /> },
+  { text: 'Design System', path: '/design-system', icon: <ArchitectureIcon /> },
   { text: 'Dashboard Example', path: '/dashboard-example', icon: <AnalyticsIcon /> },
+  { text: 'Gov Procurement', path: '/gov-procurement', icon: <AccountBalanceIcon /> },
+  { text: 'Sub-Component Test', path: '/subcomponent-test', icon: <ViewModuleIcon /> },
 ];
 
 export const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
@@ -44,19 +51,19 @@ export const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
     <Box>
       <Toolbar /> {/* Spacer for app bar */}
       <List>
-      {navigationItems.map((item) => (
-        <ListItem key={item.text} disablePadding>
-          <ListItemButton
-            component={Link}
-            to={item.path}
-            selected={location.pathname === item.path}
-            onClick={onItemClick}
-          >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItemButton>
-        </ListItem>
-      ))}
+        {navigationItems.map((item) => (
+          <ListItem key={item.text} disablePadding>
+            <ListItemButton
+              component={Link}
+              to={item.path}
+              selected={location.pathname === item.path}
+              onClick={onItemClick}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
       </List>
     </Box>
   );

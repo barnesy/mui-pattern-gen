@@ -17,11 +17,7 @@ import {
   ThemeProvider,
   CssBaseline,
 } from '@mui/material';
-import {
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-} from '@mui/icons-material';
+import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 
 import { PaletteOptions } from '@mui/material/styles';
 import { TypographyOptions } from '@mui/material/styles/createTypography';
@@ -42,7 +38,7 @@ export const ThemePreview: React.FC<ThemePreviewProps> = ({ themeState }) => {
   // Create a preview theme based on the current state
   const previewTheme = React.useMemo(() => {
     const paletteToUse = darkMode ? themeState.darkPalette : themeState.palette;
-    
+
     return createTheme({
       palette: paletteToUse,
       typography: themeState.typography,
@@ -65,8 +61,21 @@ export const ThemePreview: React.FC<ThemePreviewProps> = ({ themeState }) => {
         </Box>
 
         {/* Typography Preview */}
-        <Box sx={{ p: 2, bgcolor: 'background.paper', mb: 2, borderRadius: 1, maxHeight: 400, overflow: 'auto' }}>
-          <Typography variant="h6" gutterBottom sx={{ position: 'sticky', top: 0, bgcolor: 'background.paper', pb: 1 }}>
+        <Box
+          sx={{
+            p: 2,
+            bgcolor: 'background.paper',
+            mb: 2,
+            borderRadius: 1,
+            maxHeight: 400,
+            overflow: 'auto',
+          }}
+        >
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{ position: 'sticky', top: 0, bgcolor: 'background.paper', pb: 1 }}
+          >
             Typography
           </Typography>
           <Stack spacing={1}>
@@ -85,7 +94,9 @@ export const ThemePreview: React.FC<ThemePreviewProps> = ({ themeState }) => {
             </Typography>
             <Typography variant="subtitle1">Subtitle 1</Typography>
             <Typography variant="subtitle2">Subtitle 2</Typography>
-            <Typography variant="button" display="block">Button Text</Typography>
+            <Typography variant="button" display="block">
+              Button Text
+            </Typography>
             <Typography variant="caption" display="block">
               Caption text
             </Typography>
@@ -97,23 +108,49 @@ export const ThemePreview: React.FC<ThemePreviewProps> = ({ themeState }) => {
 
         {/* Color Preview */}
         <Box sx={{ p: 2, bgcolor: 'background.paper', mb: 2, borderRadius: 1 }}>
-          <Typography variant="h6" gutterBottom>Colors</Typography>
+          <Typography variant="h6" gutterBottom>
+            Colors
+          </Typography>
           <Stack spacing={2}>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              <Button variant="contained" color="primary">Primary</Button>
-              <Button variant="contained" color="secondary">Secondary</Button>
-              <Button variant="contained" color="error">Error</Button>
-              <Button variant="contained" color="warning">Warning</Button>
-              <Button variant="contained" color="info">Info</Button>
-              <Button variant="contained" color="success">Success</Button>
+              <Button variant="contained" color="primary">
+                Primary
+              </Button>
+              <Button variant="contained" color="secondary">
+                Secondary
+              </Button>
+              <Button variant="contained" color="error">
+                Error
+              </Button>
+              <Button variant="contained" color="warning">
+                Warning
+              </Button>
+              <Button variant="contained" color="info">
+                Info
+              </Button>
+              <Button variant="contained" color="success">
+                Success
+              </Button>
             </Box>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              <Button variant="outlined" color="primary">Primary</Button>
-              <Button variant="outlined" color="secondary">Secondary</Button>
-              <Button variant="outlined" color="error">Error</Button>
-              <Button variant="outlined" color="warning">Warning</Button>
-              <Button variant="outlined" color="info">Info</Button>
-              <Button variant="outlined" color="success">Success</Button>
+              <Button variant="outlined" color="primary">
+                Primary
+              </Button>
+              <Button variant="outlined" color="secondary">
+                Secondary
+              </Button>
+              <Button variant="outlined" color="error">
+                Error
+              </Button>
+              <Button variant="outlined" color="warning">
+                Warning
+              </Button>
+              <Button variant="outlined" color="info">
+                Info
+              </Button>
+              <Button variant="outlined" color="success">
+                Success
+              </Button>
             </Box>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               <Chip label="Primary" color="primary" />
@@ -128,7 +165,9 @@ export const ThemePreview: React.FC<ThemePreviewProps> = ({ themeState }) => {
 
         {/* Background & Text Preview */}
         <Box sx={{ p: 2, bgcolor: 'background.paper', mb: 2, borderRadius: 1 }}>
-          <Typography variant="h6" gutterBottom>Background & Text Colors</Typography>
+          <Typography variant="h6" gutterBottom>
+            Background & Text Colors
+          </Typography>
           <Stack spacing={2}>
             <Box sx={{ p: 2, bgcolor: 'background.default', border: 1, borderColor: 'divider' }}>
               <Typography color="text.primary">Primary text on default background</Typography>
@@ -154,14 +193,11 @@ export const ThemePreview: React.FC<ThemePreviewProps> = ({ themeState }) => {
 
         {/* Components Preview */}
         <Box sx={{ p: 2, bgcolor: 'background.paper', mb: 2, borderRadius: 1 }}>
-          <Typography variant="h6" gutterBottom>Components</Typography>
+          <Typography variant="h6" gutterBottom>
+            Components
+          </Typography>
           <Stack spacing={2}>
-            <TextField
-              label="Text Field"
-              placeholder="Enter text"
-              fullWidth
-              variant="outlined"
-            />
+            <TextField label="Text Field" placeholder="Enter text" fullWidth variant="outlined" />
             <Alert severity="info">This is an info alert — check it out!</Alert>
             <Alert severity="success">This is a success alert — check it out!</Alert>
             <Alert severity="warning">This is a warning alert — check it out!</Alert>
@@ -194,7 +230,9 @@ export const ThemePreview: React.FC<ThemePreviewProps> = ({ themeState }) => {
 
         {/* Spacing Preview */}
         <Box sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
-          <Typography variant="h6" gutterBottom>Spacing</Typography>
+          <Typography variant="h6" gutterBottom>
+            Spacing
+          </Typography>
           <Stack direction="row" spacing={2} alignItems="center">
             <Box sx={{ p: 1, bgcolor: 'primary.main', color: 'primary.contrastText' }}>
               Padding 1

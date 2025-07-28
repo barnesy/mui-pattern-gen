@@ -64,7 +64,7 @@ export const AIDesignModeProvider: React.FC<AIDesignModeProviderProps> = ({ chil
   const [patternInstances, setPatternInstances] = useState<Map<string, PatternInfo[]>>(new Map());
 
   const toggleEnabled = useCallback(() => {
-    setIsEnabled(prev => !prev);
+    setIsEnabled((prev) => !prev);
     if (!isEnabled) {
       // Clear states when disabling
       setHoveredPattern(null);
@@ -75,12 +75,12 @@ export const AIDesignModeProvider: React.FC<AIDesignModeProviderProps> = ({ chil
   }, [isEnabled]);
 
   const registerPatternInstance = useCallback((pattern: PatternInfo) => {
-    setPatternInstances(prev => {
+    setPatternInstances((prev) => {
       const newMap = new Map(prev);
       const instances = newMap.get(pattern.name) || [];
-      
+
       // Check if instance already exists
-      const existingIndex = instances.findIndex(p => p.instanceId === pattern.instanceId);
+      const existingIndex = instances.findIndex((p) => p.instanceId === pattern.instanceId);
       if (existingIndex >= 0) {
         // Update existing instance
         instances[existingIndex] = pattern;
@@ -88,56 +88,58 @@ export const AIDesignModeProvider: React.FC<AIDesignModeProviderProps> = ({ chil
         // Add new instance
         instances.push(pattern);
       }
-      
+
       newMap.set(pattern.name, instances);
       return newMap;
     });
-    
   }, []);
 
   const unregisterPatternInstance = useCallback((instanceId: string) => {
-    setPatternInstances(prev => {
+    setPatternInstances((prev) => {
       const newMap = new Map(prev);
-      
+
       newMap.forEach((instances, patternName) => {
-        const filtered = instances.filter(p => p.instanceId !== instanceId);
+        const filtered = instances.filter((p) => p.instanceId !== instanceId);
         if (filtered.length === 0) {
           newMap.delete(patternName);
         } else {
           newMap.set(patternName, filtered);
         }
       });
-      
+
       return newMap;
     });
-    
   }, []);
 
-  const updatePatternInstance = useCallback((instanceId: string, props: Record<string, unknown>) => {
-    
-    // Notify the pattern instance that it should update
-    PatternInstanceManager.notifyInstanceUpdate(instanceId);
-    
-    // Also emit a custom event for the specific instance
-    const event = new CustomEvent('pattern-update-request', {
-      detail: { instanceId, props },
-      bubbles: true,
-    });
-    window.dispatchEvent(event);
-  }, []);
+  const updatePatternInstance = useCallback(
+    (instanceId: string, props: Record<string, unknown>) => {
+      // Notify the pattern instance that it should update
+      PatternInstanceManager.notifyInstanceUpdate(instanceId);
 
-  const updateAllPatternInstances = useCallback((patternName: string, props: Record<string, unknown>) => {
-    
-    // Notify all instances of this pattern
-    PatternInstanceManager.notifyAllInstancesUpdate(patternName);
-    
-    // Also emit a custom event for all instances
-    const event = new CustomEvent('pattern-update-request', {
-      detail: { patternName, props, updateAll: true },
-      bubbles: true,
-    });
-    window.dispatchEvent(event);
-  }, []);
+      // Also emit a custom event for the specific instance
+      const event = new CustomEvent('pattern-update-request', {
+        detail: { instanceId, props },
+        bubbles: true,
+      });
+      window.dispatchEvent(event);
+    },
+    []
+  );
+
+  const updateAllPatternInstances = useCallback(
+    (patternName: string, props: Record<string, unknown>) => {
+      // Notify all instances of this pattern
+      PatternInstanceManager.notifyAllInstancesUpdate(patternName);
+
+      // Also emit a custom event for all instances
+      const event = new CustomEvent('pattern-update-request', {
+        detail: { patternName, props, updateAll: true },
+        bubbles: true,
+      });
+      window.dispatchEvent(event);
+    },
+    []
+  );
 
   const getPatternInstances = useCallback((patternName: string) => {
     return PatternInstanceManager.getInstances(patternName);
@@ -188,9 +190,5 @@ export const AIDesignModeProvider: React.FC<AIDesignModeProviderProps> = ({ chil
     findPatternInstanceById,
   };
 
-  return (
-    <AIDesignModeContext.Provider value={value}>
-      {children}
-    </AIDesignModeContext.Provider>
-  );
+  return <AIDesignModeContext.Provider value={value}>{children}</AIDesignModeContext.Provider>;
 };

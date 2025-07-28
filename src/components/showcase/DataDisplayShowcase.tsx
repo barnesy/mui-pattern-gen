@@ -78,7 +78,7 @@ export const DataDisplayShowcase: React.FC = () => {
                 <Avatar sx={{ bgcolor: 'secondary.main' }}>C</Avatar>
                 <Avatar src="/broken-image.jpg" />
               </Box>
-              
+
               <AvatarGroup max={4}>
                 <Avatar>A</Avatar>
                 <Avatar>B</Avatar>
