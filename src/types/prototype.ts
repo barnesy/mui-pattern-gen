@@ -78,7 +78,7 @@ export interface ApplicationPrototypeSchema extends BasePrototypeSchema {
  */
 export interface CustomPrototypeSchema extends BasePrototypeSchema {
   type: 'custom';
-  data: Record<string, any>;
+  data: Record<string, unknown>;
 }
 
 /**
@@ -100,7 +100,7 @@ export interface PrototypeConfiguration {
     primaryColor?: string;
     secondaryColor?: string;
     customPalette?: Record<string, string>;
-    typography?: Record<string, any>;
+    typography?: Record<string, unknown>;
     spacing?: number;
     borderRadius?: number;
   };
@@ -118,7 +118,7 @@ export interface PrototypeConfiguration {
   };
   
   // Component-specific configuration
-  components?: Record<string, any>;
+  components?: Record<string, unknown>;
   
   // Data configuration
   dataSources?: DataSourceSchema[];
@@ -131,7 +131,7 @@ export interface PrototypeConfiguration {
   };
   
   // Custom properties
-  custom?: Record<string, any>;
+  custom?: Record<string, unknown>;
 }
 
 /**
@@ -294,7 +294,7 @@ export interface PrototypeValidationResult {
   errors: Array<{
     field: string;
     message: string;
-    value?: any;
+    value?: unknown;
   }>;
   warnings: Array<{
     field: string;

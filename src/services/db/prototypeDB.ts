@@ -39,7 +39,7 @@ export async function initDB(config?: PrototypeServiceConfig): Promise<IDBDataba
   }
 
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(config?.database?.name || DB_NAME, config?.database?.version || DB_VERSION);
+    const request = indexedDB.open(config?.database?.name ?? DB_NAME, config?.database?.version ?? DB_VERSION);
 
     request.onerror = () => {
       console.error('Failed to open IndexedDB:', request.error);
@@ -93,7 +93,7 @@ export async function initDB(config?: PrototypeServiceConfig): Promise<IDBDataba
         
         // Create metadata store for app-level data
         if (!db.objectStoreNames.contains(STORES.METADATA)) {
-          const metadataStore = db.createObjectStore(STORES.METADATA, { keyPath: 'key' });
+          db.createObjectStore(STORES.METADATA, { keyPath: 'key' });
           
           // Initialize with default metadata
           transaction.oncomplete = () => {
@@ -118,7 +118,7 @@ export async function initDB(config?: PrototypeServiceConfig): Promise<IDBDataba
           };
         }
         
-        console.log('Database schema created successfully');
+        // Database schema created successfully
       } catch (error) {
         console.error('Failed to create database schema:', error);
         transaction.abort();
@@ -146,9 +146,10 @@ function executeTransaction<T>(
   mode: IDBTransactionMode,
   operation: (stores: IDBObjectStore | IDBObjectStore[]) => Promise<T> | T
 ): Promise<T> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const db = await getDB();
+  return new Promise((resolve, reject) => {
+    void (async () => {
+      try {
+        const db = await getDB();
       const transaction = db.transaction(storeNames, mode);
       
       const stores = Array.isArray(storeNames)
@@ -176,9 +177,10 @@ function executeTransaction<T>(
         transaction.abort();
         reject(error);
       }
-    } catch (error) {
-      reject(error);
-    }
+      } catch (error) {
+        reject(error);
+      }
+    })();
   });
 }
 
@@ -209,13 +211,13 @@ export async function getPrototype(id: string): Promise<Prototype | null> {
         
         if (result) {
           // Update view count and last viewed
-          updatePrototypeMetadata(id, {
-            viewCount: (result.metadata.viewCount || 0) + 1,
+          void updatePrototypeMetadata(id, {
+            viewCount: (result.metadata.viewCount ?? 0) + 1,
             lastViewedAt: new Date()
           }).catch(console.warn); // Don't fail the read operation
         }
         
-        resolve(result || null);
+        resolve(result ?? null);
       };
       request.onerror = () => reject(new Error(`Failed to get prototype: ${request.error?.message}`));
     });
@@ -330,13 +332,13 @@ export async function queryPrototypes(
       }
       
       request.onsuccess = () => {
-        const cursor = request.result;
+        const cursor = request.result as IDBCursorWithValue | null;
         
         if (!cursor) {
           // Sort results if not using an index for sorting
           if (sort && !['createdAt', 'updatedAt', 'viewCount'].includes(sort.field)) {
             results.sort((a, b) => {
-              let aVal: any, bVal: any;
+              let aVal: unknown, bVal: unknown;
               
               switch (sort.field) {
                 case 'name':
@@ -344,12 +346,16 @@ export async function queryPrototypes(
                   bVal = b.name.toLowerCase();
                   break;
                 default:
-                  aVal = a[sort.field as keyof Prototype];
-                  bVal = b[sort.field as keyof Prototype];
+                  aVal = a[sort.field as keyof Prototype] as unknown;
+                  bVal = b[sort.field as keyof Prototype] as unknown;
               }
               
-              if (aVal < bVal) return sort.direction === 'asc' ? -1 : 1;
-              if (aVal > bVal) return sort.direction === 'asc' ? 1 : -1;
+              if (aVal < bVal) {
+                return sort.direction === 'asc' ? -1 : 1;
+              }
+              if (aVal > bVal) {
+                return sort.direction === 'asc' ? 1 : -1;
+              }
               return 0;
             });
           }
@@ -357,8 +363,8 @@ export async function queryPrototypes(
           resolve({
             prototypes: results,
             total,
-            hasMore: limit ? total > (offset || 0) + limit : false,
-            nextOffset: limit && total > (offset || 0) + limit ? (offset || 0) + limit : undefined
+            hasMore: limit ? total > (offset ?? 0) + limit : false,
+            nextOffset: limit && total > (offset ?? 0) + limit ? (offset ?? 0) + limit : undefined
           });
           return;
         }
@@ -466,7 +472,7 @@ function matchesFilters(prototype: Prototype, filters: PrototypeQueryFilters): b
   
   // Tags filter (prototype must have ALL specified tags)
   if (filters.tags && filters.tags.length > 0) {
-    const prototypeTags = prototype.metadata.tags || [];
+    const prototypeTags = prototype.metadata.tags ?? [];
     if (!filters.tags.every(tag => prototypeTags.includes(tag))) {
       return false;
     }
@@ -512,7 +518,11 @@ export async function getDBStats(): Promise<{
   lastCleanup: Date;
 }> {
   return executeTransaction([STORES.PROTOTYPES, STORES.METADATA], 'readonly', (stores) => {
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<{
+      totalPrototypes: number;
+      sizeEstimate: number;
+      lastCleanup: Date;
+    }>((resolve, reject) => {
       const [prototypeStore, metadataStore] = stores as IDBObjectStore[];
       
       // Count prototypes
@@ -522,12 +532,13 @@ export async function getDBStats(): Promise<{
         const getStatsRequest = metadataStore.get('stats');
         
         getStatsRequest.onsuccess = () => {
-          const stats = getStatsRequest.result?.value || {};
+          const statsResult = getStatsRequest.result as { value?: Record<string, unknown> } | null;
+          const stats = statsResult?.value ?? {};
           
           resolve({
             totalPrototypes: countRequest.result,
-            sizeEstimate: stats.dbSize || 0,
-            lastCleanup: stats.lastCleanup ? new Date(stats.lastCleanup) : new Date()
+            sizeEstimate: (stats.dbSize as number) ?? 0,
+            lastCleanup: stats.lastCleanup ? new Date(stats.lastCleanup as string | number | Date) : new Date()
           });
         };
         

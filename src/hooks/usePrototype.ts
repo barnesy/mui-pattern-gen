@@ -19,7 +19,7 @@ import { PrototypeService } from '../services/PrototypeService';
  * Hook options for prototype operations
  */
 export interface UsePrototypeOptions {
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: unknown) => void;
   onError?: (error: Error) => void;
   enabled?: boolean;
   refetchOnMount?: boolean;
@@ -172,7 +172,7 @@ export function usePrototype(id: string | null, options: UsePrototypeOptions = {
   // Initial fetch
   useEffect(() => {
     if (refetchOnMount) {
-      fetchPrototype();
+      void fetchPrototype();
     }
   }, [fetchPrototype, refetchOnMount]);
 
@@ -192,13 +192,13 @@ export function usePrototype(id: string | null, options: UsePrototypeOptions = {
       return;
     }
 
-    const handleUpdated = (data: PrototypeEvents['prototype:updated']) => {
+    const handleUpdated = (data: PrototypeEvents['prototype:updated']): void => {
       if (data.prototype.id === id) {
         setState(prev => ({ ...prev, data: data.prototype }));
       }
     };
 
-    const handleDeleted = (data: PrototypeEvents['prototype:deleted']) => {
+    const handleDeleted = (data: PrototypeEvents['prototype:deleted']): void => {
       if (data.id === id) {
         setState(prev => ({ ...prev, data: null }));
       }
@@ -241,8 +241,20 @@ export function usePrototypeQuery(
   const [offset, setOffset] = useState(0);
 
   // Create stable filter and sort objects
-  const stableFilters = useMemo(() => filters, [JSON.stringify(filters)]);
-  const stableSort = useMemo(() => sort, [JSON.stringify(sort)]);
+  const stableFilters = useMemo(() => filters, [
+    filters?.status?.join(','),
+    filters?.schemaType?.join(','),
+    filters?.tags?.join(','),
+    filters?.author,
+    filters?.category,
+    filters?.isPublic,
+    filters?.search,
+    filters?.createdAfter?.toISOString(),
+    filters?.createdBefore?.toISOString(),
+    filters?.updatedAfter?.toISOString(),
+    filters?.updatedBefore?.toISOString(),
+  ]);
+  const stableSort = useMemo(() => sort, [sort?.field, sort?.direction]);
 
   // Fetch function
   const fetchPrototypes = useCallback(async (isLoadMore = false) => {
@@ -296,7 +308,7 @@ export function usePrototypeQuery(
   // Initial fetch
   useEffect(() => {
     if (refetchOnMount) {
-      refetch();
+      void refetch();
     }
   }, [refetch, refetchOnMount]);
 
@@ -304,19 +316,21 @@ export function usePrototypeQuery(
   useEffect(() => {
     setOffset(0);
     if (enabled) {
-      fetchPrototypes(false);
+      void fetchPrototypes(false);
     }
-  }, [stableFilters, stableSort, enabled, limit]);
+  }, [stableFilters, stableSort, enabled, limit, fetchPrototypes]);
 
   // Subscribe to relevant events
   useEffect(() => {
-    const handleCreated = () => {
-      refetch();
+    const handleCreated = (): void => {
+      void refetch();
     };
 
-    const handleUpdated = (data: PrototypeEvents['prototype:updated']) => {
+    const handleUpdated = (data: PrototypeEvents['prototype:updated']): void => {
       setState(prev => {
-        if (!prev.data) return prev;
+        if (!prev.data) {
+          return prev;
+        }
         
         const updatedPrototypes = prev.data.prototypes.map(p => 
           p.id === data.prototype.id ? data.prototype : p
@@ -329,9 +343,11 @@ export function usePrototypeQuery(
       });
     };
 
-    const handleDeleted = (data: PrototypeEvents['prototype:deleted']) => {
+    const handleDeleted = (data: PrototypeEvents['prototype:deleted']): void => {
       setState(prev => {
-        if (!prev.data) return prev;
+        if (!prev.data) {
+          return prev;
+        }
         
         const filteredPrototypes = prev.data.prototypes.filter(p => p.id !== data.id);
         
@@ -361,8 +377,8 @@ export function usePrototypeQuery(
     ...state,
     refetch,
     loadMore,
-    hasMore: state.data?.hasMore || false,
-    total: state.data?.total || 0
+    hasMore: state.data?.hasMore ?? false,
+    total: state.data?.total ?? 0
   };
 }
 
@@ -435,11 +451,16 @@ export function usePrototypeSearch(
 /**
  * Hook for prototype statistics
  */
-export function usePrototypeStats(options: UsePrototypeOptions = {}) {
+export function usePrototypeStats(options: UsePrototypeOptions = {}): {
+  data: unknown;
+  loading: boolean;
+  error: Error | null;
+  refetch: () => Promise<void>;
+} {
   const { onSuccess, onError, enabled = true, refetchInterval } = options;
 
   const [state, setState] = useState<{
-    data: any | null;
+    data: unknown;
     loading: boolean;
     error: Error | null;
   }>({
@@ -468,7 +489,7 @@ export function usePrototypeStats(options: UsePrototypeOptions = {}) {
   }, [enabled, onSuccess, onError]);
 
   useEffect(() => {
-    fetchStats();
+    void fetchStats();
   }, [fetchStats]);
 
   useEffect(() => {

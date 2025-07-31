@@ -125,7 +125,7 @@ class PrototypeServiceClass extends PrototypeEventEmitter {
     try {
       await initDB(this.config);
       this.isInitialized = true;
-      console.log('PrototypeService initialized successfully');
+      // PrototypeService initialized successfully
     } catch (error) {
       console.error('Failed to initialize PrototypeService:', error);
       throw error;
@@ -204,7 +204,7 @@ class PrototypeServiceClass extends PrototypeEventEmitter {
         // Emit view event
         this.emit('prototype:viewed', { 
           id: prototype.id, 
-          viewCount: prototype.metadata.viewCount || 1 
+          viewCount: prototype.metadata.viewCount ?? 1 
         });
       }
       
@@ -305,12 +305,12 @@ class PrototypeServiceClass extends PrototypeEventEmitter {
 
     const forkedInput: CreatePrototypeInput = {
       name: newName,
-      description: options?.description || `Fork of ${original.name}`,
+      description: options?.description ?? `Fork of ${original.name}`,
       schema: { ...original.schema },
       configuration: { ...original.configuration },
       metadata: {
         author: options?.author,
-        tags: [...(original.metadata.tags || []), 'fork'],
+        tags: [...(original.metadata.tags ?? []), 'fork'],
         status: 'draft'
       }
     };
@@ -540,15 +540,15 @@ class PrototypeServiceClass extends PrototypeEventEmitter {
       allPrototypes.forEach(prototype => {
         // Status stats
         prototypesBy.status[prototype.metadata.status] = 
-          (prototypesBy.status[prototype.metadata.status] || 0) + 1;
+          (prototypesBy.status[prototype.metadata.status] ?? 0) + 1;
         
         // Schema type stats
         prototypesBy.schemaType[prototype.schema.type] = 
-          (prototypesBy.schemaType[prototype.schema.type] || 0) + 1;
+          (prototypesBy.schemaType[prototype.schema.type] ?? 0) + 1;
         
         // Author stats
-        const author = prototype.metadata.author || 'Unknown';
-        prototypesBy.author[author] = (prototypesBy.author[author] || 0) + 1;
+        const author = prototype.metadata.author ?? 'Unknown';
+        prototypesBy.author[author] = (prototypesBy.author[author] ?? 0) + 1;
       });
 
       return {
@@ -616,7 +616,7 @@ class PrototypeServiceClass extends PrototypeEventEmitter {
     }
 
     // Check cache size limit
-    if (this.cache.size >= (this.config.cache.maxSize || 100)) {
+    if (this.cache.size >= (this.config.cache.maxSize ?? 100)) {
       // Remove oldest entries
       const entries = Array.from(this.cache.entries())
         .sort(([, a], [, b]) => a.timestamp - b.timestamp);
@@ -644,7 +644,7 @@ class PrototypeServiceClass extends PrototypeEventEmitter {
     }
 
     // Check if expired
-    const maxAge = this.config.cache.maxAge || 5 * 60 * 1000;
+    const maxAge = this.config.cache.maxAge ?? 5 * 60 * 1000;
     if (Date.now() - cached.timestamp > maxAge) {
       this.cache.delete(id);
       return null;
