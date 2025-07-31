@@ -5,9 +5,9 @@
 import { ComponentSchema } from '../../schemas/types';
 import { 
   ConfigControl, 
-  ConfigurationPanelProps, 
   MigrationHelpers,
-  SchemaToControlsOptions 
+  SchemaToControlsOptions,
+  ConfigValue
 } from './types';
 
 /**
@@ -32,10 +32,10 @@ export function convertSchemaToControls(
         type: mapSchemaTypeToControlType(prop.type),
         label: prop.name.charAt(0).toUpperCase() + prop.name.slice(1),
         required: prop.required,
-        defaultValue: prop.default,
-        options: prop.options,
+        defaultValue: prop.default as ConfigValue,
+        options: prop.options as { label: string; value: string | number | boolean }[] | undefined,
         description: prop.description,
-        group: includeGroups ? (prop.group || defaultGroup) : undefined,
+        group: includeGroups ? (prop.group ?? defaultGroup) : undefined,
       };
 
       // Apply custom mappings
@@ -65,8 +65,8 @@ function mapSchemaTypeToControlType(schemaType: string): ConfigControl['type'] {
 /**
  * Extract default values from controls
  */
-export function extractDefaultValues(controls: ConfigControl[]): Record<string, any> {
-  const defaults: Record<string, any> = {};
+export function extractDefaultValues(controls: ConfigControl[]): Record<string, ConfigValue> {
+  const defaults: Record<string, ConfigValue> = {};
   
   controls.forEach(control => {
     if (control.defaultValue !== undefined) {
@@ -81,7 +81,7 @@ export function extractDefaultValues(controls: ConfigControl[]): Record<string, 
  * Validate a set of values against controls
  */
 export function validateControlValues(
-  values: Record<string, any>,
+  values: Record<string, ConfigValue>,
   controls: ConfigControl[]
 ): { errors: Record<string, string>; isValid: boolean } {
   const errors: Record<string, string> = {};
@@ -167,7 +167,7 @@ export function groupControls(controls: ConfigControl[]): Record<string, ConfigC
   const groups: Record<string, ConfigControl[]> = {};
 
   controls.forEach(control => {
-    const groupName = control.group || 'General';
+    const groupName = control.group ?? 'General';
     if (!groups[groupName]) {
       groups[groupName] = [];
     }
@@ -177,16 +177,35 @@ export function groupControls(controls: ConfigControl[]): Record<string, ConfigC
   return groups;
 }
 
+// Type for legacy PatternPropsPanel controls
+interface LegacyPatternControl {
+  name: string;
+  type: string;
+  label: string;
+  defaultValue?: unknown;
+  options?: unknown;
+  min?: number;
+  max?: number;
+  step?: number;
+  helperText?: string;
+  group?: string;
+  isContent?: boolean;
+  isComponent?: boolean;
+  componentGroup?: string;
+  sides?: unknown;
+  unit?: string;
+}
+
 /**
  * Convert PatternPropsPanel controls to ConfigurationPanel format
  */
-function convertPatternPropsControls(controls: any[]): ConfigControl[] {
+function _convertPatternPropsControls(controls: LegacyPatternControl[]): ConfigControl[] {
   return controls.map(control => ({
     name: control.name,
-    type: control.type,
+    type: control.type as ConfigControl['type'],
     label: control.label,
-    defaultValue: control.defaultValue,
-    options: control.options,
+    defaultValue: control.defaultValue as ConfigValue,
+    options: control.options as { label: string; value: string | number | boolean }[] | undefined,
     min: control.min,
     max: control.max,
     step: control.step,
@@ -195,8 +214,8 @@ function convertPatternPropsControls(controls: any[]): ConfigControl[] {
     isContent: control.isContent,
     isComponent: control.isComponent,
     componentGroup: control.componentGroup,
-    sides: control.sides,
-    unit: control.unit,
+    sides: control.sides as ('top' | 'right' | 'bottom' | 'left')[] | undefined,
+    unit: control.unit as 'px' | '%' | undefined,
   }));
 }
 
@@ -204,10 +223,10 @@ function convertPatternPropsControls(controls: any[]): ConfigControl[] {
  * Migration helpers for backward compatibility
  */
 export const migrationHelpers: MigrationHelpers = {
-  fromPatternPropsPanel: (controls: any[], values: Record<string, any>) => ({
+  fromPatternPropsPanel: (controls: ConfigControl[], values: Record<string, ConfigValue>) => ({
     source: {
       type: 'controls',
-      controls: convertPatternPropsControls(controls),
+      controls: controls,
     },
     values,
     onChange: () => {}, // To be provided by consumer
@@ -215,7 +234,7 @@ export const migrationHelpers: MigrationHelpers = {
     showGroupedAccordions: false,
   }),
 
-  fromSchemaPropsForm: (schema: ComponentSchema, values: Record<string, any>) => ({
+  fromSchemaPropsForm: (schema: ComponentSchema, values: Record<string, ConfigValue>) => ({
     source: {
       type: 'schema',
       schema,
@@ -227,7 +246,7 @@ export const migrationHelpers: MigrationHelpers = {
     enableValidation: true,
   }),
 
-  fromPurePropsForm: (schema: ComponentSchema, values: Record<string, any>) => ({
+  fromPurePropsForm: (schema: ComponentSchema, values: Record<string, ConfigValue>) => ({
     source: {
       type: 'schema',
       schema,
@@ -243,18 +262,18 @@ export const migrationHelpers: MigrationHelpers = {
 /**
  * Deep comparison utility for props
  */
-export function deepEqual(a: any, b: any): boolean {
-  if (a === b) return true;
-  if (a == null || b == null) return false;
-  if (typeof a !== typeof b) return false;
+export function deepEqual(a: unknown, b: unknown): boolean {
+  if (a === b) {return true;}
+  if (a === null || a === undefined || b === null || b === undefined) {return false;}
+  if (typeof a !== typeof b) {return false;}
 
-  if (typeof a === 'object') {
-    const keysA = Object.keys(a);
-    const keysB = Object.keys(b);
+  if (typeof a === 'object' && typeof b === 'object') {
+    const keysA = Object.keys(a as Record<string, unknown>);
+    const keysB = Object.keys(b as Record<string, unknown>);
     
-    if (keysA.length !== keysB.length) return false;
+    if (keysA.length !== keysB.length) {return false;}
     
-    return keysA.every(key => deepEqual(a[key], b[key]));
+    return keysA.every(key => deepEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key]));
   }
 
   return false;
@@ -263,7 +282,7 @@ export function deepEqual(a: any, b: any): boolean {
 /**
  * Debounce utility for input changes
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
@@ -271,7 +290,9 @@ export function debounce<T extends (...args: any[]) => any>(
   
   return (...args: Parameters<T>) => {
     clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
+    timeout = setTimeout(() => {
+      func(...args);
+    }, wait);
   };
 }
 
@@ -292,11 +313,11 @@ export function formatValidationError(error: string, fieldLabel: string): string
 /**
  * Check if a value is empty for validation purposes
  */
-export function isEmpty(value: any): boolean {
-  if (value === null || value === undefined) return true;
-  if (typeof value === 'string') return value.trim() === '';
-  if (Array.isArray(value)) return value.length === 0;
-  if (typeof value === 'object') return Object.keys(value).length === 0;
+export function isEmpty(value: unknown): boolean {
+  if (value === null || value === undefined) {return true;}
+  if (typeof value === 'string') {return value.trim() === '';}
+  if (Array.isArray(value)) {return value.length === 0;}
+  if (typeof value === 'object') {return Object.keys(value).length === 0;}
   return false;
 }
 
@@ -328,8 +349,8 @@ export function mergeConfigurations(
 export function sortControls(controls: ConfigControl[]): ConfigControl[] {
   return [...controls].sort((a, b) => {
     // Sort by group first
-    const groupA = a.group || 'zzz'; // Put ungrouped items last
-    const groupB = b.group || 'zzz';
+    const groupA = a.group ?? 'zzz'; // Put ungrouped items last
+    const groupB = b.group ?? 'zzz';
     
     if (groupA !== groupB) {
       // Special ordering for common groups

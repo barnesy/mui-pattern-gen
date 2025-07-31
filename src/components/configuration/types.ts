@@ -5,7 +5,7 @@
 
 import { SpacingConfig } from '../../types/PatternVariant';
 import { UnknownObject } from '../../types/common';
-import { ComponentSchema, PropSchema, ValidationResult } from '../../schemas/types';
+import { ComponentSchema } from '../../schemas/types';
 
 // Base control types - supports all existing control types from PatternPropsPanel
 export type ControlType =
@@ -52,7 +52,7 @@ export interface ConfigControl {
     pattern?: string | RegExp;
     minLength?: number;
     maxLength?: number;
-    custom?: (value: any) => string | null; // Return error message or null
+    custom?: (value: ConfigValue) => string | null; // Return error message or null
   };
 }
 
@@ -73,16 +73,16 @@ export interface ConfigurationPanelProps {
   source: ConfigSource;
   
   // Current values
-  values: Record<string, any>;
+  values: Record<string, ConfigValue>;
   
   // Change handler
-  onChange: (name: string, value: any) => void;
+  onChange: (name: string, value: ConfigValue) => void;
   
   // Update mode
   updateMode?: UpdateMode;
   
   // Action handlers (for batched/explicit modes)
-  onSave?: (values: Record<string, any>) => void;
+  onSave?: (values: Record<string, ConfigValue>) => void;
   onCancel?: () => void;
   onReset?: () => void;
   
@@ -106,22 +106,25 @@ export interface ConfigurationPanelProps {
   enableKeyboardShortcuts?: boolean;
   enableUndoRedo?: boolean;
   showPreview?: boolean;
-  onApplyToAll?: (values: Record<string, any>) => void;
-  onPreviewChange?: (values: Record<string, any>) => void;
+  onApplyToAll?: (values: Record<string, ConfigValue>) => void;
+  onPreviewChange?: (values: Record<string, ConfigValue>) => void;
 }
+
+// Define the value type for configuration values
+export type ConfigValue = string | number | boolean | SpacingConfig | Record<string, unknown> | null | undefined;
 
 // Internal state for the configuration panel
 export interface ConfigurationState {
-  localValues: Record<string, any>;
-  originalValues: Record<string, any>;
+  localValues: Record<string, ConfigValue>;
+  originalValues: Record<string, ConfigValue>;
   hasChanges: boolean;
   errors: Record<string, string>;
   isValid: boolean;
   expandedGroups: Set<string>;
   searchQuery: string;
   filteredControls: ConfigControl[];
-  undoStack: Record<string, any>[];
-  redoStack: Record<string, any>[];
+  undoStack: Record<string, ConfigValue>[];
+  redoStack: Record<string, ConfigValue>[];
   canUndo: boolean;
   canRedo: boolean;
 }
@@ -129,8 +132,8 @@ export interface ConfigurationState {
 // Control renderer props
 export interface ControlRendererProps {
   control: ConfigControl;
-  value: any;
-  onChange: (value: any) => void;
+  value: ConfigValue;
+  onChange: (value: ConfigValue) => void;
   error?: string;
   disabled?: boolean;
   compact?: boolean;
@@ -150,12 +153,12 @@ export interface ControlGroup {
 export interface UseConfigurationPanelReturn {
   state: ConfigurationState;
   actions: {
-    handleChange: (name: string, value: any) => void;
+    handleChange: (name: string, value: ConfigValue) => void;
     handleSave: () => void;
     handleCancel: () => void;
     handleReset: () => void;
     toggleGroup: (groupName: string) => void;
-    validateField: (name: string, value: any) => string | null;
+    validateField: (name: string, value: ConfigValue) => string | null;
     validateAll: () => boolean;
     handleSearch: (query: string) => void;
     clearSearch: () => void;
@@ -178,7 +181,7 @@ export type SchemaToControlsOptions = {
 
 // Control factory options
 export interface ControlFactoryOptions {
-  theme?: any;
+  theme?: unknown;
   breakpoints?: {
     mobile: number;
     tablet: number;
@@ -191,8 +194,8 @@ export interface ControlFactoryOptions {
 export interface ConfigurationChangeEvent {
   type: 'change' | 'save' | 'cancel' | 'reset';
   name?: string;
-  value?: any;
-  values?: Record<string, any>;
+  value?: ConfigValue;
+  values?: Record<string, ConfigValue>;
   errors?: Record<string, string>;
   isValid?: boolean;
   source: 'user' | 'programmatic';
@@ -200,7 +203,7 @@ export interface ConfigurationChangeEvent {
 
 // Migration helpers for backward compatibility
 export interface MigrationHelpers {
-  fromPatternPropsPanel: (controls: any[], values: Record<string, any>) => ConfigurationPanelProps;
-  fromSchemaPropsForm: (schema: ComponentSchema, values: Record<string, any>) => ConfigurationPanelProps;
-  fromPurePropsForm: (schema: ComponentSchema, values: Record<string, any>) => ConfigurationPanelProps;
+  fromPatternPropsPanel: (controls: ConfigControl[], values: Record<string, ConfigValue>) => ConfigurationPanelProps;
+  fromSchemaPropsForm: (schema: ComponentSchema, values: Record<string, ConfigValue>) => ConfigurationPanelProps;
+  fromPurePropsForm: (schema: ComponentSchema, values: Record<string, ConfigValue>) => ConfigurationPanelProps;
 }

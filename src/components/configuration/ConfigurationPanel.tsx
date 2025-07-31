@@ -20,37 +20,26 @@ import {
   Alert,
   Select,
   MenuItem,
-  TextField,
-  InputAdornment,
-  IconButton,
-  Tooltip,
-  Collapse,
 } from '@mui/material';
 import { 
   Save, 
   Cancel, 
   Refresh, 
   ExpandMore,
-  Search,
-  Clear,
-  Undo,
-  Redo,
-  AppsOutage,
 } from '@mui/icons-material';
 
 import {
   ConfigurationPanelProps,
   ConfigurationState,
   ConfigControl,
-  ControlGroup,
-  UpdateMode,
   UseConfigurationPanelReturn,
+  ConfigValue,
 } from './types';
 import { TextFieldWithDebounce } from '../patterns/TextFieldWithDebounce';
 import { SpacingControl } from '../patterns/SpacingControl';
 import { SpacingConfig } from '../../types/PatternVariant';
-import { validateData } from '../../schemas/validation';
 import { ComponentSchema } from '../../schemas/types';
+import { convertSchemaToControls } from './utils';
 
 /**
  * Hook for managing configuration panel state and logic
@@ -82,7 +71,7 @@ export const useConfigurationPanel = ({
     const groupMap: Record<string, ConfigControl[]> = {};
     
     controls.forEach(control => {
-      const groupName = control.group || 'General';
+      const groupName = control.group ?? 'General';
       if (!groupMap[groupName]) {
         groupMap[groupName] = [];
       }
@@ -105,6 +94,12 @@ export const useConfigurationPanel = ({
     errors: {},
     isValid: true,
     expandedGroups: new Set(['General']),
+    searchQuery: '',
+    filteredControls: [],
+    undoStack: [],
+    redoStack: [],
+    canUndo: false,
+    canRedo: false,
   }));
 
   // Update local values when external values change
@@ -119,11 +114,11 @@ export const useConfigurationPanel = ({
   }, [values]);
 
   // Validation function
-  const validateField = useCallback((name: string, value: any): string | null => {
-    if (!enableValidation) return null;
+  const validateField = useCallback((name: string, value: ConfigValue): string | null => {
+    if (!enableValidation) {return null;}
 
     const control = controls.find(c => c.name === name);
-    if (!control) return null;
+    if (!control) {return null;}
 
     // Required validation
     if (control.required && (value === undefined || value === null || value === '')) {
@@ -170,7 +165,7 @@ export const useConfigurationPanel = ({
 
   // Validate all fields
   const validateAll = useCallback((): boolean => {
-    if (!enableValidation) return true;
+    if (!enableValidation) {return true;}
 
     const newErrors: Record<string, string> = {};
     let isValid = true;
@@ -194,7 +189,7 @@ export const useConfigurationPanel = ({
   }, [controls, state.localValues, validateField, enableValidation, onValidationChange]);
 
   // Handle field change
-  const handleChange = useCallback((name: string, value: any) => {
+  const handleChange = useCallback((name: string, value: ConfigValue) => {
     setState(prev => {
       const newLocalValues = { ...prev.localValues, [name]: value };
       const hasChanges = JSON.stringify(newLocalValues) !== JSON.stringify(prev.originalValues);
@@ -262,11 +257,11 @@ export const useConfigurationPanel = ({
     if (onCancel) {
       onCancel();
     }
-  }, [state.originalValues, onCancel]);
+  }, [onCancel]);
 
   // Handle reset
   const handleReset = useCallback(() => {
-    const resetValues: Record<string, any> = {};
+    const resetValues: Record<string, ConfigValue> = {};
     controls.forEach(control => {
       if (control.defaultValue !== undefined) {
         resetValues[control.name] = control.defaultValue;
@@ -325,8 +320,8 @@ export const useConfigurationPanel = ({
  */
 const ControlRenderer: React.FC<{
   control: ConfigControl;
-  value: any;
-  onChange: (value: any) => void;
+  value: ConfigValue;
+  onChange: (value: ConfigValue) => void;
   error?: string;
   disabled?: boolean;
   compact?: boolean;
@@ -340,9 +335,9 @@ const ControlRenderer: React.FC<{
           fullWidth={!compact}
           size={compact ? 'small' : 'medium'}
           label={control.label}
-          value={currentValue || ''}
+          value={currentValue ?? ''}
           onChange={onChange}
-          helperText={error || control.helperText}
+          helperText={error ?? control.helperText}
           error={!!error}
           disabled={disabled}
         />
@@ -355,9 +350,9 @@ const ControlRenderer: React.FC<{
           size={compact ? 'small' : 'medium'}
           type="number"
           label={control.label}
-          value={currentValue || 0}
+          value={currentValue ?? 0}
           onChange={(val) => onChange(Number(val))}
-          helperText={error || control.helperText}
+          helperText={error ?? control.helperText}
           error={!!error}
           disabled={disabled}
           inputProps={{
@@ -434,13 +429,13 @@ const ControlRenderer: React.FC<{
                 />
               ))}
             </Stack>
-            {(error || control.helperText) && (
+            {(error ?? control.helperText) && (
               <Typography
                 variant="caption"
                 color={error ? 'error' : 'text.secondary'}
                 sx={{ mt: 0.5, display: 'block' }}
               >
-                {error || control.helperText}
+                {error ?? control.helperText}
               </Typography>
             )}
           </Box>
@@ -455,7 +450,7 @@ const ControlRenderer: React.FC<{
             <Select
               fullWidth={!compact}
               size={compact ? 'small' : 'medium'}
-              value={currentValue || ''}
+              value={currentValue ?? ''}
               onChange={(e) => onChange(e.target.value)}
               error={!!error}
               disabled={disabled}
@@ -466,13 +461,13 @@ const ControlRenderer: React.FC<{
                 </MenuItem>
               ))}
             </Select>
-            {(error || control.helperText) && (
+            {(error ?? control.helperText) && (
               <Typography
                 variant="caption"
                 color={error ? 'error' : 'text.secondary'}
                 sx={{ mt: 0.5, display: 'block' }}
               >
-                {error || control.helperText}
+                {error ?? control.helperText}
               </Typography>
             )}
           </Box>
@@ -486,21 +481,21 @@ const ControlRenderer: React.FC<{
             {control.label}: {currentValue}
           </Typography>
           <Slider
-            value={currentValue || control.min || 0}
+            value={currentValue ?? control.min ?? 0}
             onChange={(_, newValue) => onChange(newValue)}
-            min={control.min || 0}
-            max={control.max || 100}
-            step={control.step || 1}
+            min={control.min ?? 0}
+            max={control.max ?? 100}
+            step={control.step ?? 1}
             marks
             valueLabelDisplay="auto"
             disabled={disabled}
           />
-          {(error || control.helperText) && (
+          {(error ?? control.helperText) && (
             <Typography 
               variant="caption" 
               color={error ? 'error' : 'text.secondary'}
             >
-              {error || control.helperText}
+              {error ?? control.helperText}
             </Typography>
           )}
         </Box>
@@ -508,21 +503,22 @@ const ControlRenderer: React.FC<{
 
     case 'padding':
     case 'margin':
-    case 'spacing':
-      const spacingValue = (currentValue as SpacingConfig) || {
-        top: typeof control.defaultValue === 'object' ? control.defaultValue?.top || 16 : 16,
-        right: typeof control.defaultValue === 'object' ? control.defaultValue?.right || 16 : 16,
-        bottom: typeof control.defaultValue === 'object' ? control.defaultValue?.bottom || 16 : 16,
-        left: typeof control.defaultValue === 'object' ? control.defaultValue?.left || 16 : 16,
+    case 'spacing': {
+      const spacingValue = (currentValue as SpacingConfig) ?? {
+        top: typeof control.defaultValue === 'object' ? control.defaultValue?.top ?? 16 : 16,
+        right: typeof control.defaultValue === 'object' ? control.defaultValue?.right ?? 16 : 16,
+        bottom: typeof control.defaultValue === 'object' ? control.defaultValue?.bottom ?? 16 : 16,
+        left: typeof control.defaultValue === 'object' ? control.defaultValue?.left ?? 16 : 16,
       };
       return (
         <SpacingControl
           label={control.label}
           value={spacingValue}
           onChange={onChange}
-          helperText={error || control.helperText}
+          helperText={error ?? control.helperText}
         />
       );
+    }
 
     case 'typography':
       // Custom typography control - similar to select but styled for typography
@@ -544,13 +540,13 @@ const ControlRenderer: React.FC<{
               />
             ))}
           </Stack>
-          {(error || control.helperText) && (
+          {(error ?? control.helperText) && (
             <Typography
               variant="caption"
               color={error ? 'error' : 'text.secondary'}
               sx={{ mt: 0.5, display: 'block' }}
             >
-              {error || control.helperText}
+              {error ?? control.helperText}
             </Typography>
           )}
         </Box>
@@ -564,6 +560,8 @@ const ControlRenderer: React.FC<{
       );
   }
 });
+
+ControlRenderer.displayName = 'ControlRenderer';
 
 /**
  * Main ConfigurationPanel component
@@ -746,11 +744,11 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = (props) => 
 function convertSchemaToControls(schema: ComponentSchema): ConfigControl[] {
   return schema.props.map(prop => ({
     name: prop.name,
-    type: mapSchemaTypeToControlType(prop.type),
+    type: mapSchemaTypeToControlType(prop.type as string),
     label: prop.name,
     required: prop.required,
-    defaultValue: prop.default,
-    options: prop.options,
+    defaultValue: prop.default as ConfigValue,
+    options: prop.options as { label: string; value: string | number | boolean }[] | undefined,
     description: prop.description,
     group: prop.group,
   }));
@@ -759,7 +757,7 @@ function convertSchemaToControls(schema: ComponentSchema): ConfigControl[] {
 /**
  * Map schema prop types to control types
  */
-function mapSchemaTypeToControlType(schemaType: string): any {
+function mapSchemaTypeToControlType(schemaType: string): ConfigControl['type'] {
   switch (schemaType) {
     case 'string': return 'text';
     case 'number': return 'number';

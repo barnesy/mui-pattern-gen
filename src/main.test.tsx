@@ -127,7 +127,7 @@ describe('main.tsx', () => {
     
     // Check component structure
     expect(renderedComponent).toBeTruthy();
-    expect('props' in renderedComponent && (renderedComponent as React.ReactElement).props.children).toBeTruthy();
+    expect('props' in renderedComponent && (renderedComponent).props.children).toBeTruthy();
     
     // The structure should be StrictMode > App
     const { container } = render(renderedComponent);

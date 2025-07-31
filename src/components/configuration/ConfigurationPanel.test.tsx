@@ -127,7 +127,7 @@ describe('ConfigurationPanel', () => {
       fireEvent.change(titleInput, { target: { value: 'Updated Title' } });
 
       // In immediate mode, onChange should be called immediately
-      waitFor(() => {
+      await waitFor(() => {
         expect(mockOnChange).toHaveBeenCalledWith('title', 'Updated Title');
       });
     });

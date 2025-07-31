@@ -3,8 +3,8 @@
  * Provides schema-based and custom validation support
  */
 
-import { ComponentSchema, ValidationResult } from '../../schemas/types';
-import { ConfigControl } from './types';
+import { ComponentSchema } from '../../schemas/types';
+import { ConfigControl, ConfigValue } from './types';
 
 /**
  * Common validation patterns
@@ -12,10 +12,10 @@ import { ConfigControl } from './types';
 export const ValidationPatterns = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   url: /^https?:\/\/.+/,
-  phone: /^\+?[\d\s\-\(\)]+$/,
+  phone: /^\+?[\d\s\-()]+$/,
   alphanumeric: /^[a-zA-Z0-9]+$/,
   noSpecialChars: /^[a-zA-Z0-9\s\-_]+$/,
-  cssIdentifier: /^[a-zA-Z][\w\-]*$/,
+  cssIdentifier: /^[a-zA-Z][\w-]*$/,
   hexColor: /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
   cssUnit: /^\d+(\.\d+)?(px|em|rem|%|vh|vw|pt|pc|in|cm|mm|ex|ch|lh)$/,
 } as const;
@@ -24,7 +24,7 @@ export const ValidationPatterns = {
  * Built-in validation functions
  */
 export const ValidationFunctions = {
-  required: (value: any, label: string): string | null => {
+  required: (value: ConfigValue, label: string): string | null => {
     if (value === undefined || value === null || value === '') {
       return `${label} is required`;
     }
@@ -94,13 +94,13 @@ export const ValidationFunctions = {
 
   pattern: (pattern: RegExp, message?: string) => (value: string, label: string): string | null => {
     if (value && !pattern.test(value)) {
-      return message || `${label} format is invalid`;
+      return message ?? `${label} format is invalid`;
     }
     return null;
   },
 
-  oneOf: (options: any[]) => (value: any, label: string): string | null => {
-    if (value !== undefined && value !== null && !options.includes(value)) {
+  oneOf: (options: (string | number | boolean)[]) => (value: ConfigValue, label: string): string | null => {
+    if (value !== undefined && value !== null && !options.includes(value as string | number | boolean)) {
       return `${label} must be one of: ${options.join(', ')}`;
     }
     return null;
@@ -139,7 +139,7 @@ export const ValidationFunctions = {
  * Validate a single field against a control definition
  */
 export function validateField(
-  value: any,
+  value: ConfigValue,
   control: ConfigControl
 ): string | null {
   const { label, required, validation } = control;
@@ -168,18 +168,18 @@ export function validateField(
       ? new RegExp(validation.pattern) 
       : validation.pattern;
     const error = ValidationFunctions.pattern(pattern)(value, label);
-    if (error) return error;
+    if (error) {return error;}
   }
 
   // Length validations for strings
   if (typeof value === 'string') {
     if (validation?.minLength) {
       const error = ValidationFunctions.minLength(validation.minLength)(value, label);
-      if (error) return error;
+      if (error) {return error;}
     }
     if (validation?.maxLength) {
       const error = ValidationFunctions.maxLength(validation.maxLength)(value, label);
-      if (error) return error;
+      if (error) {return error;}
     }
   }
 
@@ -187,11 +187,11 @@ export function validateField(
   if (typeof value === 'number') {
     if (control.min !== undefined) {
       const error = ValidationFunctions.min(control.min)(value, label);
-      if (error) return error;
+      if (error) {return error;}
     }
     if (control.max !== undefined) {
       const error = ValidationFunctions.max(control.max)(value, label);
-      if (error) return error;
+      if (error) {return error;}
     }
   }
 
@@ -199,7 +199,7 @@ export function validateField(
   if ((control.type === 'select' || control.type === 'variant') && control.options) {
     const validValues = control.options.map(opt => opt.value);
     const error = ValidationFunctions.oneOf(validValues)(value, label);
-    if (error) return error;
+    if (error) {return error;}
   }
 
   return null;
@@ -209,7 +209,7 @@ export function validateField(
  * Validate all fields in a form
  */
 export function validateForm(
-  values: Record<string, any>,
+  values: Record<string, ConfigValue>,
   controls: ConfigControl[]
 ): { errors: Record<string, string>; isValid: boolean } {
   const errors: Record<string, string> = {};
@@ -238,8 +238,8 @@ export function createValidationFromSchema(schema: ComponentSchema): ConfigContr
       type: mapSchemaTypeToControlType(prop.type),
       label: prop.name.charAt(0).toUpperCase() + prop.name.slice(1),
       required: prop.required,
-      defaultValue: prop.default,
-      options: prop.options,
+      defaultValue: prop.default as ConfigValue,
+      options: prop.options as { label: string; value: string | number | boolean }[] | undefined,
       description: prop.description,
       group: prop.group,
     };
@@ -314,7 +314,7 @@ export const ValidationPresets = {
     validation: {
       custom: (value: number) => {
         const positiveError = ValidationFunctions.positiveNumber(value, 'Value');
-        if (positiveError) return positiveError;
+        if (positiveError) {return positiveError;}
         return ValidationFunctions.integer(value, 'Value');
       },
     },

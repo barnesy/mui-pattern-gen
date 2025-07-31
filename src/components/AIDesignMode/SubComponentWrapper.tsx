@@ -134,7 +134,7 @@ const SubComponentWrapperComponent: React.FC<SubComponentWrapperProps> = ({
           console.log('SubComponentWrapper: Updating props!', {
             componentName,
             oldProps: currentProps,
-            newProps: props as Record<string, unknown>,
+            newProps: props,
           });
         }
         // Update props in PropsStore
