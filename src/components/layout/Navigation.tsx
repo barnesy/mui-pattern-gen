@@ -19,6 +19,7 @@ import {
   AccountBalance as AccountBalanceIcon,
   DataObject as DataObjectIcon,
   Architecture as ArchitectureIcon,
+  Storage as StorageIcon,
 } from '@mui/icons-material';
 
 interface NavigationItem {
@@ -37,6 +38,7 @@ const navigationItems: NavigationItem[] = [
   { text: 'Components', path: '/components', icon: <DashboardIcon /> },
   { text: 'Pattern Generator', path: '/pattern-generator', icon: <AddBoxIcon /> },
   { text: 'Pattern Library', path: '/patterns', icon: <ViewModuleIcon /> },
+  { text: 'Prototype Library', path: '/prototypes', icon: <StorageIcon /> },
   { text: 'Schema Demo', path: '/schema-demo', icon: <DataObjectIcon /> },
   { text: 'Design System', path: '/design-system', icon: <ArchitectureIcon /> },
   { text: 'Dashboard Example', path: '/dashboard-example', icon: <AnalyticsIcon /> },
