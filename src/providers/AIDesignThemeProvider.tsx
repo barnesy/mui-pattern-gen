@@ -1,17 +1,18 @@
 import React, { ReactNode, useEffect } from 'react';
 import { ThemeProvider as MUIThemeProvider, Theme } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-import { AIDesignModeProvider, useAIDesignMode } from '../contexts/AIDesignModeContext';
+import { ConfigurationModeProvider, useConfigurationMode } from '../contexts/ConfigurationModeContext';
 import { PropsStoreProvider } from '../contexts/PropsStoreContext';
+import { ConfigurationModeOverlay } from '../components/configuration/ConfigurationModeOverlay';
 import '../styles/aiDesignMode.css';
 
-interface AIDesignThemeProviderProps {
+interface ConfigurationThemeProviderProps {
   theme: Theme;
   children: ReactNode;
 }
 
-// Component that adds AI design mode event handlers for patterns only
-const AIDesignModeInjector: React.FC<{ children: ReactNode }> = ({ children }) => {
+// Component that adds configuration mode event handlers for patterns only
+const ConfigurationModeInjector: React.FC<{ children: ReactNode }> = ({ children }) => {
   const {
     isEnabled,
     setHoveredPattern,
@@ -21,30 +22,30 @@ const AIDesignModeInjector: React.FC<{ children: ReactNode }> = ({ children }) =
     registerPatternInstance,
     unregisterPatternInstance,
     setSelectedInstanceId,
-  } = useAIDesignMode();
+  } = useConfigurationMode();
 
-  // Add data attributes to pattern components when AI mode is enabled
+  // Add data attributes to pattern components when configuration mode is enabled
   useEffect(() => {
     if (!isEnabled) {
       // Clean up data attributes when disabled
-      document.body.removeAttribute('data-ai-mode');
-      document.querySelectorAll('[data-ai-mode]').forEach((el) => {
-        el.removeAttribute('data-ai-mode');
-        el.removeAttribute('data-ai-selected');
-        el.removeAttribute('data-ai-hovered');
+      document.body.removeAttribute('data-config-mode');
+      document.querySelectorAll('[data-config-mode]').forEach((el) => {
+        el.removeAttribute('data-config-mode');
+        el.removeAttribute('data-config-selected');
+        el.removeAttribute('data-config-hovered');
       });
       return;
     }
 
-    // Set AI mode on body for CSS selectors
-    document.body.setAttribute('data-ai-mode', 'true');
+    // Set configuration mode on body for CSS selectors
+    document.body.setAttribute('data-config-mode', 'true');
 
-    // Add data-ai-mode to pattern components only
+    // Add data-config-mode to pattern components only
     const updateDataAttributes = () => {
       document.querySelectorAll('[data-pattern-name]').forEach((el) => {
         // Only set attribute if it doesn't already have it
-        if (!el.hasAttribute('data-ai-mode')) {
-          el.setAttribute('data-ai-mode', 'true');
+        if (!el.hasAttribute('data-config-mode')) {
+          el.setAttribute('data-config-mode', 'true');
         }
       });
     };
@@ -70,19 +71,19 @@ const AIDesignModeInjector: React.FC<{ children: ReactNode }> = ({ children }) =
     if (!isEnabled) {return;}
 
     // Clear all selected/hovered attributes
-    document.querySelectorAll('[data-ai-selected], [data-ai-hovered]').forEach((el) => {
-      el.removeAttribute('data-ai-selected');
-      el.removeAttribute('data-ai-hovered');
+    document.querySelectorAll('[data-config-selected], [data-config-hovered]').forEach((el) => {
+      el.removeAttribute('data-config-selected');
+      el.removeAttribute('data-config-hovered');
     });
 
     // Add selected attribute
     if (selectedPattern?.element) {
-      selectedPattern.element.setAttribute('data-ai-selected', 'true');
+      selectedPattern.element.setAttribute('data-config-selected', 'true');
     }
 
     // Add hovered attribute
     if (hoveredPattern?.element && hoveredPattern.element !== selectedPattern?.element) {
-      hoveredPattern.element.setAttribute('data-ai-hovered', 'true');
+      hoveredPattern.element.setAttribute('data-config-hovered', 'true');
     }
   }, [isEnabled, selectedPattern, hoveredPattern]);
 
@@ -92,8 +93,8 @@ const AIDesignModeInjector: React.FC<{ children: ReactNode }> = ({ children }) =
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
 
-      // Skip if hovering over AI-ignore elements or any MUI overlay component
-      if (target.closest('[data-ai-ignore="true"]')) {
+      // Skip if hovering over config-ignore elements or any MUI overlay component
+      if (target.closest('[data-config-ignore="true"]') || target.closest('[data-ai-ignore="true"]')) {
         setHoveredPattern(null);
         return;
       }
@@ -137,8 +138,8 @@ const AIDesignModeInjector: React.FC<{ children: ReactNode }> = ({ children }) =
       const target = (e.target || (e as TouchEvent).touches?.[0]?.target) as HTMLElement;
       if (!target) {return;}
 
-      // Skip if clicking on AI-ignore elements or any MUI overlay component
-      if (target.closest('[data-ai-ignore="true"]')) {
+      // Skip if clicking on config-ignore elements or any MUI overlay component
+      if (target.closest('[data-config-ignore="true"]') || target.closest('[data-ai-ignore="true"]')) {
         return;
       }
 
@@ -261,11 +262,16 @@ const AIDesignModeInjector: React.FC<{ children: ReactNode }> = ({ children }) =
     };
   }, [isEnabled, setHoveredPattern, setSelectedPattern]);
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <ConfigurationModeOverlay />
+    </>
+  );
 };
 
 // Main provider component
-export const AIDesignThemeProvider: React.FC<AIDesignThemeProviderProps> = ({
+export const ConfigurationThemeProvider: React.FC<ConfigurationThemeProviderProps> = ({
   theme,
   children,
 }) => {
@@ -273,10 +279,13 @@ export const AIDesignThemeProvider: React.FC<AIDesignThemeProviderProps> = ({
     <MUIThemeProvider theme={theme}>
       <CssBaseline />
       <PropsStoreProvider>
-        <AIDesignModeProvider>
-          <AIDesignModeInjector>{children}</AIDesignModeInjector>
-        </AIDesignModeProvider>
+        <ConfigurationModeProvider>
+          <ConfigurationModeInjector>{children}</ConfigurationModeInjector>
+        </ConfigurationModeProvider>
       </PropsStoreProvider>
     </MUIThemeProvider>
   );
 };
+
+// Backwards compatibility alias
+export const AIDesignThemeProvider = ConfigurationThemeProvider;
