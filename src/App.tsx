@@ -11,6 +11,7 @@ import { ThemeViewer } from './pages/ThemeViewer';
 import { ThemeEditor } from './pages/ThemeEditor';
 import { PatternGenerator } from './pages/PatternGenerator';
 import { PatternViewer } from './pages/PatternViewer';
+import { PrototypeViewer } from './pages/PrototypeViewer';
 import { DashboardExample } from './pages/DashboardExample';
 import GovProcurementDashboard from './pages/GovProcurementDashboard';
 import SubComponentTest from './pages/SubComponentTest';
@@ -140,6 +141,7 @@ function AppWithDensity(): React.ReactElement {
             { path: 'theme', element: <ThemeViewer /> },
             { path: 'theme-editor', element: <ThemeEditor /> },
             { path: 'patterns', element: <PatternViewer /> },
+            { path: 'prototypes', element: <PrototypeViewer /> },
             { path: 'pattern-generator', element: <PatternGenerator /> },
             { path: 'pattern-studio', element: <PatternGenerator /> },
             { path: 'dashboard-example', element: <DashboardExample /> },
