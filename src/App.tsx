@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { createTheme } from '@mui/material/styles';
 import { PaletteMode } from '@mui/material';
 import { AIDesignThemeProvider } from './providers/AIDesignThemeProvider';
@@ -33,7 +33,7 @@ import { theme as baseTheme } from './theme/theme';
 import { darkPalette } from './theme';
 import './styles/darkMode.css';
 
-function AppWithDensity() {
+function AppWithDensity(): React.ReactElement {
   const [mode, setMode] = React.useState<PaletteMode>('light');
   const [density, setDensity] = React.useState<DensityMode>(() => {
     const stored = localStorage.getItem('mui-pattern-gen-density');
@@ -79,7 +79,7 @@ function AppWithDensity() {
     [mode, density, densitySpacing]
   );
 
-  const toggleColorMode = () => {
+  const toggleColorMode = React.useCallback(() => {
     setMode((prevMode) => {
       const newMode = prevMode === 'light' ? 'dark' : 'light';
       // Update Tailwind dark mode class
@@ -90,9 +90,9 @@ function AppWithDensity() {
       }
       return newMode;
     });
-  };
+  }, []);
 
-  const toggleDensity = () => {
+  const toggleDensity = React.useCallback(() => {
     setDensity((prevDensity) => {
       const newDensity =
         prevDensity === 'comfortable'
@@ -103,7 +103,7 @@ function AppWithDensity() {
       localStorage.setItem('mui-pattern-gen-density', newDensity);
       return newDensity;
     });
-  };
+  }, []);
 
   // Set initial dark mode class and data attribute
   React.useEffect(() => {
@@ -121,53 +121,56 @@ function AppWithDensity() {
     document.documentElement.setAttribute('data-density', density);
   }, [density]);
 
+  const router = React.useMemo(() => {
+    return createBrowserRouter([
+      {
+        path: "/",
+        element: (
+          <ResponsiveLayout
+            toggleColorMode={toggleColorMode}
+            isDarkMode={mode === 'dark'}
+            toggleDensity={toggleDensity}
+            density={density}
+          />
+        ),
+        children: [
+          { index: true, element: <Home /> },
+          { path: "components", element: <ComponentShowcase /> },
+          { path: "theme", element: <ThemeViewer /> },
+          { path: "theme-editor", element: <ThemeEditor /> },
+          { path: "patterns", element: <PatternViewer /> },
+          { path: "pattern-generator", element: <PatternGenerator /> },
+          { path: "pattern-studio", element: <PatternGenerator /> },
+          { path: "dashboard-example", element: <DashboardExample /> },
+          { path: "gov-procurement", element: <GovProcurementDashboard /> },
+          { path: "subcomponent-test", element: <SubComponentTest /> },
+          { path: "debug/subcomponents", element: <SubComponentDebug /> },
+          { path: "debug/simple", element: <SimpleSubComponentTest /> },
+          { path: "debug/settings", element: <SettingsPanelTest /> },
+          { path: "test-subcomponents", element: <TestSubComponents /> },
+          { path: "subcomponent-update-test", element: <SubComponentUpdateTest /> },
+          { path: "simple-debug", element: <SimpleSubComponentDebug /> },
+          { path: "schema-demo", element: <SchemaDemo /> },
+          { path: "design-system", element: <DesignSystemDemo /> },
+          { path: "design-test", element: <DesignSystemTest /> },
+          { path: "pure-design", element: <PureDesignSystem /> },
+          { path: "enhanced-design", element: <EnhancedDesignSystem /> },
+          { path: "design-patterns", element: <DesignWithPatterns /> },
+          { path: "nested-design", element: <NestedDesignSystem /> },
+          { path: "drag-drop-design", element: <DragDropDesignSystem /> },
+        ],
+      },
+    ]);
+  }, [mode, density, toggleColorMode, toggleDensity]);
+
   return (
     <AIDesignThemeProvider theme={theme}>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <ResponsiveLayout
-                toggleColorMode={toggleColorMode}
-                isDarkMode={mode === 'dark'}
-                toggleDensity={toggleDensity}
-                density={density}
-              />
-            }
-          >
-            <Route index element={<Home />} />
-            <Route path="components" element={<ComponentShowcase />} />
-            <Route path="theme" element={<ThemeViewer />} />
-            <Route path="theme-editor" element={<ThemeEditor />} />
-            <Route path="patterns" element={<PatternViewer />} />
-            <Route path="pattern-generator" element={<PatternGenerator />} />
-            <Route path="pattern-studio" element={<PatternGenerator />} />
-            <Route path="dashboard-example" element={<DashboardExample />} />
-            <Route path="gov-procurement" element={<GovProcurementDashboard />} />
-            <Route path="subcomponent-test" element={<SubComponentTest />} />
-            <Route path="debug/subcomponents" element={<SubComponentDebug />} />
-            <Route path="debug/simple" element={<SimpleSubComponentTest />} />
-            <Route path="debug/settings" element={<SettingsPanelTest />} />
-            <Route path="test-subcomponents" element={<TestSubComponents />} />
-            <Route path="subcomponent-update-test" element={<SubComponentUpdateTest />} />
-            <Route path="simple-debug" element={<SimpleSubComponentDebug />} />
-            <Route path="schema-demo" element={<SchemaDemo />} />
-            <Route path="design-system" element={<DesignSystemDemo />} />
-            <Route path="design-test" element={<DesignSystemTest />} />
-            <Route path="pure-design" element={<PureDesignSystem />} />
-            <Route path="enhanced-design" element={<EnhancedDesignSystem />} />
-            <Route path="design-patterns" element={<DesignWithPatterns />} />
-            <Route path="nested-design" element={<NestedDesignSystem />} />
-            <Route path="drag-drop-design" element={<DragDropDesignSystem />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <RouterProvider router={router} />
     </AIDesignThemeProvider>
   );
 }
 
-function App() {
+function App(): React.ReactElement {
   return (
     <ErrorBoundary>
       <DensityModeProvider>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useContext, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import { Box } from '@mui/material';
 import { useAIDesignMode } from '../../contexts/AIDesignModeContext';
 import { PatternPropsContext } from '../../contexts/PatternPropsContext';
@@ -31,17 +31,17 @@ const SubComponentWrapperComponent: React.FC<SubComponentWrapperProps> = ({
   // Get parent pattern instance ID from context
   const parentInstanceId = patternContext?.instanceId;
   const [subInstanceId] = useState(
-    () => `${parentInstanceId}-${componentName}-${index || 0}-${Date.now()}`
+    () => `${parentInstanceId}-${componentName}-${index ?? 0}-${Date.now()}`
   );
 
   // Use PropsStore for centralized props management
   const propsStore = usePropsStore();
   const storedProps = useComponentProps(subInstanceId);
-  const currentProps = storedProps || componentProps;
+  const currentProps = storedProps ?? componentProps;
 
   // Try to use AI Design Mode hook (will throw if not in context)
   let isEnabled = false;
-  let selectedPattern: any = null;
+  let selectedPattern: { instanceId?: string } | null = null;
   let isInMainApp = false;
 
   try {
@@ -113,11 +113,12 @@ const SubComponentWrapperComponent: React.FC<SubComponentWrapperProps> = ({
 
   // Listen for sub-component update events
   useEffect(() => {
-    const handleUpdateRequest = (event: CustomEvent) => {
-      const { instanceId, props } = event.detail;
+    const handleUpdateRequest = (event: CustomEvent): void => {
+      const { instanceId, props } = event.detail as { instanceId: string; props: Record<string, unknown> };
 
       // Only log if debug flag is set
       if (import.meta.env.DEV && window.localStorage.getItem('debug-subcomponents') === 'true') {
+        // eslint-disable-next-line no-console
         console.log('SubComponentWrapper: Event received', {
           componentName,
           eventInstanceId: instanceId,
@@ -129,10 +130,11 @@ const SubComponentWrapperComponent: React.FC<SubComponentWrapperProps> = ({
 
       if (instanceId === subInstanceId) {
         if (import.meta.env.DEV && window.localStorage.getItem('debug-subcomponents') === 'true') {
+          // eslint-disable-next-line no-console
           console.log('SubComponentWrapper: Updating props!', {
             componentName,
             oldProps: currentProps,
-            newProps: props,
+            newProps: props as Record<string, unknown>,
           });
         }
         // Update props in PropsStore
@@ -177,8 +179,10 @@ const SubComponentWrapperComponent: React.FC<SubComponentWrapperProps> = ({
         data-subcomponent-index={index !== undefined ? index.toString() : undefined}
         style={{ display: 'contents' }} // CSS display: contents makes the span act as if it doesn't exist
       >
-        {React.isValidElement(children)
-          ? React.cloneElement(children as React.ReactElement<any>, effectiveProps)
+        {React.isValidElement(children) && typeof children.type === 'string'
+          ? children // Don't pass props to DOM elements
+          : React.isValidElement(children)
+          ? React.cloneElement(children as React.ReactElement<Record<string, unknown>>, effectiveProps)
           : children}
       </span>
     );
@@ -209,8 +213,10 @@ const SubComponentWrapperComponent: React.FC<SubComponentWrapperProps> = ({
         userSelect: 'none',
       }}
     >
-      {React.isValidElement(children)
-        ? React.cloneElement(children as React.ReactElement<any>, effectiveProps)
+      {React.isValidElement(children) && typeof children.type === 'string'
+        ? children // Don't pass props to DOM elements
+        : React.isValidElement(children)
+        ? React.cloneElement(children as React.ReactElement<Record<string, unknown>>, effectiveProps)
         : children}
     </Box>
   );

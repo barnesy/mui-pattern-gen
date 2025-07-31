@@ -1,6 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 
+// Mock react-router-dom
+vi.mock('react-router-dom', () => ({
+  createBrowserRouter: vi.fn(() => ({})),
+  RouterProvider: () => <div>Router Provider</div>,
+  Outlet: () => <div>Outlet</div>,
+}));
+
 // Mock all the page components
 vi.mock('./pages/Home', () => ({ Home: () => <div>Home Page</div> }));
 vi.mock('./pages/PatternGenerator', () => ({ PatternGenerator: () => <div>Pattern Generator</div> }));
@@ -65,7 +72,7 @@ describe('App', () => {
     expect(container).toBeTruthy();
   });
 
-  it('includes BrowserRouter', async () => {
+  it('includes RouterProvider', async () => {
     const App = (await import('./App')).default;
     const { container } = render(<App />);
     

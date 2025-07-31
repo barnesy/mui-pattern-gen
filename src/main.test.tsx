@@ -18,9 +18,11 @@ vi.mock('./App', () => ({
   default: () => <div>App Component</div>,
 }));
 
-// Mock BrowserRouter
+// Mock react-router-dom
 vi.mock('react-router-dom', () => ({
-  BrowserRouter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  createBrowserRouter: vi.fn(() => ({})),
+  RouterProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Outlet: () => <div>Outlet</div>,
 }));
 
 describe('main.tsx', () => {
@@ -63,12 +65,13 @@ describe('main.tsx', () => {
     expect(mockRender).toHaveBeenCalled();
 
     // Get the rendered component from the mock call
-    const renderedComponent = mockRender.mock.calls[0][0];
+    const mockCalls = mockRender.mock.calls as Array<[React.ReactElement]>;
+    const renderedComponent = mockCalls[0][0];
 
     // Render it to check structure
     const { container } = render(renderedComponent);
     
-    // Should have BrowserRouter wrapping App
+    // Should have App component
     expect(container.textContent).toContain('App Component');
   });
 
@@ -99,15 +102,16 @@ describe('main.tsx', () => {
 
     await import('./main');
 
-    const renderedComponent = mockRender.mock.calls[0][0];
-    const { container } = render(renderedComponent);
+    const mockCalls = mockRender.mock.calls as Array<[React.ReactElement]>;
+    const renderedComponent = mockCalls[0][0];
+    render(renderedComponent);
 
     // Check that the component tree includes StrictMode
     // React.StrictMode is represented as a Symbol in React
     expect(renderedComponent.type.toString()).toContain('react.strict_mode');
   });
 
-  it('renders BrowserRouter with App', async () => {
+  it('renders App within StrictMode', async () => {
     const ReactDOMDefault = (await import('react-dom/client')).default;
     const mockRender = vi.fn();
     const mockCreateRoot = ReactDOMDefault.createRoot as ReturnType<typeof vi.fn>;
@@ -118,13 +122,14 @@ describe('main.tsx', () => {
 
     await import('./main');
 
-    const renderedComponent = mockRender.mock.calls[0][0];
+    const mockCalls = mockRender.mock.calls as Array<[React.ReactElement]>;
+    const renderedComponent = mockCalls[0][0];
     
     // Check component structure
     expect(renderedComponent).toBeTruthy();
-    expect(renderedComponent.props.children).toBeTruthy();
+    expect('props' in renderedComponent && (renderedComponent as React.ReactElement).props.children).toBeTruthy();
     
-    // The structure should be StrictMode > BrowserRouter > App
+    // The structure should be StrictMode > App
     const { container } = render(renderedComponent);
     expect(container.textContent).toContain('App Component');
   });
