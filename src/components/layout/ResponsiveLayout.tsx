@@ -22,10 +22,10 @@ import {
   DensityLarge as SpaciousIcon,
 } from '@mui/icons-material';
 import { Navigation } from './Navigation';
-import { AIDesignModeToggle } from '../AIDesignMode/AIDesignModeToggle';
-import { AIDesignModeDrawer } from '../AIDesignMode/AIDesignModeDrawer';
+import { ConfigurationModeToggle } from '../configuration/ConfigurationModeToggle';
+import { ConfigurationModeDrawer } from '../configuration/ConfigurationModeDrawer';
 import { DensityMode } from '../../contexts/DensityModeContext';
-import { useAIDesignMode } from '../../contexts/AIDesignModeContext';
+import { useConfigurationMode } from '../../contexts/ConfigurationModeContext';
 
 interface ResponsiveLayoutProps {
   toggleColorMode: () => void;
@@ -46,7 +46,7 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const { isEnabled: isAIMode } = useAIDesignMode();
+  const { isEnabled: isConfigMode } = useConfigurationMode();
 
   // Drawer states
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(true);
@@ -74,12 +74,12 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
     localStorage.setItem('right-drawer-open', rightDrawerOpen.toString());
   }, [rightDrawerOpen]);
 
-  // Auto-open right drawer when AI mode is enabled
+  // Auto-open right drawer when Configuration mode is enabled
   useEffect(() => {
-    if (isAIMode && !rightDrawerOpen) {
+    if (isConfigMode && !rightDrawerOpen) {
       setRightDrawerOpen(true);
     }
-  }, [isAIMode]);
+  }, [isConfigMode]);
 
   const toggleLeftDrawer = () => {
     setLeftDrawerOpen(!leftDrawerOpen);
@@ -111,13 +111,13 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             MPG
           </Typography>
-          <AIDesignModeToggle variant="icon" />
-          {isAIMode && (
-            <Tooltip title="Toggle Pattern Inspector">
+          <ConfigurationModeToggle variant="icon" />
+          {isConfigMode && (
+            <Tooltip title="Toggle Configuration Panel">
               <IconButton
                 color="inherit"
                 onClick={toggleRightDrawer}
-                aria-label="toggle pattern inspector"
+                aria-label="toggle configuration panel"
                 sx={{ ml: 1 }}
               >
                 <SidebarIcon sx={{ transform: 'scaleX(-1)' }} />
@@ -182,15 +182,15 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
         <Outlet />
       </Box>
 
-      {/* Right Drawer - AI Design Mode */}
+      {/* Right Drawer - Configuration Mode */}
       <Drawer
         variant={isMobile ? 'temporary' : 'permanent'}
         anchor="right"
-        open={rightDrawerOpen && isAIMode}
+        open={rightDrawerOpen && isConfigMode}
         onClose={isMobile ? toggleRightDrawer : undefined}
         sx={{
           width:
-            rightDrawerOpen && isAIMode
+            rightDrawerOpen && isConfigMode
               ? isMobile
                 ? MOBILE_RIGHT_DRAWER_WIDTH
                 : RIGHT_DRAWER_WIDTH
@@ -198,7 +198,7 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
           flexShrink: 0,
           '& .MuiDrawer-paper': {
             width:
-              rightDrawerOpen && isAIMode
+              rightDrawerOpen && isConfigMode
                 ? isMobile
                   ? MOBILE_RIGHT_DRAWER_WIDTH
                   : RIGHT_DRAWER_WIDTH
@@ -217,7 +217,7 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
         }}
       >
         <Box sx={{ height: '100%' }}>
-          <AIDesignModeDrawer onClose={isMobile ? toggleRightDrawer : undefined} />
+          <ConfigurationModeDrawer onClose={isMobile ? toggleRightDrawer : undefined} />
         </Box>
       </Drawer>
     </Box>
