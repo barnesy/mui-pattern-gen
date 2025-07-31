@@ -122,45 +122,52 @@ function AppWithDensity(): React.ReactElement {
   }, [density]);
 
   const router = React.useMemo(() => {
-    return createBrowserRouter([
+    return createBrowserRouter(
+      [
+        {
+          path: '/',
+          element: (
+            <ResponsiveLayout
+              toggleColorMode={toggleColorMode}
+              isDarkMode={mode === 'dark'}
+              toggleDensity={toggleDensity}
+              density={density}
+            />
+          ),
+          children: [
+            { index: true, element: <Home /> },
+            { path: 'components', element: <ComponentShowcase /> },
+            { path: 'theme', element: <ThemeViewer /> },
+            { path: 'theme-editor', element: <ThemeEditor /> },
+            { path: 'patterns', element: <PatternViewer /> },
+            { path: 'pattern-generator', element: <PatternGenerator /> },
+            { path: 'pattern-studio', element: <PatternGenerator /> },
+            { path: 'dashboard-example', element: <DashboardExample /> },
+            { path: 'gov-procurement', element: <GovProcurementDashboard /> },
+            { path: 'subcomponent-test', element: <SubComponentTest /> },
+            { path: 'debug/subcomponents', element: <SubComponentDebug /> },
+            { path: 'debug/simple', element: <SimpleSubComponentTest /> },
+            { path: 'debug/settings', element: <SettingsPanelTest /> },
+            { path: 'test-subcomponents', element: <TestSubComponents /> },
+            { path: 'subcomponent-update-test', element: <SubComponentUpdateTest /> },
+            { path: 'simple-debug', element: <SimpleSubComponentDebug /> },
+            { path: 'schema-demo', element: <SchemaDemo /> },
+            { path: 'design-system', element: <DesignSystemDemo /> },
+            { path: 'design-test', element: <DesignSystemTest /> },
+            { path: 'pure-design', element: <PureDesignSystem /> },
+            { path: 'enhanced-design', element: <EnhancedDesignSystem /> },
+            { path: 'design-patterns', element: <DesignWithPatterns /> },
+            { path: 'nested-design', element: <NestedDesignSystem /> },
+            { path: 'drag-drop-design', element: <DragDropDesignSystem /> },
+          ],
+        },
+      ],
       {
-        path: "/",
-        element: (
-          <ResponsiveLayout
-            toggleColorMode={toggleColorMode}
-            isDarkMode={mode === 'dark'}
-            toggleDensity={toggleDensity}
-            density={density}
-          />
-        ),
-        children: [
-          { index: true, element: <Home /> },
-          { path: "components", element: <ComponentShowcase /> },
-          { path: "theme", element: <ThemeViewer /> },
-          { path: "theme-editor", element: <ThemeEditor /> },
-          { path: "patterns", element: <PatternViewer /> },
-          { path: "pattern-generator", element: <PatternGenerator /> },
-          { path: "pattern-studio", element: <PatternGenerator /> },
-          { path: "dashboard-example", element: <DashboardExample /> },
-          { path: "gov-procurement", element: <GovProcurementDashboard /> },
-          { path: "subcomponent-test", element: <SubComponentTest /> },
-          { path: "debug/subcomponents", element: <SubComponentDebug /> },
-          { path: "debug/simple", element: <SimpleSubComponentTest /> },
-          { path: "debug/settings", element: <SettingsPanelTest /> },
-          { path: "test-subcomponents", element: <TestSubComponents /> },
-          { path: "subcomponent-update-test", element: <SubComponentUpdateTest /> },
-          { path: "simple-debug", element: <SimpleSubComponentDebug /> },
-          { path: "schema-demo", element: <SchemaDemo /> },
-          { path: "design-system", element: <DesignSystemDemo /> },
-          { path: "design-test", element: <DesignSystemTest /> },
-          { path: "pure-design", element: <PureDesignSystem /> },
-          { path: "enhanced-design", element: <EnhancedDesignSystem /> },
-          { path: "design-patterns", element: <DesignWithPatterns /> },
-          { path: "nested-design", element: <NestedDesignSystem /> },
-          { path: "drag-drop-design", element: <DragDropDesignSystem /> },
-        ],
-      },
-    ]);
+        future: {
+          v7_startTransition: true,
+        },
+      }
+    );
   }, [mode, density, toggleColorMode, toggleDensity]);
 
   return (

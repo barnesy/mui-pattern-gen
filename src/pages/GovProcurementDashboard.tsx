@@ -19,7 +19,6 @@ import {
   Badge,
   Button,
   Divider,
-  LinearProgress,
   useTheme,
   useMediaQuery,
   alpha,
@@ -30,12 +29,9 @@ import {
   AttachMoney as MoneyIcon,
   Schedule as ScheduleIcon,
   Notifications as NotificationsIcon,
-  TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
   CheckCircle as CheckCircleIcon,
   Warning as WarningIcon,
   Error as ErrorIcon,
-  MoreVert as MoreVertIcon,
   ArrowForward as ArrowForwardIcon,
 } from '@mui/icons-material';
 import { PageHeader } from '../patterns/pending/PageHeader';
@@ -93,7 +89,7 @@ const GovProcurementDashboard: React.FC = () => {
     },
   ];
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): 'success' | 'warning' | 'error' | 'info' | 'default' => {
     switch (status) {
       case 'open':
         return 'success';
@@ -108,7 +104,7 @@ const GovProcurementDashboard: React.FC = () => {
     }
   };
 
-  const getPriorityIcon = (priority: string) => {
+  const getPriorityIcon = (priority: string): React.ReactNode => {
     switch (priority) {
       case 'urgent':
         return <ErrorIcon color="error" fontSize="small" />;
@@ -261,7 +257,7 @@ const GovProcurementDashboard: React.FC = () => {
                           <Chip
                             label={activity.status}
                             size="small"
-                            color={getStatusColor(activity.status) as any}
+                            color={getStatusColor(activity.status)}
                             sx={{ height: 20 }}
                           />
                         </Stack>
@@ -287,6 +283,7 @@ const GovProcurementDashboard: React.FC = () => {
                         />
                       </Stack>
                     }
+                    secondaryTypographyProps={{ component: 'div' }}
                   />
                   {!isMobile && (
                     <ListItemSecondaryAction>
