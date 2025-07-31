@@ -34,6 +34,7 @@ import {
  * Browser-compatible event emitter for prototype events
  */
 class PrototypeEventEmitter {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private events: Map<keyof PrototypeEvents, Set<(data: any) => void>> = new Map();
 
   on<K extends keyof PrototypeEvents>(event: K, handler: (data: PrototypeEvents[K]) => void): void {

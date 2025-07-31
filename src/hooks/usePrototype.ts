@@ -241,7 +241,9 @@ export function usePrototypeQuery(
   const [offset, setOffset] = useState(0);
 
   // Create stable filter and sort objects
-  const stableFilters = useMemo(() => filters, [
+  const stableFilters = useMemo(() => {
+    return filters;
+  }, [
     filters?.status?.join(','),
     filters?.schemaType?.join(','),
     filters?.tags?.join(','),
@@ -254,7 +256,9 @@ export function usePrototypeQuery(
     filters?.updatedAfter?.toISOString(),
     filters?.updatedBefore?.toISOString(),
   ]);
-  const stableSort = useMemo(() => sort, [sort?.field, sort?.direction]);
+  const stableSort = useMemo(() => {
+    return sort;
+  }, [sort?.field, sort?.direction]);
 
   // Fetch function
   const fetchPrototypes = useCallback(async (isLoadMore = false) => {

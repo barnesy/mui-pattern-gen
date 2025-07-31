@@ -36,6 +36,7 @@ export interface PrototypeMetadata {
  */
 export interface BasePrototypeSchema {
   type: SchemaType;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
 }
 
